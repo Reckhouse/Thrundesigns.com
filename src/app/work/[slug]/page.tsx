@@ -80,7 +80,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   return (
     <>
       <SiteHeader nav={settings?.nav} />
-      <main className="flex-1 pt-[84px]">
+      <main className="flex-1 pt-[80px] md:pt-[96px]">
         <article>
           <section className="border-b border-line">
             <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-16 md:px-10 lg:grid-cols-[1fr_1.2fr] lg:px-[74px]">

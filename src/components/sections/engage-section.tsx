@@ -1,4 +1,17 @@
-import { SectionHeading, TextLink } from "@/components/site/primitives";
+"use client";
+
+import { TextLink } from "@/components/site/primitives";
+import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
+import { ClipHeading } from "@/components/site/clip-heading";
+import { SceneSection } from "@/components/site/scene-section";
+import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type EngageSectionProps = {
   heading?: string | null;
@@ -38,68 +51,90 @@ export function EngageSection({
   const replies = replyPoints?.length ? replyPoints : defaultReplyPoints;
 
   return (
-    <section id="engage" className="border-b border-line bg-bg-raised">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[1fr_1fr] lg:gap-16 lg:px-[74px] lg:py-20">
-        <div>
-          <SectionHeading className="max-w-lg text-balance text-[28px] leading-9 md:text-[34px] md:leading-[42px] lg:text-[42px] lg:leading-[46px]">
+    <SceneSection id="engage" tone="glass" reveal="rise">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:gap-14 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16 lg:px-[74px] lg:py-28">
+        <Reveal variant="left">
+          <Badge
+            variant="outline"
+            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
+          >
+            Engagement
+          </Badge>
+          <ClipHeading className="mt-5 max-w-lg text-balance font-display text-[clamp(1.75rem,3.5vw,2.65rem)] leading-[1.1] tracking-[-0.02em] text-fg">
             {heading || "How we engage — and what you’ll get in a reply."}
-          </SectionHeading>
-          <p className="mt-6 max-w-[48ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+          </ClipHeading>
+          <p className="mt-6 max-w-[48ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:text-base">
             No invented case studies required. This is the real first step with
             Thrun Design Co.
           </p>
           <div className="mt-8">
             <TextLink href="/quote">Request a project quote</TextLink>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="grid gap-8 sm:grid-cols-2 sm:gap-10">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
-              How we engage
-            </p>
-            <ol className="mt-5 space-y-5">
-              {steps.map((step, index) => (
-                <li key={step.title} className="flex gap-4">
-                  <span
-                    className="font-mono text-[12px] text-gold"
-                    aria-hidden
-                  >
-                    0{index + 1}
-                  </span>
-                  <div>
-                    <p className="font-sans text-[15px] font-medium text-fg">
-                      {step.title}
-                    </p>
-                    <p className="mt-1 font-sans text-sm leading-6 text-fg-muted">
-                      {step.copy}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
+        <Stagger className="grid gap-5" stagger={0.1}>
+          <StaggerItem variant="left">
+            <Card className="editorial-panel border-line bg-bg-raised/95 py-0">
+              <CardHeader className="border-b border-line pt-6">
+                <CardTitle className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+                  How we engage
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="py-2">
+                <Accordion
+                  type="single"
+                  collapsible
+                  defaultValue="step-0"
+                  className="w-full"
+                >
+                  {steps.map((step, index) => (
+                    <AccordionItem
+                      key={step.title}
+                      value={`step-${index}`}
+                      className="border-line"
+                    >
+                      <AccordionTrigger className="py-4 text-left font-sans text-[15px] font-medium text-fg hover:no-underline hover:text-gold [&[data-state=open]]:text-gold">
+                        <span className="mr-3 font-mono text-[12px] text-gold">
+                          0{index + 1}
+                        </span>
+                        {step.title}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm leading-6 text-fg-muted">
+                        {step.copy}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </CardContent>
+            </Card>
+          </StaggerItem>
 
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
-              {replyHeading || "What’s in a reply"}
-            </p>
-            <ul className="mt-5 space-y-4">
-              {replies.map((point) => (
-                <li key={point} className="flex items-start gap-3">
-                  <span
-                    className="mt-2 size-1.5 shrink-0 bg-gold"
-                    aria-hidden
-                  />
-                  <p className="font-sans text-[15px] leading-6 text-fg">
-                    {point}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+          <StaggerItem variant="scale">
+            <Card className="editorial-panel border-line bg-bg-raised/95 py-0">
+              <CardHeader className="border-b border-line pt-6">
+                <CardTitle className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+                  {replyHeading || "What’s in a reply"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="py-5">
+                <ul className="space-y-4">
+                  {replies.map((point) => (
+                    <li key={point} className="flex items-start gap-3">
+                      <span
+                        className="mt-2 size-1.5 shrink-0 bg-gold"
+                        aria-hidden
+                      />
+                      <p className="font-sans text-[15px] leading-6 text-fg-muted">
+                        {point}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </StaggerItem>
+        </Stagger>
       </div>
-    </section>
+    </SceneSection>
   );
 }

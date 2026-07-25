@@ -41,7 +41,7 @@ export default async function WorkIndexPage() {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 pt-[72px] md:pt-[84px]">
+      <main className="flex-1 pt-[80px] md:pt-[96px]">
         <WorkSection
           heading="Concept studies"
           intro="Speculative projects that show how we think — not client case studies. Real work will replace these as engagements ship."

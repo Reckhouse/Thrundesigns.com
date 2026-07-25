@@ -2,16 +2,18 @@
 name: Thrun Design Co.
 description: Dark Editorial marketing system for a strategic design studio — near-black surfaces, gold accent, zero radius, Libre Baskerville + IBM Plex.
 colors:
-  bg: "#090b0d"
-  bg-raised: "#111417"
-  surface: "#15191c"
-  contrast: "#eeeae1"
-  fg: "#f3f1eb"
-  fg-muted: "#b3aea4"
-  ink: "#121416"
-  line: "#2b3033"
-  gold: "#c59a53"
-  bronze: "#7a5d2f"
+  bg-deep: "#0c0d0c"
+  bg: "#171816"
+  bg-raised: "#1c1e1b"
+  surface: "#222522"
+  surface-glass: "rgba(28, 30, 27, 0.86)"
+  contrast: "#ebe7df"
+  fg: "#f4f1e9"
+  fg-muted: "#c7c2b8"
+  ink: "#171816"
+  line: "rgba(255, 255, 255, 0.18)"
+  gold: "#d4af6a"
+  bronze: "#8a6a38"
 typography:
   display:
     fontFamily: "Libre Baskerville, Georgia, serif"
