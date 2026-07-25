@@ -1,50 +1,49 @@
-import { SectionHeading } from "@/components/site/primitives";
-
-type Step = {
-  _id: string;
-  number?: string | null;
-  title?: string | null;
-  copy?: string | null;
-};
+import {
+  PrimaryButtonLink,
+  SectionHeading,
+  TextLink,
+} from "@/components/site/primitives";
 
 type ProcessSectionProps = {
-  eyebrow?: string | null;
   heading?: string | null;
-  steps: Step[];
+  steps: {
+    _id: string;
+    number?: string | null;
+    title?: string | null;
+    copy?: string | null;
+  }[];
 };
 
 export function ProcessSection({ heading, steps }: ProcessSectionProps) {
   return (
     <section id="process" className="border-b border-line">
       <div className="mx-auto w-full max-w-[1440px] px-5 py-12 md:px-10 md:py-16 lg:px-[74px] lg:py-20">
-        <div className="max-w-xl">
-          <SectionHeading className="text-balance">
+        <div className="flex max-w-3xl flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <SectionHeading className="max-w-xl text-balance">
             {heading || "A clear path from brief to launch."}
           </SectionHeading>
+          <TextLink href="/quote" className="shrink-0 self-start md:self-auto">
+            Start with a quote
+          </TextLink>
         </div>
 
-        <ol className="relative mt-10 grid list-none gap-8 sm:grid-cols-2 md:mt-14 md:gap-10 md:grid-cols-3 lg:grid-cols-5">
-          <div
-            className="pointer-events-none absolute left-0 right-0 top-[26px] hidden h-px bg-line lg:block"
-            aria-hidden
-          />
+        <ol className="mt-10 grid list-none gap-8 sm:grid-cols-2 md:mt-14 md:gap-10 lg:grid-cols-3">
           {steps.map((step) => (
-            <li key={step._id} className="relative">
-              <div
-                className="flex size-[52px] items-center justify-center rounded-full border border-gold bg-bg font-mono text-[12px] text-gold"
-                aria-hidden
-              >
-                {step.number}
-              </div>
-              <h3 className="mt-5 font-display text-xl text-fg md:mt-6">
-                {step.title}
-              </h3>
-              <p className="mt-3 max-w-[28ch] font-sans text-sm leading-6 text-fg-muted">
+            <li key={step._id} className="relative border-t border-line pt-6">
+              <p className="font-mono text-[12px] text-gold">{step.number}</p>
+              <h3 className="mt-4 font-display text-2xl text-fg">{step.title}</h3>
+              <p className="mt-3 max-w-[36ch] font-sans text-sm leading-6 text-fg-muted">
                 {step.copy}
               </p>
             </li>
           ))}
         </ol>
+
+        <div className="mt-10 md:mt-12 lg:hidden">
+          <PrimaryButtonLink href="/quote" className="w-full justify-center">
+            Request a project quote
+          </PrimaryButtonLink>
+        </div>
       </div>
     </section>
   );

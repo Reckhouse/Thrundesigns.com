@@ -45,6 +45,33 @@ export const homePage = defineType({
       ],
     }),
     defineField({
+      name: "engage",
+      title: "How we engage",
+      type: "object",
+      fields: [
+        defineField({ name: "heading", type: "string" }),
+        defineField({
+          name: "steps",
+          type: "array",
+          of: [
+            {
+              type: "object",
+              fields: [
+                defineField({ name: "title", type: "string" }),
+                defineField({ name: "copy", type: "text", rows: 2 }),
+              ],
+            },
+          ],
+        }),
+        defineField({ name: "replyHeading", type: "string" }),
+        defineField({
+          name: "replyPoints",
+          type: "array",
+          of: [{ type: "string" }],
+        }),
+      ],
+    }),
+    defineField({
       name: "whyThrun",
       type: "object",
       fields: [
@@ -72,6 +99,7 @@ export const homePage = defineType({
         }),
       ],
     }),
+
     defineField({
       name: "finalCta",
       type: "object",

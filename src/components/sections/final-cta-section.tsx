@@ -6,7 +6,6 @@ import {
 } from "@/components/site/primitives";
 
 type FinalCtaSectionProps = {
-  eyebrow?: string | null;
   heading?: string | null;
   copy?: string | null;
   primaryCta?: { label?: string | null; href?: string | null } | null;
@@ -22,7 +21,7 @@ export function FinalCtaSection({
   return (
     <section className="relative overflow-hidden border-b border-line">
       <div className="mx-auto w-full max-w-[1440px] px-5 py-12 md:px-10 md:py-16 lg:px-[74px] lg:py-24">
-        <PrecisionMark className="absolute right-8 top-10 hidden size-[80px] md:right-[74px] md:top-14 md:block lg:size-[112px]" />
+        <PrecisionMark className="absolute right-8 top-10 hidden size-[72px] md:right-[74px] md:top-14 md:block lg:size-[96px]" />
         <SectionHeading className="max-w-3xl text-balance">
           {heading || "Tell us where the brand needs to go next."}
         </SectionHeading>

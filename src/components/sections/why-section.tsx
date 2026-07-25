@@ -1,13 +1,8 @@
-import {
-  PrecisionMark,
-  SectionHeading,
-} from "@/components/site/primitives";
+import { SectionHeading } from "@/components/site/primitives";
 
 type WhySectionProps = {
-  eyebrow?: string | null;
   heading?: string | null;
   bullets?: string[] | null;
-  credibilityEyebrow?: string | null;
   credibilityHeading?: string | null;
   proofPoints?: { num?: string | null; label?: string | null }[] | null;
 };
@@ -38,7 +33,8 @@ export function WhySection({
           },
           {
             num: "02",
-            label: "Websites designed for clarity and conversion — then maintained",
+            label:
+              "Websites designed for clarity and conversion — then maintained",
           },
           {
             num: "03",
@@ -53,8 +49,7 @@ export function WhySection({
   return (
     <section id="about" className="border-b border-line">
       <div className="mx-auto grid w-full max-w-[1440px] gap-4 px-5 py-12 md:gap-6 md:px-10 md:py-16 lg:grid-cols-2 lg:gap-8 lg:px-[74px] lg:py-20">
-        <div className="relative border border-line bg-bg-raised p-6 md:p-8 lg:p-9">
-          <PrecisionMark className="absolute right-6 top-6 hidden size-[56px] md:right-8 md:top-8 md:block lg:size-[70px]" />
+        <div className="border border-line bg-bg-raised p-6 md:p-8 lg:p-9">
           <SectionHeading className="max-w-md text-balance text-[28px] leading-9 md:text-[34px] md:leading-[42px] lg:text-[42px] lg:leading-[46px]">
             {heading || "A partner when the stakes feel real."}
           </SectionHeading>
@@ -69,7 +64,7 @@ export function WhySection({
         </div>
 
         <div className="border border-line bg-contrast p-6 text-ink md:p-8 lg:p-9">
-          <h3 className="font-display text-[28px] leading-9 text-balance text-ink md:text-[34px] md:leading-[42px]">
+          <h3 className="text-balance font-display text-[28px] leading-9 text-ink md:text-[34px] md:leading-[42px]">
             {credibilityHeading || "What you get when we work together."}
           </h3>
           <ul className="mt-10 space-y-5 md:mt-16 md:space-y-6">

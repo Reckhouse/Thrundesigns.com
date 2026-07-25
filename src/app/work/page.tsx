@@ -3,7 +3,7 @@ import Link from "next/link";
 import { WorkSection } from "@/components/sections/work-section";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { SectionHeading } from "@/components/site/primitives";
+import { withConceptLabel } from "@/lib/concept-label";
 import { defaultHomeContent } from "@/lib/default-content";
 import { sanityFetch } from "@/sanity/lib/live";
 import { projectsQuery, siteSettingsQuery } from "@/sanity/lib/queries";
@@ -31,39 +31,40 @@ export default async function WorkIndexPage() {
   const fetched = asArray<(typeof defaultHomeContent.projects)[number]>(
     projectsRes.data,
   );
-  const projects = fetched.length ? fetched : defaultHomeContent.projects;
+  const projects = (fetched.length ? fetched : defaultHomeContent.projects).map(
+    (project) => ({
+      ...project,
+      industry: withConceptLabel(project.industry),
+    }),
+  );
 
   return (
     <>
       <SiteHeader />
       <main className="flex-1 pt-[72px] md:pt-[84px]">
-        <section className="border-b border-line">
-          <div className="mx-auto w-full max-w-[1440px] px-6 py-16 md:px-10 lg:px-[74px]">
-            <SectionHeading className="max-w-3xl text-balance">
-              Concept studies
-            </SectionHeading>
-            <p className="mt-6 max-w-[60ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
-              Speculative projects that show how we think — not client case
-              studies. Real work will replace these as engagements ship.
-            </p>
-            <Link
-              href="/quote"
-              className="mt-8 inline-flex min-h-11 items-center font-mono text-[11px] uppercase tracking-[0.14em] text-gold"
-            >
-              Request a project quote →
-            </Link>
-          </div>
-        </section>
         <WorkSection
-          eyebrow="Concept studies"
-          heading="Speculative work with production intent."
-          intro="Advisory, construction, and systems narratives — framed as concepts until real clients live here."
+          heading="Concept studies"
+          intro="Speculative projects that show how we think — not client case studies. Real work will replace these as engagements ship."
           projects={projects.map((project, index) => ({
             ...project,
             imageSrc:
               project.cover?.blobUrl || `/images/project-0${index + 1}.jpg`,
           }))}
         />
+        <section className="border-b border-line">
+          <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-6 py-12 md:px-10 lg:px-[74px]">
+            <p className="max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+              Ready to talk about a real engagement? Send a short brief and
+              we’ll reply with scope options.
+            </p>
+            <Link
+              href="/quote"
+              className="inline-flex min-h-11 w-fit items-center font-mono text-[11px] uppercase tracking-[0.14em] text-gold"
+            >
+              Request a project quote →
+            </Link>
+          </div>
+        </section>
       </main>
       <SiteFooter tagline={settings?.tagline} />
     </>

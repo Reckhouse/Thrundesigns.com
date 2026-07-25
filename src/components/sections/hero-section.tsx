@@ -1,12 +1,12 @@
 import Image from "next/image";
 import {
   PrimaryButtonLink,
-  PrecisionMark,
   TextLink,
 } from "@/components/site/primitives";
 import { ContourOverlay } from "@/components/site/contour-overlay";
 import { HeroCanvas } from "@/components/site/hero-canvas";
 import { Reveal } from "@/components/site/reveal";
+import { BrandLogo } from "@/components/icons/brand-logo";
 
 type HeroSectionProps = {
   eyebrow?: string | null;
@@ -33,10 +33,13 @@ export function HeroSection({
     <section className="relative overflow-hidden border-b border-line pt-[72px] md:min-h-[900px] md:pt-[84px] lg:min-h-[820px]">
       <div className="mx-auto grid w-full max-w-[1440px] gap-8 px-5 pb-12 pt-8 md:gap-10 md:px-10 md:pb-16 md:pt-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8 lg:px-[74px] lg:pb-10 lg:pt-12">
         <Reveal className="relative z-10 flex max-w-xl flex-col justify-center order-1">
-          <p className="font-display text-[22px] leading-7 tracking-[-0.02em] text-gold md:text-[26px] md:leading-8">
-            {eyebrow || "Thrun Design Co."}
-          </p>
-          <h1 className="mt-4 text-balance font-display text-[30px] leading-10 text-fg md:mt-5 md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]">
+          <div className="flex items-center gap-4">
+            <BrandLogo className="hidden w-14 shrink-0 sm:block md:w-16" />
+            <p className="font-display text-[28px] leading-8 tracking-[-0.02em] text-gold md:text-[34px] md:leading-10 lg:text-[40px] lg:leading-[44px]">
+              {eyebrow || "Thrun Design Co."}
+            </p>
+          </div>
+          <h1 className="mt-5 text-balance font-display text-[28px] leading-9 tracking-[-0.02em] text-fg md:mt-6 md:text-[32px] md:leading-[42px] lg:text-[48px] lg:leading-[58px]">
             {headline ||
               "Strategic design for businesses ready to move forward."}
           </h1>
@@ -83,10 +86,6 @@ export function HeroSection({
             )}
             <ContourOverlay className="absolute inset-0 hidden md:block" />
             <HeroCanvas className="absolute inset-0 hidden opacity-70 lg:block" />
-            <PrecisionMark className="absolute right-6 top-8 hidden size-[64px] md:right-8 md:top-10 md:block lg:size-[76px]" />
-            <p className="absolute bottom-5 right-5 hidden font-mono text-[10px] uppercase tracking-[0.14em] text-gold md:bottom-6 md:right-6 md:block">
-              39.7392° N  ·  104.9903° W
-            </p>
           </div>
         </div>
       </div>
