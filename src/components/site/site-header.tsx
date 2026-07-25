@@ -31,8 +31,12 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
   return (
     <header className="absolute inset-x-0 top-0 z-40 border-b border-line">
       <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-5 md:h-[84px] md:px-10 lg:px-[74px]">
-        <Link href="/" className="shrink-0" aria-label="Thrun Design Co. home">
-          <BrandLogo className="w-14 md:w-[84px]" />
+        <Link
+          href="/"
+          className="inline-flex shrink-0 items-center overflow-visible"
+          aria-label="Thrun Design Co. home"
+        >
+          <BrandLogo className="h-10 w-auto md:h-12" />
         </Link>
 
         <nav className="hidden items-center gap-10 lg:flex" aria-label="Primary">

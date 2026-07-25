@@ -46,7 +46,7 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
     <footer id="contact" className="border-t border-line bg-bg">
       <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-16 md:px-10 lg:grid-cols-[1.1fr_2fr] lg:gap-20 lg:px-[74px] lg:py-20">
         <div>
-          <BrandLogo className="w-[116px]" />
+          <BrandLogo className="h-[72px] w-auto" />
           <p className="mt-10 max-w-[40ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
             {tagline ||
               "Strategic design for founders and owners ready to move forward."}

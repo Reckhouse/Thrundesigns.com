@@ -37,7 +37,7 @@ export function HeroSection({
       <div className="relative z-10 mx-auto flex min-h-[calc(100svh-72px)] w-full max-w-[1440px] flex-col justify-end px-5 pb-12 pt-10 md:min-h-[calc(920px-84px)] md:justify-center md:px-10 md:pb-20 md:pt-12 lg:min-h-[calc(100svh-84px)] lg:px-[74px] lg:pb-24">
         <Reveal className="max-w-xl lg:max-w-[34rem]">
           <div className="flex items-center gap-4 md:gap-5">
-            <BrandLogo className="hidden w-16 shrink-0 sm:block md:w-[4.5rem] lg:w-20" />
+            <BrandLogo className="hidden h-14 w-auto shrink-0 sm:block md:h-16 lg:h-[4.5rem]" />
             <p className="text-balance font-display text-[34px] leading-9 tracking-[-0.02em] text-gold sm:text-[40px] sm:leading-10 md:text-[48px] md:leading-[1.05] lg:text-[56px] lg:leading-[1.02]">
               {eyebrow || "Thrun Design Co."}
             </p>

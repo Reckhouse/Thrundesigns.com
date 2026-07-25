@@ -10,10 +10,12 @@ export function BrandLogo({ className, variant = "light" }: LogoProps) {
 
   return (
     <svg
-      className={cn("h-auto w-[4.75rem]", className)}
-      viewBox="0 0 370 382"
+      className={cn("h-12 w-auto", className)}
+      viewBox="-12 -12 394 406"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      overflow="visible"
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Thrun Design Co."
     >
