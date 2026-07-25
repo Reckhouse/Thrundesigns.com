@@ -5,6 +5,7 @@ import {
   TextLink,
 } from "@/components/site/primitives";
 import { HeroBackdrop } from "@/components/site/hero-backdrop";
+import { HeroLogoDraw } from "@/components/site/hero-logo-draw";
 import { motion, useReducedMotion } from "framer-motion";
 
 type HeroSectionProps = {
@@ -48,17 +49,17 @@ export function HeroSection({
     >
       <HeroBackdrop imageSrc={imageSrc} />
 
-      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-80px)] w-full max-w-[1440px] flex-col justify-end px-5 pb-12 pt-10 md:min-h-[calc(920px-96px)] md:justify-center md:px-10 md:pb-20 md:pt-12 lg:min-h-[calc(100svh-96px)] lg:px-[74px] lg:pb-24">
-        <div className="max-w-xl lg:max-w-[36rem]">
+      <div className="relative z-10 mx-auto grid min-h-[calc(100svh-80px)] w-full max-w-[1440px] items-end gap-8 px-5 pb-12 pt-8 md:min-h-[calc(920px-96px)] md:items-center md:gap-10 md:px-10 md:pb-16 md:pt-10 lg:min-h-[calc(100svh-96px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-8 lg:px-[74px] lg:pb-20">
+        <div className="order-2 max-w-xl lg:order-1 lg:max-w-[34rem]">
           <motion.p
-            className="text-balance font-display text-[40px] leading-[1.05] tracking-[-0.02em] text-gold sm:text-[48px] md:text-[56px] lg:text-[64px] lg:leading-[1.02]"
+            className="text-balance font-display text-[34px] leading-[1.05] tracking-[-0.02em] text-gold sm:text-[42px] md:text-[48px] lg:text-[56px] lg:leading-[1.02]"
             {...item(0.05)}
           >
             {eyebrow || "Thrun Design Co."}
           </motion.p>
 
           <motion.div
-            className="mt-6 h-px w-16 origin-left bg-gold md:mt-8 md:w-24"
+            className="mt-5 h-px w-16 origin-left bg-gold md:mt-7 md:w-24"
             aria-hidden
             initial={reduce ? false : { scaleX: 0 }}
             animate={{ scaleX: 1 }}
@@ -66,7 +67,7 @@ export function HeroSection({
           />
 
           <motion.h1
-            className="mt-6 text-balance font-display text-[26px] leading-8 tracking-[-0.02em] text-fg md:mt-8 md:text-[36px] md:leading-[44px] lg:text-[48px] lg:leading-[56px]"
+            className="mt-5 text-balance font-display text-[24px] leading-8 tracking-[-0.02em] text-fg md:mt-7 md:text-[34px] md:leading-[42px] lg:text-[44px] lg:leading-[52px]"
             {...item(0.2)}
           >
             {headline ||
@@ -107,6 +108,12 @@ export function HeroSection({
               {servicesMeta}
             </motion.p>
           ) : null}
+        </div>
+
+        <div className="order-1 flex justify-center lg:order-2 lg:justify-end lg:self-center">
+          <div className="relative w-[min(88vw,420px)] sm:w-[min(70vw,480px)] md:w-[520px] lg:w-[560px] xl:w-[640px]">
+            <HeroLogoDraw />
+          </div>
         </div>
       </div>
 
