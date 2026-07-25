@@ -18,9 +18,31 @@ Dark editorial marketing site for Thrun Design Co.
 ```bash
 cp .env.example .env.local
 # fill Sanity tokens + BLOB_READ_WRITE_TOKEN
+# for quote security (production): Turnstile, QUOTE_FORM_SECRET, Upstash Redis
 npm install
 npm run dev
 ```
+
+## Quote form security (P0)
+
+`POST /api/quote` is server-only and applies:
+
+- Strict Zod validation (enums + max lengths)
+- Origin / Fetch Metadata checks
+- Signed form token (min completion time + expiry)
+- Honeypot field
+- Cloudflare Turnstile (server Siteverify when keys are set)
+- IP + email + global rate limits (Upstash when configured; in-memory fallback)
+- Duplicate submission suppression
+- Attachment MIME + size checks
+
+Required production env vars (see `.env.example`):
+
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`
+- `QUOTE_FORM_SECRET` (min 16 characters)
+- `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`
+
+Also enable a Vercel Firewall rule for `POST /api/quote` (start in log mode).
 
 Studio (local package or hosted):
 

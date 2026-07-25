@@ -1,114 +1,202 @@
 import { createClient } from "next-sanity";
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
-import { z } from "zod";
+import { validateAttachments } from "@/lib/quote/attachments";
+import { verifyFormToken } from "@/lib/quote/form-token";
+import {
+  enforceQuoteRateLimits,
+  isDuplicateSubmission,
+} from "@/lib/quote/rate-limit";
+import {
+  assertQuoteRequestGuards,
+  fieldsTooLarge,
+  genericError,
+  genericSuccess,
+  getClientIp,
+} from "@/lib/quote/request-guards";
+import { quoteFieldsSchema } from "@/lib/quote/schema";
+import {
+  hashIdentifier,
+  logQuoteSecurity,
+} from "@/lib/quote/security-log";
+import { verifyTurnstileToken } from "@/lib/quote/turnstile";
 import { apiVersion, dataset, projectId } from "@/sanity/env";
 
-const bodySchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  company: z.string().optional(),
-  projectType: z.string().min(1),
-  budget: z.string().min(1),
-  timeline: z.string().min(1),
-  message: z.string().min(10),
-  attachments: z.array(z.string().url()).max(5).optional(),
-});
-
 export async function POST(request: Request) {
-  const contentType = request.headers.get("content-type") || "";
+  const guard = assertQuoteRequestGuards(request);
+  if (guard) {
+    logQuoteSecurity("quote.request_rejected", { stage: "guards" });
+    return guard;
+  }
 
-  // Multipart path: upload files to Blob, then create Sanity submission.
-  if (contentType.includes("multipart/form-data")) {
-    const form = await request.formData();
-    const values = {
-      name: String(form.get("name") || ""),
-      email: String(form.get("email") || ""),
-      company: String(form.get("company") || "") || undefined,
-      projectType: String(form.get("projectType") || ""),
-      budget: String(form.get("budget") || ""),
-      timeline: String(form.get("timeline") || ""),
-      message: String(form.get("message") || ""),
-    };
+  const ip = getClientIp(request);
+  const form = await request.formData().catch(() => null);
+  if (!form) {
+    logQuoteSecurity("quote.request_rejected", { stage: "formdata" });
+    return genericError(400);
+  }
 
-    const parsed = bodySchema.omit({ attachments: true }).safeParse(values);
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  // Honeypot — silent success so bots think it worked.
+  const honeypot = String(form.get("website_confirm") || "");
+  if (honeypot.trim().length > 0) {
+    logQuoteSecurity("quote.honeypot", {
+      ipHash: hashIdentifier(ip),
+    });
+    return genericSuccess();
+  }
+
+  const rawFields = {
+    name: String(form.get("name") || ""),
+    email: String(form.get("email") || ""),
+    company: String(form.get("company") || ""),
+    projectType: String(form.get("projectType") || ""),
+    budget: String(form.get("budget") || ""),
+    timeline: String(form.get("timeline") || ""),
+    message: String(form.get("message") || ""),
+  };
+
+  if (fieldsTooLarge(rawFields)) {
+    logQuoteSecurity("quote.request_rejected", { stage: "field_size" });
+    return genericError(413);
+  }
+
+  const parsed = quoteFieldsSchema.safeParse({
+    ...rawFields,
+    company: rawFields.company || undefined,
+  });
+  if (!parsed.success) {
+    logQuoteSecurity("quote.schema_invalid", {
+      ipHash: hashIdentifier(ip),
+    });
+    return genericError(400);
+  }
+
+  const rate = await enforceQuoteRateLimits({
+    ip,
+    email: parsed.data.email,
+  });
+  if (!rate.success) {
+    logQuoteSecurity("quote.rate_limited", {
+      ipHash: hashIdentifier(ip),
+      emailHash: hashIdentifier(parsed.data.email),
+    });
+    return genericError(429, rate.retryAfterSec);
+  }
+
+  const formToken = String(form.get("formToken") || "");
+  const tokenResult = verifyFormToken(formToken);
+  if (!tokenResult.ok) {
+    if (tokenResult.reason === "too_fast") {
+      logQuoteSecurity("quote.too_fast", {
+        ipHash: hashIdentifier(ip),
+      });
+      return genericSuccess();
     }
+    logQuoteSecurity("quote.form_token_invalid", {
+      reason: tokenResult.reason,
+      ipHash: hashIdentifier(ip),
+    });
+    return genericError(400);
+  }
 
-    const files = form
-      .getAll("files")
-      .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+  const turnstileToken = String(
+    form.get("cf-turnstile-response") || form.get("turnstileToken") || "",
+  );
+  const turnstile = await verifyTurnstileToken({
+    token: turnstileToken || null,
+    ip,
+  });
+  if (!turnstile.ok) {
+    logQuoteSecurity("quote.turnstile_failed", {
+      reason: turnstile.reason,
+      ipHash: hashIdentifier(ip),
+    });
+    return genericError(400);
+  }
 
-    if (files.length > 5) {
+  const duplicate = await isDuplicateSubmission({
+    email: parsed.data.email,
+    message: parsed.data.message,
+    projectType: parsed.data.projectType,
+  });
+  if (duplicate) {
+    logQuoteSecurity("quote.duplicate", {
+      emailHash: hashIdentifier(parsed.data.email),
+    });
+    return genericSuccess();
+  }
+
+  const attachmentCheck = validateAttachments(form.getAll("files"));
+  if (!attachmentCheck.ok) {
+    logQuoteSecurity("quote.request_rejected", {
+      stage: "attachments",
+      reason: attachmentCheck.reason,
+    });
+    return genericError(400);
+  }
+
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  const attachments: string[] = [];
+
+  if (attachmentCheck.files.length > 0) {
+    if (!blobToken) {
+      logQuoteSecurity("quote.storage_failed", { stage: "blob_config" });
       return NextResponse.json(
-        { error: "Maximum 5 attachments" },
-        { status: 400 },
+        { error: "Unable to process request" },
+        { status: 500 },
       );
     }
 
-    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
-    const attachments: string[] = [];
-
-    if (files.length > 0) {
-      if (!blobToken) {
-        return NextResponse.json(
-          { error: "Blob storage is not configured" },
-          { status: 500 },
-        );
-      }
-
-      for (const file of files) {
-        if (file.size > 8 * 1024 * 1024) {
-          return NextResponse.json(
-            { error: `File ${file.name} exceeds 8MB` },
-            { status: 400 },
-          );
-        }
-
-        const blob = await put(`quotes/${Date.now()}-${file.name}`, file, {
-          access: "public",
-          token: blobToken,
-          addRandomSuffix: true,
-        });
-        attachments.push(blob.url);
-      }
+    for (const file of attachmentCheck.files) {
+      const safeName = file.name.replace(/[^\w.\-]+/g, "_").slice(0, 80);
+      const blob = await put(`quotes/${Date.now()}-${safeName}`, file, {
+        access: "public",
+        token: blobToken,
+        addRandomSuffix: true,
+        contentType: file.type || undefined,
+      });
+      attachments.push(blob.url);
     }
-
-    return createSubmission({ ...parsed.data, attachments });
   }
 
-  const json = await request.json().catch(() => null);
-  const parsed = bodySchema.safeParse(json);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
-  }
-
-  return createSubmission(parsed.data);
-}
-
-async function createSubmission(data: z.infer<typeof bodySchema>) {
-  const token = process.env.SANITY_API_WRITE_TOKEN;
-  if (!token) {
+  const writeToken = process.env.SANITY_API_WRITE_TOKEN;
+  if (!writeToken) {
+    logQuoteSecurity("quote.storage_failed", { stage: "sanity_config" });
     return NextResponse.json(
-      { error: "Write token not configured" },
+      { error: "Unable to process request" },
       { status: 500 },
     );
   }
 
-  const writeClient = createClient({
-    projectId,
-    dataset,
-    apiVersion,
-    token,
-    useCdn: false,
+  try {
+    const writeClient = createClient({
+      projectId,
+      dataset,
+      apiVersion,
+      token: writeToken,
+      useCdn: false,
+    });
+
+    await writeClient.create({
+      _type: "quoteSubmission",
+      ...parsed.data,
+      attachments,
+      submittedAt: new Date().toISOString(),
+    });
+  } catch {
+    logQuoteSecurity("quote.storage_failed", { stage: "sanity_write" });
+    return NextResponse.json(
+      { error: "Unable to process request" },
+      { status: 500 },
+    );
+  }
+
+  logQuoteSecurity("quote.stored", {
+    ipHash: hashIdentifier(ip),
+    emailHash: hashIdentifier(parsed.data.email),
+    projectType: parsed.data.projectType,
+    attachmentCount: attachments.length,
   });
 
-  await writeClient.create({
-    _type: "quoteSubmission",
-    ...data,
-    submittedAt: new Date().toISOString(),
-  });
-
-  return NextResponse.json({ ok: true });
+  return genericSuccess();
 }
