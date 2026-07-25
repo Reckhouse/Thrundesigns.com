@@ -7,10 +7,9 @@ import { HeroCanvas } from "@/components/site/hero-canvas";
 
 type HeroBackdropProps = {
   imageSrc?: string | null;
-  imageAlt?: string | null;
 };
 
-export function HeroBackdrop({ imageSrc, imageAlt }: HeroBackdropProps) {
+export function HeroBackdrop({ imageSrc }: HeroBackdropProps) {
   const reduce = useReducedMotion();
 
   return (
