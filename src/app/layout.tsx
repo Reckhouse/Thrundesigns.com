@@ -24,6 +24,12 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "https://thrundesigns-com.vercel.app");
+
 export const metadata: Metadata = {
   title: {
     default: "Thrun Design Co.",
@@ -31,7 +37,7 @@ export const metadata: Metadata = {
   },
   description:
     "Strategic brand identity, website design, and marketing systems for businesses ready to move forward.",
-  metadataBase: new URL("https://thrundesign.com"),
+  metadataBase: new URL(siteUrl),
 };
 
 export default function RootLayout({
