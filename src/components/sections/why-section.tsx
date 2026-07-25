@@ -101,26 +101,23 @@ export function WhySection({
           </motion.div>
         </StaggerItem>
 
-        <StaggerItem variant="scale">
+        <StaggerItem variant="scale" className="h-full">
           <Reveal variant="scale" className="h-full">
-            <div className="relative h-full overflow-hidden border border-contrast/40 bg-contrast p-6 text-ink md:p-8 lg:p-9">
-              <motion.div
-                aria-hidden
-                className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full border border-ink/10"
-                animate={
-                  reduce
-                    ? undefined
-                    : {
-                        rotate: 360,
-                        transition: {
-                          duration: 28,
-                          repeat: Infinity,
-                          ease: "linear",
-                        },
-                      }
-                }
-              />
-              <h3 className="text-balance font-display text-[clamp(1.75rem,3vw,2.15rem)] leading-[1.15] text-ink">
+            <motion.div
+              className="editorial-panel relative h-full border-line bg-surface-glass p-6 md:p-8 lg:p-9"
+              whileHover={
+                reduce
+                  ? undefined
+                  : {
+                      y: -4,
+                      transition: {
+                        duration: motionTokens.durationFast,
+                        ease: motionTokens.easeOut,
+                      },
+                    }
+              }
+            >
+              <h3 className="text-balance font-display text-[clamp(1.75rem,3vw,2.15rem)] leading-[1.15] text-fg">
                 {credibilityHeading || "What you get when we work together."}
               </h3>
               <ul className="mt-10 space-y-5 md:mt-16 md:space-y-6">
@@ -138,18 +135,18 @@ export function WhySection({
                     }}
                   >
                     <span
-                      className="font-mono text-[12px] text-bronze"
+                      className="font-mono text-[12px] text-gold"
                       aria-hidden
                     >
                       {item.num}
                     </span>
-                    <p className="font-sans text-[15px] leading-6 text-ink/90">
+                    <p className="font-sans text-[15px] leading-6 text-fg-muted">
                       {item.label}
                     </p>
                   </motion.li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           </Reveal>
         </StaggerItem>
       </Stagger>

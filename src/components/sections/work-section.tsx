@@ -77,10 +77,11 @@ export function WorkSection({
             return (
               <StaggerItem
                 key={project._id}
+                className="h-full"
                 variant={index % 2 === 0 ? "up" : "scale"}
               >
                 <HoverCard openDelay={180} closeDelay={80}>
-                  <article className="group flex flex-col">
+                  <article className="group flex h-full flex-col">
                     <HoverCardTrigger asChild>
                       <Link
                         href={href}
@@ -142,7 +143,8 @@ export function WorkSection({
                     <p className="mt-3 font-sans text-sm leading-6 text-fg-muted">
                       {project.services}
                     </p>
-                    <div className="mt-8 border-t border-line pt-5">
+                    <div className="min-h-8 flex-1" aria-hidden />
+                    <div className="border-t border-line pt-5">
                       <TextLink href={href}>View concept</TextLink>
                     </div>
                   </article>

@@ -110,21 +110,21 @@ export function EngageSection({
           </StaggerItem>
 
           <StaggerItem variant="scale">
-            <Card className="editorial-panel border-ink/10 bg-[var(--contrast)] py-0 text-ink ring-0">
-              <CardHeader className="border-b border-ink/15 bg-[var(--contrast)] pt-6">
-                <CardTitle className="font-mono text-[11px] uppercase tracking-[0.14em] text-bronze">
+            <Card className="editorial-panel border-line bg-bg-raised/95 py-0">
+              <CardHeader className="border-b border-line pt-6">
+                <CardTitle className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
                   {replyHeading || "What’s in a reply"}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="bg-[var(--contrast)] py-5">
+              <CardContent className="py-5">
                 <ul className="space-y-4">
                   {replies.map((point) => (
                     <li key={point} className="flex items-start gap-3">
                       <span
-                        className="mt-2 size-1.5 shrink-0 bg-bronze"
+                        className="mt-2 size-1.5 shrink-0 bg-gold"
                         aria-hidden
                       />
-                      <p className="font-sans text-[15px] leading-6 text-ink">
+                      <p className="font-sans text-[15px] leading-6 text-fg-muted">
                         {point}
                       </p>
                     </li>
