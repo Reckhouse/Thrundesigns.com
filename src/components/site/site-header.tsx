@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { BrandLogo } from "@/components/icons/brand-logo";
@@ -9,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Magnetic } from "@/components/site/magnetic";
 import { cn } from "@/lib/utils";
 
 const defaultNav = [
@@ -52,16 +55,24 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <Button
-            asChild
-            className="inline-flex h-11 rounded-none bg-gold px-3 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-ink hover:bg-bronze hover:text-fg sm:h-12 sm:px-4 sm:text-[11px]"
-          >
-            <Link href="/quote">
-              <span className="sm:hidden">Quote</span>
-              <span className="hidden sm:inline">Request a quote</span>
-              <ArrowUpRight className="size-3.5" aria-hidden />
-            </Link>
-          </Button>
+          <Magnetic strength={0.2}>
+            <Button
+              asChild
+              className="group relative inline-flex h-11 overflow-hidden rounded-none bg-gold px-3 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-ink hover:bg-bronze hover:text-fg sm:h-12 sm:px-4 sm:text-[11px]"
+            >
+              <Link href="/quote">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 -translate-x-full bg-[linear-gradient(110deg,transparent,rgba(243,241,235,0.28),transparent)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-full"
+                />
+                <span className="relative z-10 inline-flex items-center gap-2">
+                  <span className="sm:hidden">Quote</span>
+                  <span className="hidden sm:inline">Request a quote</span>
+                  <ArrowUpRight className="size-3.5" aria-hidden />
+                </span>
+              </Link>
+            </Button>
+          </Magnetic>
 
           <Sheet>
             <SheetTrigger

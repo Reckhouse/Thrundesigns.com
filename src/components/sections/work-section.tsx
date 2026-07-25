@@ -2,11 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  SectionHeading,
-  TextLink,
-} from "@/components/site/primitives";
+import { TextLink } from "@/components/site/primitives";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
+import { ClipHeading } from "@/components/site/clip-heading";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Badge } from "@/components/ui/badge";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { motion, useReducedMotion } from "framer-motion";
 
 type Project = {
@@ -40,23 +45,27 @@ export function WorkSection({
 
   return (
     <section id="work" className="border-b border-line">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[340px_1fr] lg:gap-16 lg:px-[74px] lg:py-20">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-14 md:gap-12 md:px-10 md:py-20 lg:grid-cols-[340px_1fr] lg:gap-16 lg:px-[74px] lg:py-24">
         <Reveal variant="blur">
-          {eyebrow ? (
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted">
-              {eyebrow}
-            </p>
-          ) : null}
-          <SectionHeading className={eyebrow ? "mt-4 text-balance" : "text-balance"}>
+          <Badge
+            variant="outline"
+            className="rounded-none border-gold/40 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
+          >
+            {eyebrow || "Concept studies"}
+          </Badge>
+          <ClipHeading className="mt-5 text-balance font-display text-[30px] leading-10 tracking-[-0.02em] text-fg md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]">
             {heading || "Speculative work with production intent."}
-          </SectionHeading>
+          </ClipHeading>
           <p className="mt-6 max-w-[40ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8">
             {intro ||
               "These are concept projects — not client case studies — until we replace them with real engagements."}
           </p>
         </Reveal>
 
-        <Stagger className="grid gap-8 sm:grid-cols-2 md:gap-6 lg:grid-cols-3" stagger={0.12}>
+        <Stagger
+          className="grid gap-8 sm:grid-cols-2 md:gap-6 lg:grid-cols-3"
+          stagger={0.12}
+        >
           {projects.map((project) => {
             const href = project.slug?.current
               ? `/work/${project.slug.current}`
@@ -65,47 +74,90 @@ export function WorkSection({
 
             return (
               <StaggerItem key={project._id}>
-                <article className="group flex flex-col">
-                  <Link
-                    href={href}
-                    className="relative block aspect-[286/390] overflow-hidden bg-bg-raised"
-                  >
-                    {src ? (
-                      <motion.div
-                        className="absolute inset-0"
-                        whileHover={reduce ? undefined : { scale: 1.05 }}
-                        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                <HoverCard openDelay={180} closeDelay={80}>
+                  <article className="group flex flex-col">
+                    <HoverCardTrigger asChild>
+                      <Link
+                        href={href}
+                        className="relative block overflow-hidden bg-bg-raised ring-1 ring-line transition-[ring-color] duration-300 hover:ring-gold/50"
                       >
-                        <Image
-                          src={src}
-                          alt={
-                            project.cover?.alt ||
-                            project.title ||
-                            "Concept study"
-                          }
-                          fill
-                          className="object-cover grayscale transition duration-500 group-hover:grayscale-0"
-                          sizes="(max-width: 768px) 100vw, 286px"
-                        />
-                      </motion.div>
-                    ) : (
-                      <div className="absolute inset-0 bg-[linear-gradient(160deg,#15191c,#090b0d)]" />
-                    )}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg/70 via-transparent to-transparent opacity-80" />
-                  </Link>
-                  <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
-                    {project.industry}
-                  </p>
-                  <h3 className="mt-3 font-display text-[26px] leading-8 text-fg">
-                    {project.title}
-                  </h3>
-                  <p className="mt-3 font-sans text-sm text-fg-muted">
-                    {project.services}
-                  </p>
-                  <div className="mt-8 border-t border-line pt-5">
-                    <TextLink href={href}>View concept</TextLink>
-                  </div>
-                </article>
+                        <AspectRatio ratio={286 / 390}>
+                          {src ? (
+                            <motion.div
+                              className="absolute inset-0"
+                              initial={
+                                reduce
+                                  ? false
+                                  : { clipPath: "inset(100% 0 0 0)" }
+                              }
+                              whileInView={{ clipPath: "inset(0% 0 0 0)" }}
+                              viewport={{ once: true, amount: 0.35 }}
+                              transition={{
+                                duration: 0.9,
+                                ease: [0.22, 1, 0.36, 1],
+                              }}
+                            >
+                              <motion.div
+                                className="absolute inset-0"
+                                whileHover={
+                                  reduce ? undefined : { scale: 1.06 }
+                                }
+                                transition={{
+                                  duration: 0.55,
+                                  ease: [0.22, 1, 0.36, 1],
+                                }}
+                              >
+                                <Image
+                                  src={src}
+                                  alt={
+                                    project.cover?.alt ||
+                                    project.title ||
+                                    "Concept study"
+                                  }
+                                  fill
+                                  className="object-cover grayscale transition duration-500 group-hover:grayscale-0"
+                                  sizes="(max-width: 768px) 100vw, 286px"
+                                />
+                              </motion.div>
+                            </motion.div>
+                          ) : (
+                            <div className="absolute inset-0 bg-[linear-gradient(160deg,#15191c,#090b0d)]" />
+                          )}
+                        </AspectRatio>
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg/75 via-transparent to-transparent" />
+                      </Link>
+                    </HoverCardTrigger>
+
+                    <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+                      {project.industry}
+                    </p>
+                    <h3 className="mt-3 font-display text-[26px] leading-8 text-fg">
+                      {project.title}
+                    </h3>
+                    <p className="mt-3 font-sans text-sm text-fg-muted">
+                      {project.services}
+                    </p>
+                    <div className="mt-8 border-t border-line pt-5">
+                      <TextLink href={href}>View concept</TextLink>
+                    </div>
+                  </article>
+
+                  <HoverCardContent
+                    side="top"
+                    className="w-64 rounded-none border-line bg-bg-raised p-4 text-fg shadow-none"
+                  >
+                    <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
+                      Concept study
+                    </p>
+                    <p className="mt-2 font-display text-lg text-fg">
+                      {project.title}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-fg-muted">
+                      {project.services}. Speculative work with production
+                      intent — not a client case study.
+                    </p>
+                  </HoverCardContent>
+                </HoverCard>
               </StaggerItem>
             );
           })}

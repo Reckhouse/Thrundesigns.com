@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Magnetic } from "@/components/site/magnetic";
+import { useReducedMotion } from "framer-motion";
 
 type EyebrowProps = {
   children: React.ReactNode;
@@ -49,12 +53,15 @@ export function TextLink({ href, children, className }: TextLinkProps) {
     <Link
       href={href}
       className={cn(
-        "inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-fg transition-colors hover:text-gold",
+        "group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-fg transition-colors hover:text-gold",
         className,
       )}
     >
       {children}
-      <ArrowUpRight className="size-3.5" aria-hidden />
+      <ArrowUpRight
+        className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+        aria-hidden
+      />
     </Link>
   );
 }
@@ -70,18 +77,30 @@ export function PrimaryButtonLink({
   children,
   className,
 }: PrimaryButtonLinkProps) {
-  return (
+  const reduce = useReducedMotion();
+
+  const link = (
     <Link
       href={href}
       className={cn(
-        "inline-flex h-[52px] items-center gap-2 bg-gold px-[18px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bronze hover:text-fg",
+        "group relative inline-flex h-[52px] items-center gap-2 overflow-hidden bg-gold px-[18px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bronze hover:text-fg",
         className,
       )}
     >
-      {children}
-      <ArrowUpRight className="size-3.5" aria-hidden />
+      {!reduce ? (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -translate-x-full bg-[linear-gradient(110deg,transparent,rgba(243,241,235,0.28),transparent)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-full"
+        />
+      ) : null}
+      <span className="relative z-10 inline-flex items-center gap-2">
+        {children}
+        <ArrowUpRight className="size-3.5" aria-hidden />
+      </span>
     </Link>
   );
+
+  return <Magnetic strength={0.22}>{link}</Magnetic>;
 }
 
 export function SectionRule({ className }: { className?: string }) {

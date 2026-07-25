@@ -1,7 +1,8 @@
 "use client";
 
-import { SectionHeading } from "@/components/site/primitives";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
+import { ClipHeading } from "@/components/site/clip-heading";
+import { motion, useReducedMotion } from "framer-motion";
 
 type WhySectionProps = {
   heading?: string | null;
@@ -16,6 +17,7 @@ export function WhySection({
   credibilityHeading,
   proofPoints,
 }: WhySectionProps) {
+  const reduce = useReducedMotion();
   const list =
     bullets?.length
       ? bullets
@@ -52,36 +54,74 @@ export function WhySection({
   return (
     <section id="about" className="border-b border-line">
       <Stagger
-        className="mx-auto grid w-full max-w-[1440px] gap-4 px-5 py-12 md:gap-6 md:px-10 md:py-16 lg:grid-cols-2 lg:gap-8 lg:px-[74px] lg:py-20"
-        stagger={0.14}
+        className="mx-auto grid w-full max-w-[1440px] gap-4 px-5 py-14 md:gap-6 md:px-10 md:py-20 lg:grid-cols-2 lg:gap-8 lg:px-[74px] lg:py-24"
+        stagger={0.16}
       >
         <StaggerItem>
-          <div className="h-full border border-line bg-bg-raised p-6 md:p-8 lg:p-9">
-            <SectionHeading className="max-w-md text-balance text-[28px] leading-9 md:text-[34px] md:leading-[42px] lg:text-[42px] lg:leading-[46px]">
+          <motion.div
+            className="editorial-panel h-full bg-bg-raised p-6 md:p-8 lg:p-9"
+            whileHover={
+              reduce
+                ? undefined
+                : { y: -4, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }
+            }
+          >
+            <ClipHeading className="max-w-md text-balance font-display text-[28px] leading-9 tracking-[-0.02em] text-fg md:text-[34px] md:leading-[42px] lg:text-[42px] lg:leading-[46px]">
               {heading || "A partner when the stakes feel real."}
-            </SectionHeading>
+            </ClipHeading>
             <ul className="mt-10 space-y-5 md:mt-12 md:space-y-6">
-              {list.map((item) => (
-                <li key={item} className="flex items-start gap-4">
+              {list.map((item, index) => (
+                <motion.li
+                  key={item}
+                  className="flex items-start gap-4"
+                  initial={reduce ? false : { opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    delay: 0.1 + index * 0.08,
+                    duration: 0.5,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
                   <span className="mt-2 size-1.5 shrink-0 bg-gold" aria-hidden />
                   <p className="font-sans text-[15px] leading-6 text-fg">
                     {item}
                   </p>
-                </li>
+                </motion.li>
               ))}
             </ul>
-          </div>
+          </motion.div>
         </StaggerItem>
 
         <StaggerItem>
           <Reveal variant="scale" className="h-full">
-            <div className="h-full border border-line bg-contrast p-6 text-ink md:p-8 lg:p-9">
+            <div className="relative h-full overflow-hidden border border-line bg-contrast p-6 text-ink md:p-8 lg:p-9">
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full border border-ink/10"
+                animate={
+                  reduce
+                    ? undefined
+                    : { rotate: 360, transition: { duration: 28, repeat: Infinity, ease: "linear" } }
+                }
+              />
               <h3 className="text-balance font-display text-[28px] leading-9 text-ink md:text-[34px] md:leading-[42px]">
                 {credibilityHeading || "What you get when we work together."}
               </h3>
               <ul className="mt-10 space-y-5 md:mt-16 md:space-y-6">
-                {deliverables.map((item) => (
-                  <li key={`${item.num}-${item.label}`} className="flex gap-5">
+                {deliverables.map((item, index) => (
+                  <motion.li
+                    key={`${item.num}-${item.label}`}
+                    className="flex gap-5"
+                    initial={reduce ? false : { opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      delay: 0.15 + index * 0.08,
+                      duration: 0.5,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                  >
                     <span
                       className="font-mono text-[12px] text-bronze"
                       aria-hidden
@@ -91,7 +131,7 @@ export function WhySection({
                     <p className="font-sans text-[15px] leading-6 text-ink/85">
                       {item.label}
                     </p>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
             </div>

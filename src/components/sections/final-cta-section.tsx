@@ -25,13 +25,13 @@ export function FinalCtaSection({
   const reduce = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden border-b border-line">
-      <div className="mx-auto w-full max-w-[1440px] px-5 py-12 md:px-10 md:py-16 lg:px-[74px] lg:py-24">
+    <section className="editorial-depth relative overflow-hidden border-b border-line">
+      <div className="mx-auto w-full max-w-[1440px] px-5 py-14 md:px-10 md:py-20 lg:px-[74px] lg:py-28">
         <motion.div
           className="absolute right-8 top-10 hidden md:right-[74px] md:top-14 md:block"
           aria-hidden
-          initial={reduce ? false : { opacity: 0, rotate: -12 }}
-          whileInView={{ opacity: 1, rotate: 0 }}
+          initial={reduce ? false : { opacity: 0, rotate: -12, scale: 0.9 }}
+          whileInView={{ opacity: 1, rotate: 0, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >

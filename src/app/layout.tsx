@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Libre_Baskerville } from "next/font/google";
 import { SanityLive } from "@/sanity/lib/live";
+import { ScrollProgress } from "@/components/site/scroll-progress";
 import "./globals.css";
 
 const libre = Libre_Baskerville({
@@ -51,6 +52,7 @@ export default function RootLayout({
       className={`${libre.variable} ${plexSans.variable} ${plexMono.variable} dark h-full`}
     >
       <body className="min-h-full flex flex-col bg-bg text-fg">
+        <ScrollProgress />
         {children}
         <SanityLive />
       </body>
