@@ -5,7 +5,6 @@ import {
   TextLink,
 } from "@/components/site/primitives";
 import { HeroBackdrop } from "@/components/site/hero-backdrop";
-import { HeroLogoDraw } from "@/components/site/hero-logo-draw";
 import { motion, useReducedMotion } from "framer-motion";
 
 type HeroSectionProps = {
@@ -49,8 +48,8 @@ export function HeroSection({
     >
       <HeroBackdrop imageSrc={imageSrc} />
 
-      <div className="relative z-10 mx-auto grid min-h-[calc(100svh-80px)] w-full max-w-[1440px] items-end gap-8 px-5 pb-12 pt-8 md:min-h-[calc(920px-96px)] md:items-center md:gap-10 md:px-10 md:pb-16 md:pt-10 lg:min-h-[calc(100svh-96px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-8 lg:px-[74px] lg:pb-20">
-        <div className="order-2 max-w-xl lg:order-1 lg:max-w-[34rem]">
+      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-80px)] w-full max-w-[1440px] items-end px-5 pb-12 pt-8 md:min-h-[calc(920px-96px)] md:items-center md:px-10 md:pb-16 md:pt-10 lg:min-h-[calc(100svh-96px)] lg:px-[74px] lg:pb-20">
+        <div className="max-w-xl lg:max-w-[38rem]">
           <motion.p
             className="text-balance font-display text-[34px] leading-[1.05] tracking-[-0.02em] text-gold sm:text-[42px] md:text-[48px] lg:text-[56px] lg:leading-[1.02]"
             {...item(0.05)}
@@ -108,12 +107,6 @@ export function HeroSection({
               {servicesMeta}
             </motion.p>
           ) : null}
-        </div>
-
-        <div className="order-1 flex justify-center lg:order-2 lg:justify-end lg:self-center">
-          <div className="relative w-[min(88vw,420px)] sm:w-[min(70vw,480px)] md:w-[520px] lg:w-[560px] xl:w-[640px]">
-            <HeroLogoDraw />
-          </div>
         </div>
       </div>
 
