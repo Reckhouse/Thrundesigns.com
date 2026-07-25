@@ -37,6 +37,8 @@ const variants: Record<
   },
 };
 
+const viewport = { once: true, amount: 0.15, margin: "0px 0px -6% 0px" } as const;
+
 export function Reveal({
   children,
   className,
@@ -55,7 +57,7 @@ export function Reveal({
       className={className}
       initial={motionVariant.initial}
       whileInView={motionVariant.animate}
-      viewport={{ once: true, amount: 0.22 }}
+      viewport={viewport}
       transition={{
         duration: variant === "blur" ? 0.85 : 0.7,
         ease: [0.22, 1, 0.36, 1],
@@ -89,7 +91,7 @@ export function Stagger({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.18 }}
+      viewport={viewport}
       variants={{
         hidden: {},
         show: {
