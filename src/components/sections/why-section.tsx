@@ -1,4 +1,7 @@
+"use client";
+
 import { SectionHeading } from "@/components/site/primitives";
+import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 
 type WhySectionProps = {
   heading?: string | null;
@@ -48,39 +51,53 @@ export function WhySection({
 
   return (
     <section id="about" className="border-b border-line">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-4 px-5 py-12 md:gap-6 md:px-10 md:py-16 lg:grid-cols-2 lg:gap-8 lg:px-[74px] lg:py-20">
-        <div className="border border-line bg-bg-raised p-6 md:p-8 lg:p-9">
-          <SectionHeading className="max-w-md text-balance text-[28px] leading-9 md:text-[34px] md:leading-[42px] lg:text-[42px] lg:leading-[46px]">
-            {heading || "A partner when the stakes feel real."}
-          </SectionHeading>
-          <ul className="mt-10 space-y-5 md:mt-12 md:space-y-6">
-            {list.map((item) => (
-              <li key={item} className="flex items-start gap-4">
-                <span className="mt-2 size-1.5 shrink-0 bg-gold" aria-hidden />
-                <p className="font-sans text-[15px] leading-6 text-fg">{item}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <Stagger
+        className="mx-auto grid w-full max-w-[1440px] gap-4 px-5 py-12 md:gap-6 md:px-10 md:py-16 lg:grid-cols-2 lg:gap-8 lg:px-[74px] lg:py-20"
+        stagger={0.14}
+      >
+        <StaggerItem>
+          <div className="h-full border border-line bg-bg-raised p-6 md:p-8 lg:p-9">
+            <SectionHeading className="max-w-md text-balance text-[28px] leading-9 md:text-[34px] md:leading-[42px] lg:text-[42px] lg:leading-[46px]">
+              {heading || "A partner when the stakes feel real."}
+            </SectionHeading>
+            <ul className="mt-10 space-y-5 md:mt-12 md:space-y-6">
+              {list.map((item) => (
+                <li key={item} className="flex items-start gap-4">
+                  <span className="mt-2 size-1.5 shrink-0 bg-gold" aria-hidden />
+                  <p className="font-sans text-[15px] leading-6 text-fg">
+                    {item}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </StaggerItem>
 
-        <div className="border border-line bg-contrast p-6 text-ink md:p-8 lg:p-9">
-          <h3 className="text-balance font-display text-[28px] leading-9 text-ink md:text-[34px] md:leading-[42px]">
-            {credibilityHeading || "What you get when we work together."}
-          </h3>
-          <ul className="mt-10 space-y-5 md:mt-16 md:space-y-6">
-            {deliverables.map((item) => (
-              <li key={`${item.num}-${item.label}`} className="flex gap-5">
-                <span className="font-mono text-[12px] text-bronze" aria-hidden>
-                  {item.num}
-                </span>
-                <p className="font-sans text-[15px] leading-6 text-ink/85">
-                  {item.label}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+        <StaggerItem>
+          <Reveal variant="scale" className="h-full">
+            <div className="h-full border border-line bg-contrast p-6 text-ink md:p-8 lg:p-9">
+              <h3 className="text-balance font-display text-[28px] leading-9 text-ink md:text-[34px] md:leading-[42px]">
+                {credibilityHeading || "What you get when we work together."}
+              </h3>
+              <ul className="mt-10 space-y-5 md:mt-16 md:space-y-6">
+                {deliverables.map((item) => (
+                  <li key={`${item.num}-${item.label}`} className="flex gap-5">
+                    <span
+                      className="font-mono text-[12px] text-bronze"
+                      aria-hidden
+                    >
+                      {item.num}
+                    </span>
+                    <p className="font-sans text-[15px] leading-6 text-ink/85">
+                      {item.label}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
+        </StaggerItem>
+      </Stagger>
     </section>
   );
 }

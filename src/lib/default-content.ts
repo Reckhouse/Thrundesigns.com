@@ -10,7 +10,7 @@ export const defaultHomeContent = {
       secondaryCta: { label: "Browse concept studies", href: "/work" },
       image: {
         blobUrl: "/images/hero-mountain.jpg",
-        alt: "Dramatic desaturated mountain ridge with open sky",
+        alt: "Snow-capped mountain ridge under a pale dawn sky",
       },
     },
     servicesIntro: {

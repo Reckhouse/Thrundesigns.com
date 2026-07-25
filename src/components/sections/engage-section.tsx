@@ -1,4 +1,7 @@
+"use client";
+
 import { SectionHeading, TextLink } from "@/components/site/primitives";
+import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 
 type EngageSectionProps = {
   heading?: string | null;
@@ -40,7 +43,7 @@ export function EngageSection({
   return (
     <section id="engage" className="border-b border-line bg-bg-raised">
       <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[1fr_1fr] lg:gap-16 lg:px-[74px] lg:py-20">
-        <div>
+        <Reveal variant="left">
           <SectionHeading className="max-w-lg text-balance text-[28px] leading-9 md:text-[34px] md:leading-[42px] lg:text-[42px] lg:leading-[46px]">
             {heading || "How we engage — and what you’ll get in a reply."}
           </SectionHeading>
@@ -51,10 +54,10 @@ export function EngageSection({
           <div className="mt-8">
             <TextLink href="/quote">Request a project quote</TextLink>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="grid gap-8 sm:grid-cols-2 sm:gap-10">
-          <div>
+        <Stagger className="grid gap-8 sm:grid-cols-2 sm:gap-10" stagger={0.1}>
+          <StaggerItem>
             <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
               How we engage
             </p>
@@ -78,9 +81,9 @@ export function EngageSection({
                 </li>
               ))}
             </ol>
-          </div>
+          </StaggerItem>
 
-          <div>
+          <StaggerItem>
             <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
               {replyHeading || "What’s in a reply"}
             </p>
@@ -97,8 +100,8 @@ export function EngageSection({
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
+          </StaggerItem>
+        </Stagger>
       </div>
     </section>
   );

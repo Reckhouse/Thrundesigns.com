@@ -162,7 +162,10 @@ export default async function HomePage() {
           primaryCta={home.hero?.primaryCta}
           secondaryCta={home.hero?.secondaryCta}
           imageSrc="/images/hero-mountain.jpg"
-          imageAlt={home.hero?.image?.alt || "Dramatic mountain landscape"}
+          imageAlt={
+            home.hero?.image?.alt ||
+            "Snow-capped mountain ridge under a pale dawn sky"
+          }
         />
         <ServicesSection
           heading={home.servicesIntro?.heading}
