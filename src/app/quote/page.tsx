@@ -31,6 +31,7 @@ const steps = ["Contact", "Project", "Details"] as const;
 
 export default function QuotePage() {
   const [step, setStep] = useState(0);
+  const [files, setFiles] = useState<FileList | null>(null);
   const [status, setStatus] = useState<"idle" | "submitting" | "done" | "error">(
     "idle",
   );
@@ -52,10 +53,19 @@ export default function QuotePage() {
   async function onSubmit(values: QuoteValues) {
     setStatus("submitting");
     try {
+      const body = new FormData();
+      Object.entries(values).forEach(([key, value]) => {
+        if (value) body.append(key, value);
+      });
+      if (files) {
+        Array.from(files)
+          .slice(0, 5)
+          .forEach((file) => body.append("files", file));
+      }
+
       const res = await fetch("/api/quote", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body,
       });
       if (!res.ok) throw new Error("Failed");
       setStatus("done");
@@ -77,9 +87,9 @@ export default function QuotePage() {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 pt-[84px]">
+      <main className="flex-1 pt-[72px] md:pt-[84px]">
         <section className="border-b border-line">
-          <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-16 md:px-10 lg:grid-cols-[1fr_1fr] lg:px-[74px]">
+          <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[1fr_1fr] lg:px-[74px]">
             <div>
               <Eyebrow>Project quote</Eyebrow>
               <SectionHeading className="mt-4">
@@ -89,7 +99,7 @@ export default function QuotePage() {
                 A short multi-step brief helps us return with a clear scope.
                 Progress is kept as you move between steps.
               </p>
-              <ol className="mt-10 flex gap-4">
+              <ol className="mt-8 flex flex-wrap gap-x-4 gap-y-2 md:mt-10">
                 {steps.map((label, index) => (
                   <li
                     key={label}
@@ -105,7 +115,7 @@ export default function QuotePage() {
 
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="border border-line bg-bg-raised p-6 md:p-8"
+              className="border border-line bg-bg-raised p-5 md:p-8"
             >
               {status === "done" ? (
                 <div>
@@ -200,17 +210,31 @@ export default function QuotePage() {
                   )}
 
                   {step === 2 && (
-                    <Field
-                      label="Project notes"
-                      error={form.formState.errors.message?.message}
-                    >
-                      <Textarea
-                        rows={7}
-                        className="rounded-none border-line bg-bg"
-                        placeholder="Goals, audience, constraints, references…"
-                        {...form.register("message")}
-                      />
-                    </Field>
+                    <div className="space-y-5">
+                      <Field
+                        label="Project notes"
+                        error={form.formState.errors.message?.message}
+                      >
+                        <Textarea
+                          rows={6}
+                          className="rounded-none border-line bg-bg"
+                          placeholder="Goals, audience, constraints, references…"
+                          {...form.register("message")}
+                        />
+                      </Field>
+                      <Field label="Attachments (optional)">
+                        <Input
+                          type="file"
+                          multiple
+                          accept="image/jpeg,image/png,image/webp,application/pdf"
+                          className="rounded-none border-line bg-bg file:mr-3 file:border-0 file:bg-gold file:px-3 file:py-1 file:font-mono file:text-[10px] file:uppercase file:text-ink"
+                          onChange={(event) => setFiles(event.target.files)}
+                        />
+                        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
+                          Up to 5 files · 8MB each · JPG, PNG, WEBP, PDF
+                        </p>
+                      </Field>
+                    </div>
                   )}
 
                   <div className="mt-8 flex items-center justify-between gap-3">

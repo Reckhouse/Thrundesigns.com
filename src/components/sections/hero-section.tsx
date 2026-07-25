@@ -31,35 +31,41 @@ export function HeroSection({
   imageAlt,
 }: HeroSectionProps) {
   return (
-    <section className="relative min-h-[820px] overflow-hidden border-b border-line pt-[84px]">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 pb-16 pt-10 md:px-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8 lg:px-[74px] lg:pb-10 lg:pt-12">
-        <Reveal className="relative z-10 flex max-w-xl flex-col justify-center">
+    <section className="relative overflow-hidden border-b border-line pt-[72px] md:min-h-[900px] md:pt-[84px] lg:min-h-[820px]">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-8 px-5 pb-12 pt-8 md:gap-10 md:px-10 md:pb-16 md:pt-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8 lg:px-[74px] lg:pb-10 lg:pt-12">
+        <Reveal className="relative z-10 flex max-w-xl flex-col justify-center order-1">
           <Eyebrow>{eyebrow || "Thrun Design Co."}</Eyebrow>
-          <h1 className="mt-5 font-display text-[30px] leading-10 text-fg md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]">
+          <h1 className="mt-4 font-display text-[30px] leading-10 text-fg md:mt-5 md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]">
             {headline ||
               "Strategic design for businesses ready to move forward."}
           </h1>
-          <p className="mt-6 max-w-[500px] font-sans text-[15px] leading-7 text-fg-muted md:text-base">
+          <p className="mt-5 max-w-[500px] font-sans text-[15px] leading-7 text-fg-muted md:mt-6 md:text-base">
             {support ||
               "Cohesive brand identities, websites, and marketing materials built for clarity, consistency, and confidence."}
           </p>
 
-          <div className="mt-12 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
-            <PrimaryButtonLink href={primaryCta?.href || "/quote"}>
+          <div className="mt-8 flex flex-col items-stretch gap-4 sm:mt-12 sm:flex-row sm:items-center sm:gap-5">
+            <PrimaryButtonLink
+              href={primaryCta?.href || "/quote"}
+              className="w-full justify-center sm:w-auto"
+            >
               {primaryCta?.label || "Request a project quote"}
             </PrimaryButtonLink>
-            <TextLink href={secondaryCta?.href || "/work"}>
+            <TextLink
+              href={secondaryCta?.href || "/work"}
+              className="justify-center sm:justify-start"
+            >
               {secondaryCta?.label || "Explore our work"}
             </TextLink>
           </div>
 
-          <p className="mt-10 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-muted">
+          <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-muted md:mt-10">
             {servicesMeta ||
               "Brand identity  ·  Website design  ·  Print & marketing"}
           </p>
         </Reveal>
 
-        <div className="relative min-h-[420px] lg:min-h-[736px]">
+        <div className="relative order-2 min-h-[320px] md:min-h-[480px] lg:min-h-[736px]">
           <div className="absolute inset-0 overflow-hidden bg-bg-raised">
             {imageSrc ? (
               <Image
@@ -68,15 +74,15 @@ export function HeroSection({
                 fill
                 priority
                 className="object-cover object-center grayscale contrast-125"
-                sizes="(max-width: 1024px) 100vw, 820px"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 820px"
               />
             ) : (
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#2b3033,transparent_45%),linear-gradient(160deg,#111417,#090b0d)]" />
             )}
             <ContourOverlay className="absolute inset-0 hidden md:block" />
             <HeroCanvas className="absolute inset-0 hidden opacity-70 lg:block" />
-            <PrecisionMark className="absolute right-8 top-10 hidden lg:block" />
-            <p className="absolute bottom-6 right-6 hidden font-mono text-[10px] uppercase tracking-[0.14em] text-gold md:block">
+            <PrecisionMark className="absolute right-6 top-8 hidden size-[64px] md:right-8 md:top-10 md:block lg:size-[76px]" />
+            <p className="absolute bottom-5 right-5 hidden font-mono text-[10px] uppercase tracking-[0.14em] text-gold md:bottom-6 md:right-6 md:block">
               39.7392° N  ·  104.9903° W
             </p>
           </div>

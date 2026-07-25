@@ -35,19 +35,19 @@ export function WorkSection({
 }: WorkSectionProps) {
   return (
     <section id="work" className="border-b border-line">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-16 md:px-10 lg:grid-cols-[340px_1fr] lg:gap-16 lg:px-[74px] lg:py-20">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[340px_1fr] lg:gap-16 lg:px-[74px] lg:py-20">
         <div>
           <Eyebrow>{eyebrow || "Selected work"}</Eyebrow>
           <SectionHeading className="mt-4">
             {heading || "Concept projects with production intent."}
           </SectionHeading>
-          <p className="mt-8 max-w-sm font-sans text-[15px] leading-7 text-fg-muted">
+          <p className="mt-6 max-w-sm font-sans text-[15px] leading-7 text-fg-muted md:mt-8">
             {intro ||
               "A focused set of case studies spanning advisory, construction, and systems brands."}
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-8 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
           {projects.map((project) => {
             const href = project.slug?.current
               ? `/work/${project.slug.current}`
