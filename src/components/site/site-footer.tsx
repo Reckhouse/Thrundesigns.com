@@ -43,7 +43,10 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
   const cols = columns?.length ? columns : defaultColumns;
 
   return (
-    <footer id="contact" className="border-t border-line bg-bg">
+    <footer
+      id="contact"
+      className="relative z-10 border-t border-line bg-bg-deep/95"
+    >
       <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-16 md:px-10 lg:grid-cols-[1.1fr_2fr] lg:gap-20 lg:px-[74px] lg:py-20">
         <div>
           <BrandLogo className="h-[72px] w-auto" />

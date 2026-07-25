@@ -3,6 +3,7 @@
 import { TextLink } from "@/components/site/primitives";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 import { ClipHeading } from "@/components/site/clip-heading";
+import { SceneSection } from "@/components/site/scene-section";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
@@ -50,19 +51,19 @@ export function EngageSection({
   const replies = replyPoints?.length ? replyPoints : defaultReplyPoints;
 
   return (
-    <section id="engage" className="border-b border-line bg-bg-raised">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-14 md:gap-12 md:px-10 md:py-20 lg:grid-cols-[1fr_1fr] lg:gap-16 lg:px-[74px] lg:py-24">
+    <SceneSection id="engage" tone="glass" reveal="rise">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:gap-14 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16 lg:px-[74px] lg:py-28">
         <Reveal variant="left">
           <Badge
             variant="outline"
-            className="rounded-none border-gold/40 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
+            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
           >
             Engagement
           </Badge>
-          <ClipHeading className="mt-5 max-w-lg text-balance font-display text-[28px] leading-9 tracking-[-0.02em] text-fg md:text-[34px] md:leading-[42px] lg:text-[42px] lg:leading-[46px]">
+          <ClipHeading className="mt-5 max-w-lg text-balance font-display text-[clamp(1.75rem,3.5vw,2.65rem)] leading-[1.1] tracking-[-0.02em] text-fg">
             {heading || "How we engage — and what you’ll get in a reply."}
           </ClipHeading>
-          <p className="mt-6 max-w-[48ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+          <p className="mt-6 max-w-[48ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:text-base">
             No invented case studies required. This is the real first step with
             Thrun Design Co.
           </p>
@@ -72,8 +73,8 @@ export function EngageSection({
         </Reveal>
 
         <Stagger className="grid gap-5" stagger={0.1}>
-          <StaggerItem>
-            <Card className="editorial-panel bg-bg py-0">
+          <StaggerItem variant="left">
+            <Card className="editorial-panel border-line bg-bg-raised/95 py-0">
               <CardHeader className="border-b border-line pt-6">
                 <CardTitle className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
                   How we engage
@@ -108,14 +109,14 @@ export function EngageSection({
             </Card>
           </StaggerItem>
 
-          <StaggerItem>
-            <Card className="editorial-panel bg-contrast py-0 text-ink ring-contrast">
-              <CardHeader className="border-b border-ink/15 pt-6">
+          <StaggerItem variant="scale">
+            <Card className="editorial-panel border-ink/10 bg-[var(--contrast)] py-0 text-ink ring-0">
+              <CardHeader className="border-b border-ink/15 bg-[var(--contrast)] pt-6">
                 <CardTitle className="font-mono text-[11px] uppercase tracking-[0.14em] text-bronze">
                   {replyHeading || "What’s in a reply"}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="py-5">
+              <CardContent className="bg-[var(--contrast)] py-5">
                 <ul className="space-y-4">
                   {replies.map((point) => (
                     <li key={point} className="flex items-start gap-3">
@@ -123,7 +124,7 @@ export function EngageSection({
                         className="mt-2 size-1.5 shrink-0 bg-bronze"
                         aria-hidden
                       />
-                      <p className="font-sans text-[15px] leading-6 text-ink/85">
+                      <p className="font-sans text-[15px] leading-6 text-ink">
                         {point}
                       </p>
                     </li>
@@ -134,6 +135,6 @@ export function EngageSection({
           </StaggerItem>
         </Stagger>
       </div>
-    </section>
+    </SceneSection>
   );
 }

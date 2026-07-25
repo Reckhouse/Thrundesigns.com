@@ -2,7 +2,9 @@
 
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 import { ClipHeading } from "@/components/site/clip-heading";
+import { SceneSection } from "@/components/site/scene-section";
 import { motion, useReducedMotion } from "framer-motion";
+import { motionTokens } from "@/lib/motion-tokens";
 
 type WhySectionProps = {
   heading?: string | null;
@@ -52,21 +54,27 @@ export function WhySection({
         ];
 
   return (
-    <section id="about" className="border-b border-line">
+    <SceneSection id="about" tone="clear" reveal="scale">
       <Stagger
-        className="mx-auto grid w-full max-w-[1440px] gap-4 px-5 py-14 md:gap-6 md:px-10 md:py-20 lg:grid-cols-2 lg:gap-8 lg:px-[74px] lg:py-24"
+        className="mx-auto grid w-full max-w-[1440px] gap-4 px-5 py-16 md:gap-6 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-8 lg:px-[74px] lg:py-28"
         stagger={0.16}
       >
-        <StaggerItem>
+        <StaggerItem variant="left">
           <motion.div
-            className="editorial-panel h-full bg-bg-raised p-6 md:p-8 lg:p-9"
+            className="editorial-panel h-full border-line bg-surface-glass p-6 md:p-8 lg:p-9"
             whileHover={
               reduce
                 ? undefined
-                : { y: -4, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }
+                : {
+                    y: -4,
+                    transition: {
+                      duration: motionTokens.durationFast,
+                      ease: motionTokens.easeOut,
+                    },
+                  }
             }
           >
-            <ClipHeading className="max-w-md text-balance font-display text-[28px] leading-9 tracking-[-0.02em] text-fg md:text-[34px] md:leading-[42px] lg:text-[42px] lg:leading-[46px]">
+            <ClipHeading className="max-w-md text-balance font-display text-[clamp(1.75rem,3.2vw,2.65rem)] leading-[1.1] tracking-[-0.02em] text-fg">
               {heading || "A partner when the stakes feel real."}
             </ClipHeading>
             <ul className="mt-10 space-y-5 md:mt-12 md:space-y-6">
@@ -79,8 +87,8 @@ export function WhySection({
                   viewport={{ once: true }}
                   transition={{
                     delay: 0.1 + index * 0.08,
-                    duration: 0.5,
-                    ease: [0.22, 1, 0.36, 1],
+                    duration: motionTokens.durationFast,
+                    ease: motionTokens.easeOut,
                   }}
                 >
                   <span className="mt-2 size-1.5 shrink-0 bg-gold" aria-hidden />
@@ -93,19 +101,26 @@ export function WhySection({
           </motion.div>
         </StaggerItem>
 
-        <StaggerItem>
+        <StaggerItem variant="scale">
           <Reveal variant="scale" className="h-full">
-            <div className="relative h-full overflow-hidden border border-line bg-contrast p-6 text-ink md:p-8 lg:p-9">
+            <div className="relative h-full overflow-hidden border border-contrast/40 bg-contrast p-6 text-ink md:p-8 lg:p-9">
               <motion.div
                 aria-hidden
                 className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full border border-ink/10"
                 animate={
                   reduce
                     ? undefined
-                    : { rotate: 360, transition: { duration: 28, repeat: Infinity, ease: "linear" } }
+                    : {
+                        rotate: 360,
+                        transition: {
+                          duration: 28,
+                          repeat: Infinity,
+                          ease: "linear",
+                        },
+                      }
                 }
               />
-              <h3 className="text-balance font-display text-[28px] leading-9 text-ink md:text-[34px] md:leading-[42px]">
+              <h3 className="text-balance font-display text-[clamp(1.75rem,3vw,2.15rem)] leading-[1.15] text-ink">
                 {credibilityHeading || "What you get when we work together."}
               </h3>
               <ul className="mt-10 space-y-5 md:mt-16 md:space-y-6">
@@ -118,8 +133,8 @@ export function WhySection({
                     viewport={{ once: true }}
                     transition={{
                       delay: 0.15 + index * 0.08,
-                      duration: 0.5,
-                      ease: [0.22, 1, 0.36, 1],
+                      duration: motionTokens.durationFast,
+                      ease: motionTokens.easeOut,
                     }}
                   >
                     <span
@@ -128,7 +143,7 @@ export function WhySection({
                     >
                       {item.num}
                     </span>
-                    <p className="font-sans text-[15px] leading-6 text-ink/85">
+                    <p className="font-sans text-[15px] leading-6 text-ink/90">
                       {item.label}
                     </p>
                   </motion.li>
@@ -138,6 +153,6 @@ export function WhySection({
           </Reveal>
         </StaggerItem>
       </Stagger>
-    </section>
+    </SceneSection>
   );
 }

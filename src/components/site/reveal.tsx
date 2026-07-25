@@ -2,8 +2,9 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
+import { motionTokens, revealViewport } from "@/lib/motion-tokens";
 
-type RevealVariant = "up" | "left" | "blur" | "scale";
+type RevealVariant = "up" | "left" | "blur" | "scale" | "clip";
 
 type RevealProps = {
   children: ReactNode;
@@ -20,24 +21,26 @@ const variants: Record<
   }
 > = {
   up: {
-    initial: { opacity: 0, y: 28 },
+    initial: { opacity: 0, y: 32 },
     animate: { opacity: 1, y: 0 },
   },
   left: {
-    initial: { opacity: 0, x: -36 },
+    initial: { opacity: 0, x: -40 },
     animate: { opacity: 1, x: 0 },
   },
   blur: {
-    initial: { opacity: 0, filter: "blur(10px)", y: 16 },
+    initial: { opacity: 0, filter: "blur(8px)", y: 18 },
     animate: { opacity: 1, filter: "blur(0px)", y: 0 },
   },
   scale: {
     initial: { opacity: 0, scale: 0.96 },
     animate: { opacity: 1, scale: 1 },
   },
+  clip: {
+    initial: { clipPath: "inset(0 0 100% 0)", opacity: 1 },
+    animate: { clipPath: "inset(0 0 0% 0)", opacity: 1 },
+  },
 };
-
-const viewport = { once: true, amount: 0.15, margin: "0px 0px -6% 0px" } as const;
 
 export function Reveal({
   children,
@@ -57,10 +60,13 @@ export function Reveal({
       className={className}
       initial={motionVariant.initial}
       whileInView={motionVariant.animate}
-      viewport={viewport}
+      viewport={revealViewport}
       transition={{
-        duration: variant === "blur" ? 0.85 : 0.7,
-        ease: [0.22, 1, 0.36, 1],
+        duration:
+          variant === "blur" || variant === "clip"
+            ? motionTokens.durationSlow
+            : motionTokens.durationBase,
+        ease: motionTokens.easeOut,
         delay,
       }}
     >
@@ -78,7 +84,7 @@ type StaggerProps = {
 export function Stagger({
   children,
   className,
-  stagger = 0.1,
+  stagger = motionTokens.stagger,
 }: StaggerProps) {
   const reduce = useReducedMotion();
 
@@ -91,11 +97,14 @@ export function Stagger({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={viewport}
+      viewport={revealViewport}
       variants={{
         hidden: {},
         show: {
-          transition: { staggerChildren: stagger, delayChildren: 0.08 },
+          transition: {
+            staggerChildren: stagger,
+            delayChildren: 0.06,
+          },
         },
       }}
     >
@@ -107,9 +116,11 @@ export function Stagger({
 export function StaggerItem({
   children,
   className,
+  variant = "up",
 }: {
   children: ReactNode;
   className?: string;
+  variant?: "up" | "left" | "scale";
 }) {
   const reduce = useReducedMotion();
 
@@ -117,15 +128,26 @@ export function StaggerItem({
     return <div className={className}>{children}</div>;
   }
 
+  const item = {
+    up: { hidden: { opacity: 0, y: 28 }, show: { opacity: 1, y: 0 } },
+    left: { hidden: { opacity: 0, x: -28 }, show: { opacity: 1, x: 0 } },
+    scale: {
+      hidden: { opacity: 0, scale: 0.96 },
+      show: { opacity: 1, scale: 1 },
+    },
+  }[variant];
+
   return (
     <motion.div
       className={className}
       variants={{
-        hidden: { opacity: 0, y: 22 },
+        hidden: item.hidden,
         show: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+          ...item.show,
+          transition: {
+            duration: motionTokens.durationBase,
+            ease: motionTokens.easeOut,
+          },
         },
       }}
     >

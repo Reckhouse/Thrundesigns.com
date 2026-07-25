@@ -5,6 +5,7 @@ import Link from "next/link";
 import { TextLink } from "@/components/site/primitives";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 import { ClipHeading } from "@/components/site/clip-heading";
+import { SceneSection } from "@/components/site/scene-section";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,6 +14,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { motion, useReducedMotion } from "framer-motion";
+import { motionTokens } from "@/lib/motion-tokens";
 
 type Project = {
   _id: string;
@@ -44,19 +46,19 @@ export function WorkSection({
   const reduce = useReducedMotion();
 
   return (
-    <section id="work" className="border-b border-line">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-14 md:gap-12 md:px-10 md:py-20 lg:grid-cols-[340px_1fr] lg:gap-16 lg:px-[74px] lg:py-24">
+    <SceneSection id="work" tone="plate" reveal="wipe-left">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:gap-14 md:px-10 md:py-24 lg:grid-cols-[minmax(0,340px)_1fr] lg:gap-16 lg:px-[74px] lg:py-28">
         <Reveal variant="blur">
           <Badge
             variant="outline"
-            className="rounded-none border-gold/40 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
+            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
           >
             {eyebrow || "Concept studies"}
           </Badge>
-          <ClipHeading className="mt-5 text-balance font-display text-[30px] leading-10 tracking-[-0.02em] text-fg md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]">
+          <ClipHeading className="mt-5 text-balance font-display text-[clamp(1.85rem,4vw,3.5rem)] leading-[1.08] tracking-[-0.02em] text-fg">
             {heading || "Speculative work with production intent."}
           </ClipHeading>
-          <p className="mt-6 max-w-[40ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8">
+          <p className="mt-6 max-w-[40ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8 md:text-base">
             {intro ||
               "These are concept projects — not client case studies — until we replace them with real engagements."}
           </p>
@@ -66,20 +68,23 @@ export function WorkSection({
           className="grid gap-8 sm:grid-cols-2 md:gap-6 lg:grid-cols-3"
           stagger={0.12}
         >
-          {projects.map((project) => {
+          {projects.map((project, index) => {
             const href = project.slug?.current
               ? `/work/${project.slug.current}`
               : "/work";
             const src = project.imageSrc || project.cover?.blobUrl || null;
 
             return (
-              <StaggerItem key={project._id}>
+              <StaggerItem
+                key={project._id}
+                variant={index % 2 === 0 ? "up" : "scale"}
+              >
                 <HoverCard openDelay={180} closeDelay={80}>
                   <article className="group flex flex-col">
                     <HoverCardTrigger asChild>
                       <Link
                         href={href}
-                        className="relative block overflow-hidden bg-bg-raised ring-1 ring-line transition-[ring-color] duration-300 hover:ring-gold/50"
+                        className="relative block overflow-hidden bg-bg-raised ring-1 ring-line transition-[ring-color] duration-300 hover:ring-gold/55"
                       >
                         <AspectRatio ratio={286 / 390}>
                           {src ? (
@@ -91,20 +96,20 @@ export function WorkSection({
                                   : { clipPath: "inset(100% 0 0 0)" }
                               }
                               whileInView={{ clipPath: "inset(0% 0 0 0)" }}
-                              viewport={{ once: true, amount: 0.35 }}
+                              viewport={{ once: true, amount: 0.3 }}
                               transition={{
-                                duration: 0.9,
-                                ease: [0.22, 1, 0.36, 1],
+                                duration: motionTokens.durationSlow,
+                                ease: motionTokens.easeOut,
                               }}
                             >
                               <motion.div
                                 className="absolute inset-0"
                                 whileHover={
-                                  reduce ? undefined : { scale: 1.06 }
+                                  reduce ? undefined : { scale: 1.05 }
                                 }
                                 transition={{
                                   duration: 0.55,
-                                  ease: [0.22, 1, 0.36, 1],
+                                  ease: motionTokens.easeOut,
                                 }}
                               >
                                 <Image
@@ -121,10 +126,10 @@ export function WorkSection({
                               </motion.div>
                             </motion.div>
                           ) : (
-                            <div className="absolute inset-0 bg-[linear-gradient(160deg,#15191c,#090b0d)]" />
+                            <div className="absolute inset-0 bg-[linear-gradient(160deg,#222522,#0c0d0c)]" />
                           )}
                         </AspectRatio>
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg/75 via-transparent to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-deep/80 via-transparent to-transparent" />
                       </Link>
                     </HoverCardTrigger>
 
@@ -134,7 +139,7 @@ export function WorkSection({
                     <h3 className="mt-3 font-display text-[26px] leading-8 text-fg">
                       {project.title}
                     </h3>
-                    <p className="mt-3 font-sans text-sm text-fg-muted">
+                    <p className="mt-3 font-sans text-sm leading-6 text-fg-muted">
                       {project.services}
                     </p>
                     <div className="mt-8 border-t border-line pt-5">
@@ -163,6 +168,6 @@ export function WorkSection({
           })}
         </Stagger>
       </div>
-    </section>
+    </SceneSection>
   );
 }

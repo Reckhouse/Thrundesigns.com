@@ -33,7 +33,7 @@ export function SectionHeading({ children, className }: SectionHeadingProps) {
   return (
     <h2
       className={cn(
-        "text-balance font-display text-[30px] leading-10 tracking-[-0.02em] text-fg md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]",
+        "text-balance font-display text-[clamp(1.85rem,4vw,3.5rem)] leading-[1.08] tracking-[-0.02em] text-fg",
         className,
       )}
     >

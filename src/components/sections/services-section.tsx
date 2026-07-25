@@ -9,6 +9,7 @@ import {
 } from "@/components/icons/service-icons";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 import { ClipHeading } from "@/components/site/clip-heading";
+import { SceneSection } from "@/components/site/scene-section";
 import {
   Card,
   CardContent,
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion, useReducedMotion } from "framer-motion";
+import { motionTokens } from "@/lib/motion-tokens";
 
 type Service = {
   _id: string;
@@ -50,19 +52,19 @@ export function ServicesSection({
   const reduce = useReducedMotion();
 
   return (
-    <section id="services" className="editorial-depth border-b border-line">
-      <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-14 md:gap-12 md:px-10 md:py-20 lg:grid-cols-[380px_1fr] lg:gap-16 lg:px-[74px] lg:py-24">
+    <SceneSection id="services" tone="glass" reveal="wipe-up">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:gap-14 md:px-10 md:py-24 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-16 lg:px-[74px] lg:py-28">
         <Reveal variant="left">
           <Badge
             variant="outline"
-            className="rounded-none border-gold/40 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
+            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
           >
             Offer
           </Badge>
-          <ClipHeading className="mt-5 text-balance font-display text-[30px] leading-10 tracking-[-0.02em] text-fg md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]">
+          <ClipHeading className="mt-5 text-balance font-display text-[clamp(1.85rem,4vw,3.5rem)] leading-[1.08] tracking-[-0.02em] text-fg">
             {heading || "Four ways we steady a growing brand."}
           </ClipHeading>
-          <p className="mt-6 max-w-[42ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8">
+          <p className="mt-6 max-w-[42ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8 md:text-base">
             {intro ||
               "From the system that holds your identity together to the site you maintain and the materials your team ships every week."}
           </p>
@@ -74,16 +76,22 @@ export function ServicesSection({
               iconMap[(service.icon as keyof typeof iconMap) || "brand"] ||
               BrandIcon;
             return (
-              <StaggerItem key={service._id}>
+              <StaggerItem key={service._id} variant="scale">
                 <motion.div
                   whileHover={
                     reduce
                       ? undefined
-                      : { y: -6, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }
+                      : {
+                          y: -6,
+                          transition: {
+                            duration: motionTokens.durationFast,
+                            ease: motionTokens.easeOut,
+                          },
+                        }
                   }
                   className="h-full"
                 >
-                  <Card className="editorial-panel h-full bg-bg-raised/90 py-0 ring-line transition-[ring-color,background-color] duration-300 hover:bg-surface hover:ring-gold/45">
+                  <Card className="editorial-panel h-full border-line bg-bg-raised/90 py-0 ring-line transition-[ring-color,background-color] duration-300 hover:bg-surface hover:ring-gold/50">
                     <CardHeader className="gap-5 border-b border-line/70 pt-7">
                       <div className="flex items-center justify-between">
                         <Icon className="size-11 text-gold" />
@@ -94,7 +102,7 @@ export function ServicesSection({
                       <CardTitle>{service.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="pt-5">
-                      <CardDescription className="max-w-[36ch]">
+                      <CardDescription className="max-w-[36ch] text-fg-muted">
                         {service.summary}
                       </CardDescription>
                     </CardContent>
@@ -110,6 +118,6 @@ export function ServicesSection({
           })}
         </Stagger>
       </div>
-    </section>
+    </SceneSection>
   );
 }

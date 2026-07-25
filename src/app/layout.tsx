@@ -51,7 +51,7 @@ export default function RootLayout({
       lang="en"
       className={`${libre.variable} ${plexSans.variable} ${plexMono.variable} dark h-full`}
     >
-      <body className="min-h-full flex flex-col bg-bg text-fg">
+      <body className="relative flex min-h-full flex-col bg-bg-deep text-fg">
         <ScrollProgress />
         {children}
         <SanityLive />

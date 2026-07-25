@@ -7,6 +7,7 @@ import { WhySection } from "@/components/sections/why-section";
 import { FinalCtaSection } from "@/components/sections/final-cta-section";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { MountainScene } from "@/components/site/mountain-scene";
 import { withConceptLabel } from "@/lib/concept-label";
 import { defaultHomeContent } from "@/lib/default-content";
 import { sanityFetch } from "@/sanity/lib/live";
@@ -150,62 +151,67 @@ export default async function HomePage() {
     industry: withConceptLabel(project.industry),
   }));
 
+  const mountainSrc = "/images/hero-mountain.jpg";
+  const mountainAlt =
+    home.hero?.image?.alt ||
+    "Snow-capped mountain ridge under a pale dawn sky";
+
   return (
     <>
-      <SiteHeader nav={settings?.nav} />
-      <main className="flex-1">
-        <HeroSection
-          eyebrow={home.hero?.eyebrow}
-          headline={home.hero?.headline}
-          support={home.hero?.support}
-          servicesMeta={home.hero?.servicesMeta}
-          primaryCta={home.hero?.primaryCta}
-          secondaryCta={home.hero?.secondaryCta}
-          imageSrc="/images/hero-mountain.jpg"
-          imageAlt={
-            home.hero?.image?.alt ||
-            "Snow-capped mountain ridge under a pale dawn sky"
-          }
-        />
-        <ServicesSection
-          heading={home.servicesIntro?.heading}
-          intro={home.servicesIntro?.intro}
-          services={resolvedServices}
-        />
-        <WorkSection
-          eyebrow={home.workIntro?.eyebrow}
-          heading={home.workIntro?.heading}
-          intro={home.workIntro?.intro}
-          projects={resolvedProjects.map((project, index) => ({
-            ...project,
-            imageSrc:
-              project.cover?.blobUrl || `/images/project-0${index + 1}.jpg`,
-          }))}
-        />
-        <ProcessSection
-          heading={home.processIntro?.heading}
-          steps={resolvedSteps}
-        />
-        <EngageSection
-          heading={home.engage?.heading}
-          engageSteps={home.engage?.steps}
-          replyHeading={home.engage?.replyHeading}
-          replyPoints={home.engage?.replyPoints}
-        />
-        <WhySection
-          heading={home.whyThrun?.heading}
-          bullets={home.whyThrun?.bullets}
-          credibilityHeading={home.whyThrun?.credibilityHeading}
-          proofPoints={home.whyThrun?.proofPoints}
-        />
-        <FinalCtaSection
-          heading={home.finalCta?.heading}
-          copy={home.finalCta?.copy}
-          primaryCta={home.finalCta?.primaryCta}
-          secondaryCta={home.finalCta?.secondaryCta}
-        />
-      </main>
-      <SiteFooter tagline={settings?.tagline} />
+      <MountainScene imageSrc={mountainSrc} />
+      <div className="relative z-10 flex min-h-full flex-1 flex-col">
+        <SiteHeader nav={settings?.nav} />
+        <main className="flex-1">
+          <HeroSection
+            eyebrow={home.hero?.eyebrow}
+            headline={home.hero?.headline}
+            support={home.hero?.support}
+            servicesMeta={home.hero?.servicesMeta}
+            primaryCta={home.hero?.primaryCta}
+            secondaryCta={home.hero?.secondaryCta}
+            imageSrc={mountainSrc}
+            imageAlt={mountainAlt}
+          />
+          <ServicesSection
+            heading={home.servicesIntro?.heading}
+            intro={home.servicesIntro?.intro}
+            services={resolvedServices}
+          />
+          <WorkSection
+            eyebrow={home.workIntro?.eyebrow}
+            heading={home.workIntro?.heading}
+            intro={home.workIntro?.intro}
+            projects={resolvedProjects.map((project, index) => ({
+              ...project,
+              imageSrc:
+                project.cover?.blobUrl || `/images/project-0${index + 1}.jpg`,
+            }))}
+          />
+          <ProcessSection
+            heading={home.processIntro?.heading}
+            steps={resolvedSteps}
+          />
+          <EngageSection
+            heading={home.engage?.heading}
+            engageSteps={home.engage?.steps}
+            replyHeading={home.engage?.replyHeading}
+            replyPoints={home.engage?.replyPoints}
+          />
+          <WhySection
+            heading={home.whyThrun?.heading}
+            bullets={home.whyThrun?.bullets}
+            credibilityHeading={home.whyThrun?.credibilityHeading}
+            proofPoints={home.whyThrun?.proofPoints}
+          />
+          <FinalCtaSection
+            heading={home.finalCta?.heading}
+            copy={home.finalCta?.copy}
+            primaryCta={home.finalCta?.primaryCta}
+            secondaryCta={home.finalCta?.secondaryCta}
+          />
+        </main>
+        <SiteFooter tagline={settings?.tagline} />
+      </div>
     </>
   );
 }

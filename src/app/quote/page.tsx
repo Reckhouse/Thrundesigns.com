@@ -86,7 +86,7 @@ export default function QuotePage() {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 pt-[72px] md:pt-[84px]">
+      <main className="flex-1 pt-[80px] md:pt-[96px]">
         <section className="border-b border-line">
           <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[1fr_1fr] lg:px-[74px]">
             <div>
