@@ -15,8 +15,7 @@ const defaultNav = [
   { label: "Services", href: "/#services" },
   { label: "Work", href: "/#work" },
   { label: "Process", href: "/#process" },
-  { label: "About", href: "/#about" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Why Thrun", href: "/#about" },
 ];
 
 type SiteHeaderProps = {
@@ -33,7 +32,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
     <header className="absolute inset-x-0 top-0 z-40 border-b border-line">
       <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between px-5 md:h-[84px] md:px-10 lg:px-[74px]">
         <Link href="/" className="shrink-0" aria-label="Thrun Design Co. home">
-          <BrandLogo className="w-12 md:w-[84px]" />
+          <BrandLogo className="w-14 md:w-[84px]" />
         </Link>
 
         <nav className="hidden items-center gap-10 lg:flex" aria-label="Primary">
@@ -48,13 +47,14 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Button
             asChild
-            className="hidden h-12 rounded-none bg-gold px-4 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink hover:bg-bronze hover:text-fg md:inline-flex"
+            className="inline-flex h-11 rounded-none bg-gold px-3 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-ink hover:bg-bronze hover:text-fg sm:h-12 sm:px-4 sm:text-[11px]"
           >
             <Link href="/quote">
-              Request a quote
+              <span className="sm:hidden">Quote</span>
+              <span className="hidden sm:inline">Request a quote</span>
               <ArrowUpRight className="size-3.5" aria-hidden />
             </Link>
           </Button>
@@ -62,7 +62,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
           <Sheet>
             <SheetTrigger
               className={cn(
-                "inline-flex h-11 items-center justify-center border border-line px-4 font-mono text-[11px] uppercase tracking-[0.14em] text-fg lg:hidden",
+                "inline-flex h-11 items-center justify-center border border-line px-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg sm:px-4 lg:hidden",
               )}
             >
               Menu
@@ -88,7 +88,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
                 ))}
                 <Link
                   href="/quote"
-                  className="mt-4 inline-flex items-center gap-2 bg-gold px-4 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-ink"
+                  className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 bg-gold px-4 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-ink"
                 >
                   Request a quote
                   <ArrowUpRight className="size-3.5" aria-hidden />

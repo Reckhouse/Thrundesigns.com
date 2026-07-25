@@ -54,3 +54,27 @@ export function PrintIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function AuditIcon({ className }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 54 54"
+      fill="none"
+      className={cn(className)}
+      aria-hidden
+    >
+      <path
+        d="M16 14h22v26H16V14Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M22 22h10M22 28h10M22 34h6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <circle cx="36" cy="36" r="8" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M41 41l4 4" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}

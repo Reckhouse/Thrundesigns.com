@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     template: "%s · Thrun Design Co.",
   },
   description:
-    "Strategic brand identity, website design, and marketing systems for businesses ready to move forward.",
+    "Strategic brand systems, websites, marketing audits, and print & digital assets for founders and owners ready to move forward.",
   metadataBase: new URL(siteUrl),
 };
 

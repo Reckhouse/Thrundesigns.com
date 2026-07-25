@@ -6,25 +6,25 @@ const defaultColumns = [
     heading: "Explore",
     links: [
       { label: "Services", href: "/#services" },
-      { label: "Work", href: "/#work" },
+      { label: "Concept studies", href: "/#work" },
       { label: "Process", href: "/#process" },
-      { label: "About", href: "/#about" },
-      { label: "Contact", href: "/#contact" },
+      { label: "Why Thrun", href: "/#about" },
     ],
   },
   {
     heading: "Services",
     links: [
-      { label: "Brand identity", href: "/#services" },
-      { label: "Website design", href: "/#services" },
-      { label: "Print & marketing", href: "/#services" },
+      { label: "Brand & system architecture", href: "/#services" },
+      { label: "Web design & maintenance", href: "/#services" },
+      { label: "Business marketing audits", href: "/#services" },
+      { label: "Print & digital assets", href: "/#services" },
     ],
   },
   {
-    heading: "Contact",
+    heading: "Start",
     links: [
       { label: "Request a quote", href: "/quote" },
-      { label: "View selected work", href: "/work" },
+      { label: "Browse concept studies", href: "/work" },
     ],
   },
 ];
@@ -47,9 +47,9 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
       <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-16 md:px-10 lg:grid-cols-[1.1fr_2fr] lg:gap-20 lg:px-[74px] lg:py-20">
         <div>
           <BrandLogo className="w-[116px]" />
-          <p className="mt-10 max-w-sm font-sans text-[15px] leading-7 text-fg-muted">
+          <p className="mt-10 max-w-[40ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
             {tagline ||
-              "Strategic design for businesses ready to move forward."}
+              "Strategic design for founders and owners ready to move forward."}
           </p>
         </div>
 
@@ -62,7 +62,7 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
               <ul className="mt-5 space-y-3">
                 {column.links?.map((link) =>
                   link?.label && link?.href ? (
-                    <li key={`${column.heading}-${link.href}`}>
+                    <li key={`${column.heading}-${link.label}-${link.href}`}>
                       <Link
                         href={link.href}
                         className="font-sans text-[15px] text-fg transition-colors hover:text-gold"
@@ -80,7 +80,7 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
 
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 border-t border-line px-6 py-6 font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted md:flex-row md:items-center md:justify-between md:px-10 lg:px-[74px]">
         <p>© {new Date().getFullYear()} Thrun Design Co.</p>
-        <p>Precision brand systems</p>
+        <p>Brand systems for growing businesses</p>
       </div>
     </footer>
   );
