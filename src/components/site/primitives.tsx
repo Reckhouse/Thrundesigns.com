@@ -29,7 +29,7 @@ export function SectionHeading({ children, className }: SectionHeadingProps) {
   return (
     <h2
       className={cn(
-        "font-display text-[30px] leading-10 text-fg md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]",
+        "text-balance font-display text-[30px] leading-10 tracking-[-0.02em] text-fg md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]",
         className,
       )}
     >

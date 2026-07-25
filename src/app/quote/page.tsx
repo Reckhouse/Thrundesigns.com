@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import {
-  Eyebrow,
   SectionHeading,
 } from "@/components/site/primitives";
 import { Button } from "@/components/ui/button";
@@ -91,13 +90,12 @@ export default function QuotePage() {
         <section className="border-b border-line">
           <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[1fr_1fr] lg:px-[74px]">
             <div>
-              <Eyebrow>Project quote</Eyebrow>
-              <SectionHeading className="mt-4">
+              <SectionHeading className="text-balance">
                 Tell us what you&apos;re building.
               </SectionHeading>
-              <p className="mt-6 max-w-md font-sans text-[15px] leading-7 text-fg-muted">
-                A short multi-step brief helps us return with a clear scope.
-                Progress is kept as you move between steps.
+              <p className="mt-6 max-w-[42ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+                A short brief is enough. We’ll reply within a few business days
+                with scope options and next steps.
               </p>
               <ol className="mt-8 flex flex-wrap gap-x-4 gap-y-2 md:mt-10">
                 {steps.map((label, index) => (
@@ -119,12 +117,13 @@ export default function QuotePage() {
             >
               {status === "done" ? (
                 <div>
-                  <Eyebrow>Received</Eyebrow>
-                  <h2 className="mt-4 font-display text-3xl text-fg">
-                    Thanks — we&apos;ll be in touch.
+                  <h2 className="font-display text-3xl text-fg text-balance">
+                    Thanks — your brief is in.
                   </h2>
-                  <p className="mt-4 font-sans text-fg-muted">
-                    Your quote request is in. Expect a reply with next steps.
+                  <p className="mt-4 max-w-[40ch] text-pretty font-sans text-fg-muted">
+                    We’ll review it and reply within a few business days with
+                    scope options and clear next steps. No need to resubmit
+                    unless something changes.
                   </p>
                 </div>
               ) : (
@@ -170,9 +169,10 @@ export default function QuotePage() {
                           {...form.register("projectType")}
                         >
                           <option value="">Select</option>
-                          <option value="brand">Brand identity</option>
-                          <option value="website">Website design</option>
-                          <option value="print">Print & marketing</option>
+                          <option value="brand">Brand & system architecture</option>
+                          <option value="website">Web design & maintenance</option>
+                          <option value="audit">Business marketing audit</option>
+                          <option value="print">Print & digital assets</option>
                           <option value="mixed">Mixed engagement</option>
                         </select>
                       </Field>
@@ -266,8 +266,9 @@ export default function QuotePage() {
                     )}
                   </div>
                   {status === "error" && (
-                    <p className="mt-4 font-sans text-sm text-red-300">
-                      Something went wrong. Please try again.
+                    <p className="mt-4 font-sans text-sm text-red-300" role="alert">
+                      We couldn’t send your brief. Check your connection and try
+                      again — your answers on this step are still here.
                     </p>
                   )}
                 </>

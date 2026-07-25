@@ -1,6 +1,5 @@
 import Image from "next/image";
 import {
-  Eyebrow,
   PrimaryButtonLink,
   PrecisionMark,
   TextLink,
@@ -34,14 +33,16 @@ export function HeroSection({
     <section className="relative overflow-hidden border-b border-line pt-[72px] md:min-h-[900px] md:pt-[84px] lg:min-h-[820px]">
       <div className="mx-auto grid w-full max-w-[1440px] gap-8 px-5 pb-12 pt-8 md:gap-10 md:px-10 md:pb-16 md:pt-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-8 lg:px-[74px] lg:pb-10 lg:pt-12">
         <Reveal className="relative z-10 flex max-w-xl flex-col justify-center order-1">
-          <Eyebrow>{eyebrow || "Thrun Design Co."}</Eyebrow>
-          <h1 className="mt-4 font-display text-[30px] leading-10 text-fg md:mt-5 md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]">
+          <p className="font-display text-[22px] leading-7 tracking-[-0.02em] text-gold md:text-[26px] md:leading-8">
+            {eyebrow || "Thrun Design Co."}
+          </p>
+          <h1 className="mt-4 text-balance font-display text-[30px] leading-10 text-fg md:mt-5 md:text-[34px] md:leading-[46px] lg:text-[56px] lg:leading-[70px]">
             {headline ||
               "Strategic design for businesses ready to move forward."}
           </h1>
-          <p className="mt-5 max-w-[500px] font-sans text-[15px] leading-7 text-fg-muted md:mt-6 md:text-base">
+          <p className="mt-5 max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-6 md:text-base md:leading-7">
             {support ||
-              "Cohesive brand identities, websites, and marketing materials built for clarity, consistency, and confidence."}
+              "We help founders and owners build clearer brands, websites, and marketing systems — so your next chapter feels confident, not chaotic."}
           </p>
 
           <div className="mt-8 flex flex-col items-stretch gap-4 sm:mt-12 sm:flex-row sm:items-center sm:gap-5">
@@ -55,14 +56,15 @@ export function HeroSection({
               href={secondaryCta?.href || "/work"}
               className="justify-center sm:justify-start"
             >
-              {secondaryCta?.label || "Explore our work"}
+              {secondaryCta?.label || "Browse concept studies"}
             </TextLink>
           </div>
 
-          <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-muted md:mt-10">
-            {servicesMeta ||
-              "Brand identity  ·  Website design  ·  Print & marketing"}
-          </p>
+          {servicesMeta ? (
+            <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-muted md:mt-10">
+              {servicesMeta}
+            </p>
+          ) : null}
         </Reveal>
 
         <div className="relative order-2 min-h-[320px] md:min-h-[480px] lg:min-h-[736px]">

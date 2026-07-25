@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Eyebrow,
   SectionHeading,
   TextLink,
 } from "@/components/site/primitives";
@@ -37,13 +36,17 @@ export function WorkSection({
     <section id="work" className="border-b border-line">
       <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-5 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[340px_1fr] lg:gap-16 lg:px-[74px] lg:py-20">
         <div>
-          <Eyebrow>{eyebrow || "Selected work"}</Eyebrow>
-          <SectionHeading className="mt-4">
-            {heading || "Concept projects with production intent."}
+          {eyebrow ? (
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted">
+              {eyebrow}
+            </p>
+          ) : null}
+          <SectionHeading className={eyebrow ? "mt-4 text-balance" : "text-balance"}>
+            {heading || "Speculative work with production intent."}
           </SectionHeading>
-          <p className="mt-6 max-w-sm font-sans text-[15px] leading-7 text-fg-muted md:mt-8">
+          <p className="mt-6 max-w-[40ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8">
             {intro ||
-              "A focused set of case studies spanning advisory, construction, and systems brands."}
+              "These are concept projects — not client case studies — until we replace them with real engagements."}
           </p>
         </div>
 
@@ -63,7 +66,7 @@ export function WorkSection({
                   {src ? (
                     <Image
                       src={src}
-                      alt={project.cover?.alt || project.title || "Project"}
+                      alt={project.cover?.alt || project.title || "Concept study"}
                       fill
                       className="object-cover grayscale transition duration-500 group-hover:scale-[1.03]"
                       sizes="(max-width: 768px) 100vw, 286px"
@@ -82,7 +85,7 @@ export function WorkSection({
                   {project.services}
                 </p>
                 <div className="mt-8 border-t border-line pt-5">
-                  <TextLink href={href}>View project</TextLink>
+                  <TextLink href={href}>View concept</TextLink>
                 </div>
               </article>
             );

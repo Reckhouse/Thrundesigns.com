@@ -3,14 +3,15 @@ import Link from "next/link";
 import { WorkSection } from "@/components/sections/work-section";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { Eyebrow, SectionHeading } from "@/components/site/primitives";
+import { SectionHeading } from "@/components/site/primitives";
 import { defaultHomeContent } from "@/lib/default-content";
 import { sanityFetch } from "@/sanity/lib/live";
 import { projectsQuery, siteSettingsQuery } from "@/sanity/lib/queries";
 
 export const metadata: Metadata = {
-  title: "Work",
-  description: "Selected concept and client work from Thrun Design Co.",
+  title: "Concept studies",
+  description:
+    "Concept projects from Thrun Design Co. — speculative studies until real client work replaces them.",
 };
 
 function asArray<T>(value: unknown): T[] {
@@ -24,14 +25,7 @@ export default async function WorkIndexPage() {
   ]);
 
   const settings = (settingsRes.data || null) as {
-    nav?: { label?: string | null; href?: string | null }[] | null;
     tagline?: string | null;
-    footerColumns?:
-      | {
-          heading?: string | null;
-          links?: { label?: string | null; href?: string | null }[] | null;
-        }[]
-      | null;
   } | null;
 
   const fetched = asArray<(typeof defaultHomeContent.projects)[number]>(
@@ -41,30 +35,29 @@ export default async function WorkIndexPage() {
 
   return (
     <>
-      <SiteHeader nav={settings?.nav} />
-      <main className="flex-1 pt-[84px]">
+      <SiteHeader />
+      <main className="flex-1 pt-[72px] md:pt-[84px]">
         <section className="border-b border-line">
           <div className="mx-auto w-full max-w-[1440px] px-6 py-16 md:px-10 lg:px-[74px]">
-            <Eyebrow>Work index</Eyebrow>
-            <SectionHeading className="mt-4 max-w-3xl">
-              Selected work
+            <SectionHeading className="max-w-3xl text-balance">
+              Concept studies
             </SectionHeading>
-            <p className="mt-6 max-w-2xl font-sans text-[15px] leading-7 text-fg-muted">
-              Concept projects now; later mixes of real and concept work live
-              here.
+            <p className="mt-6 max-w-[60ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+              Speculative projects that show how we think — not client case
+              studies. Real work will replace these as engagements ship.
             </p>
             <Link
               href="/quote"
-              className="mt-8 inline-flex font-mono text-[11px] uppercase tracking-[0.14em] text-gold"
+              className="mt-8 inline-flex min-h-11 items-center font-mono text-[11px] uppercase tracking-[0.14em] text-gold"
             >
-              Start a project →
+              Request a project quote →
             </Link>
           </div>
         </section>
         <WorkSection
-          eyebrow="Case studies"
-          heading="Projects with production intent."
-          intro="Explore advisory, construction, and systems narratives."
+          eyebrow="Concept studies"
+          heading="Speculative work with production intent."
+          intro="Advisory, construction, and systems narratives — framed as concepts until real clients live here."
           projects={projects.map((project, index) => ({
             ...project,
             imageSrc:
@@ -72,10 +65,7 @@ export default async function WorkIndexPage() {
           }))}
         />
       </main>
-      <SiteFooter
-        tagline={settings?.tagline}
-        columns={settings?.footerColumns}
-      />
+      <SiteFooter tagline={settings?.tagline} />
     </>
   );
 }
