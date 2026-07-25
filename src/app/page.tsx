@@ -2,10 +2,12 @@ import { HeroSection } from "@/components/sections/hero-section";
 import { ServicesSection } from "@/components/sections/services-section";
 import { ProcessSection } from "@/components/sections/process-section";
 import { WorkSection } from "@/components/sections/work-section";
+import { EngageSection } from "@/components/sections/engage-section";
 import { WhySection } from "@/components/sections/why-section";
 import { FinalCtaSection } from "@/components/sections/final-cta-section";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { withConceptLabel } from "@/lib/concept-label";
 import { defaultHomeContent } from "@/lib/default-content";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
@@ -36,16 +38,13 @@ export default async function HomePage() {
   const projects = asArray<(typeof defaultHomeContent.projects)[number]>(
     projectsRes.data,
   );
-  const resolvedProjects = projects.length
-    ? projects.map((project) => ({
-        ...project,
-        industry: project.industry?.includes("Concept")
-          ? project.industry
-          : project.industry
-            ? `${project.industry} · Concept`
-            : "Concept",
-      }))
-    : defaultHomeContent.projects;
+  const resolvedProjects = (projects.length
+    ? projects
+    : defaultHomeContent.projects
+  ).map((project) => ({
+    ...project,
+    industry: withConceptLabel(project.industry),
+  }));
 
   return (
     <>
@@ -66,10 +65,6 @@ export default async function HomePage() {
           intro={home.servicesIntro?.intro}
           services={resolvedServices}
         />
-        <ProcessSection
-          heading={home.processIntro?.heading}
-          steps={resolvedSteps}
-        />
         <WorkSection
           eyebrow={home.workIntro?.eyebrow}
           heading={home.workIntro?.heading}
@@ -79,6 +74,16 @@ export default async function HomePage() {
             imageSrc:
               project.cover?.blobUrl || `/images/project-0${index + 1}.jpg`,
           }))}
+        />
+        <ProcessSection
+          heading={home.processIntro?.heading}
+          steps={resolvedSteps}
+        />
+        <EngageSection
+          heading={home.engage?.heading}
+          engageSteps={home.engage?.steps}
+          replyHeading={home.engage?.replyHeading}
+          replyPoints={home.engage?.replyPoints}
         />
         <WhySection
           heading={home.whyThrun?.heading}

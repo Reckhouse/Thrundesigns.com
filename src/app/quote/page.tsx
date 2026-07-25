@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, cloneElement, isValidElement } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -291,13 +291,23 @@ function Field({
   error?: string;
   children: React.ReactNode;
 }) {
+  const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   return (
     <div className="space-y-2">
-      <Label className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+      <Label
+        htmlFor={id}
+        className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold"
+      >
         {label}
       </Label>
-      {children}
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+      {isValidElement<{ id?: string }>(children)
+        ? cloneElement(children, { id })
+        : children}
+      {error ? (
+        <p className="text-sm text-red-300" role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -21,7 +21,7 @@ export const defaultHomeContent = {
     },
     processIntro: {
       eyebrow: null,
-      heading: "A clear path from brief to launch.",
+      heading: "Three phases from brief to handoff.",
     },
     workIntro: {
       eyebrow: "Concept studies",
@@ -29,13 +29,36 @@ export const defaultHomeContent = {
       intro:
         "These are concept projects — not client case studies — until we replace them with real engagements. They show how we think about advisory, construction, and systems brands.",
     },
+    engage: {
+      heading: "How we engage — and what you’ll get in a reply.",
+      steps: [
+        {
+          title: "Send a short brief",
+          copy: "About five minutes on your business, audience, and the outcome you need.",
+        },
+        {
+          title: "Get a scoped reply",
+          copy: "Within a few business days we write back with options — not a hard sell.",
+        },
+        {
+          title: "Choose your next step",
+          copy: "Move forward, adjust the scope, or pause. You’re in control either way.",
+        },
+      ],
+      replyHeading: "What’s in a reply",
+      replyPoints: [
+        "A plain-language read of your goals and constraints",
+        "Scope options (and ballpark ranges when we can estimate)",
+        "Clear next steps if we both want to continue",
+      ],
+    },
     whyThrun: {
       eyebrow: null,
       heading: "A partner when the stakes feel real.",
       bullets: [
         "Systems that stay coherent as you grow",
         "Brand architecture that works across channels",
-        "Careful craft without decorative excess",
+        "Clear craft without decorative excess",
         "Steady pace from discovery through launch",
       ],
       credibilityEyebrow: null,
@@ -93,32 +116,20 @@ export const defaultHomeContent = {
     {
       _id: "step-1",
       number: "01",
-      title: "Discover",
-      copy: "Clarify audience, constraints, and the outcome that matters.",
+      title: "Discover & define",
+      copy: "We clarify audience, constraints, positioning, and the outcome that matters before any design work starts.",
     },
     {
       _id: "step-2",
       number: "02",
-      title: "Define",
-      copy: "Lock positioning, messaging, and the system architecture.",
+      title: "Design & build",
+      copy: "Identity, site, and assets take shape together — then we implement with performance and CMS readiness in mind.",
     },
     {
       _id: "step-3",
       number: "03",
-      title: "Design",
-      copy: "Craft identity, interfaces, and assets with editorial precision.",
-    },
-    {
-      _id: "step-4",
-      number: "04",
-      title: "Build",
-      copy: "Implement with performance, accessibility, and CMS readiness.",
-    },
-    {
-      _id: "step-5",
-      number: "05",
-      title: "Launch",
-      copy: "Ship, hand off, and leave you with a clear path to maintain.",
+      title: "Launch & handoff",
+      copy: "We ship, leave you with a clear way to maintain the system, and stay available for the next chapter.",
     },
   ],
   projects: [
