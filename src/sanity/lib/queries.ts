@@ -27,6 +27,12 @@ export const homePageQuery = defineQuery(`
     servicesIntro,
     processIntro,
     workIntro,
+    engage{
+      heading,
+      steps[]{ title, copy },
+      replyHeading,
+      replyPoints
+    },
     whyThrun,
     finalCta,
     seo

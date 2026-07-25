@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-25T20:38:00.000Z",
+  "title": "Design System: Thrun Design Co.",
+  "extensions": {
+    "colorMeta": {
+      "bg": { "role": "neutral", "displayName": "Void Charcoal", "canonical": "#090b0d", "tonalRamp": ["#050607", "#090b0d", "#111417", "#15191c", "#2b3033", "#b3aea4", "#eeeae1", "#f3f1eb"] },
+      "bg-raised": { "role": "neutral", "displayName": "Raised Charcoal", "canonical": "#111417", "tonalRamp": ["#050607", "#090b0d", "#111417", "#15191c", "#2b3033", "#b3aea4", "#eeeae1", "#f3f1eb"] },
+      "surface": { "role": "neutral", "displayName": "Surface Charcoal", "canonical": "#15191c", "tonalRamp": ["#050607", "#090b0d", "#111417", "#15191c", "#2b3033", "#b3aea4", "#eeeae1", "#f3f1eb"] },
+      "contrast": { "role": "neutral", "displayName": "Contrast Cream", "canonical": "#eeeae1", "tonalRamp": ["#121416", "#2b3033", "#7a5d2f", "#b3aea4", "#c59a53", "#eeeae1", "#f3f1eb", "#faf8f4"] },
+      "fg": { "role": "neutral", "displayName": "Cream Ink", "canonical": "#f3f1eb", "tonalRamp": ["#121416", "#2b3033", "#7a5d2f", "#b3aea4", "#c59a53", "#eeeae1", "#f3f1eb", "#faf8f4"] },
+      "fg-muted": { "role": "neutral", "displayName": "Muted Parchment", "canonical": "#b3aea4", "tonalRamp": ["#121416", "#2b3033", "#7a5d2f", "#b3aea4", "#c59a53", "#eeeae1", "#f3f1eb", "#faf8f4"] },
+      "ink": { "role": "neutral", "displayName": "Near Ink", "canonical": "#121416", "tonalRamp": ["#050607", "#090b0d", "#121416", "#15191c", "#2b3033", "#b3aea4", "#eeeae1", "#f3f1eb"] },
+      "line": { "role": "neutral", "displayName": "Hairline Graphite", "canonical": "#2b3033", "tonalRamp": ["#090b0d", "#111417", "#15191c", "#2b3033", "#4a5054", "#b3aea4", "#eeeae1", "#f3f1eb"] },
+      "gold": { "role": "primary", "displayName": "Editorial Gold", "canonical": "#c59a53", "tonalRamp": ["#3d2e14", "#5c4420", "#7a5d2f", "#9a7540", "#c59a53", "#d4b57a", "#e6d4a8", "#f5edd8"] },
+      "bronze": { "role": "secondary", "displayName": "Deep Bronze", "canonical": "#7a5d2f", "tonalRamp": ["#2a1f10", "#3d2e14", "#5c4420", "#7a5d2f", "#9a7540", "#c59a53", "#d4b57a", "#e6d4a8"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero brand and page-defining headlines." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles in Libre Baskerville." },
+      "body": { "displayName": "Body", "purpose": "Founder-facing support copy." },
+      "label": { "displayName": "Label", "purpose": "Mono uppercase nav, meta, and button labels." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default state transitions." },
+      { "name": "reveal", "value": "opacity + translateY short spring", "purpose": "Section/hero presence without noise." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "figma-desktop", "value": "1440px" },
+      { "name": "figma-tablet", "value": "768px" },
+      { "name": "figma-mobile", "value": "390px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Gold mono CTA used for quote requests.",
+      "html": "<button class=\"ds-btn-primary\">Request a quote</button>",
+      "css": ".ds-btn-primary { background: var(--gold, #c59a53); color: var(--ink, #121416); padding: 12px 16px; border: none; border-radius: 0; font-family: \"IBM Plex Mono\", ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; transition: background 0.2s, color 0.2s; } .ds-btn-primary:hover { background: var(--bronze, #7a5d2f); color: var(--fg, #f3f1eb); } .ds-btn-primary:focus-visible { outline: 2px solid var(--gold, #c59a53); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary charcoal outline action.",
+      "html": "<button class=\"ds-btn-ghost\">Browse concept studies</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: var(--fg, #f3f1eb); padding: 12px 16px; border: 1px solid var(--line, #2b3033); border-radius: 0; font-family: \"IBM Plex Mono\", ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; transition: color 0.2s, border-color 0.2s; } .ds-btn-ghost:hover { color: var(--gold, #c59a53); border-color: var(--gold, #c59a53); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--gold, #c59a53); outline-offset: 2px; }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Mono uppercase primary navigation link.",
+      "html": "<a class=\"ds-nav-link\" href=\"#services\">Services</a>",
+      "css": ".ds-nav-link { color: var(--fg, #f3f1eb); font-family: \"IBM Plex Mono\", ui-monospace, monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; transition: color 0.2s; } .ds-nav-link:hover { color: var(--gold, #c59a53); } .ds-nav-link:focus-visible { outline: 2px solid var(--gold, #c59a53); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Quote form field on raised charcoal.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Email</span><input class=\"ds-input\" type=\"email\" placeholder=\"you@company.com\" /></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 8px; } .ds-field-label { font-family: \"IBM Plex Mono\", ui-monospace, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-muted, #b3aea4); } .ds-input { background: var(--bg-raised, #111417); color: var(--fg, #f3f1eb); border: 1px solid var(--line, #2b3033); border-radius: 0; padding: 12px 14px; font-family: \"IBM Plex Sans\", Helvetica Neue, sans-serif; font-size: 16px; } .ds-input:focus-visible { outline: 2px solid var(--gold, #c59a53); outline-offset: 0; border-color: var(--gold, #c59a53); }"
+    },
+    {
+      "name": "Service Module",
+      "kind": "card",
+      "refersTo": null,
+      "description": "Hairline-bordered service block — enclosure only when listing offers.",
+      "html": "<article class=\"ds-service\"><h3 class=\"ds-service-title\">Brand &amp; system architecture</h3><p class=\"ds-service-copy\">Naming, visual language, and guidelines that stay coherent as the business grows.</p><a class=\"ds-service-link\" href=\"/quote\">Start a brand project</a></article>",
+      "css": ".ds-service { background: var(--surface, #15191c); border: 1px solid var(--line, #2b3033); border-radius: 0; padding: 28px; } .ds-service-title { margin: 0 0 12px; font-family: \"Libre Baskerville\", Georgia, serif; font-size: 1.35rem; color: var(--fg, #f3f1eb); font-weight: 400; } .ds-service-copy { margin: 0 0 20px; font-family: \"IBM Plex Sans\", Helvetica Neue, sans-serif; color: var(--fg-muted, #b3aea4); line-height: 1.6; } .ds-service-link { font-family: \"IBM Plex Mono\", ui-monospace, monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold, #c59a53); text-decoration: none; } .ds-service-link:hover { color: var(--bronze, #7a5d2f); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Dark Editorial Atelier",
+    "overview": "Thrun Design Co.’s public surfaces feel like a quiet studio after hours: charcoal planes, cream ink, and a single warm gold used sparingly like a brass rule on an editorial spread. The system favors restraint over spectacle — composition, typography, and honest copy do the persuasion work.\n\nDensity is editorial, not dashboard. Sections breathe with large vertical rhythm; borders are hairline charcoal; corners stay sharp (0 radius). Imagery is desaturated landscape and architectural atmosphere, never stock-smiley lifestyle collage.",
+    "keyCharacteristics": [
+      "Near-black charcoal field with cream type and rare gold accents",
+      "Libre Baskerville display + IBM Plex Sans/Mono for body and labels",
+      "Zero border-radius; hairline rules instead of cards-as-decoration",
+      "Persuasion path always ends at the quote request"
+    ],
+    "rules": [
+      { "name": "The One Gold Rule", "body": "Gold appears on primary CTAs, brand lockup emphasis, and selective hover — never as a wash, gradient field, or decorative glow.", "section": "colors" },
+      { "name": "The No-Purple Rule", "body": "Do not introduce purple, indigo, neon, or glow accents. Stay in charcoal / cream / gold / bronze.", "section": "colors" },
+      { "name": "The Brand-First Display Rule", "body": "On branded first viewports, the Thrun name/lockup must compete with — not surrender to — the headline.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "No decorative drop shadows. If a surface needs separation, change tone or draw a 1px line.", "section": "elevation" },
+      { "name": "The Zero-Radius Rule", "body": "Do not introduce rounded-full pills, soft cards, or floating media tiles unless a platform control absolutely requires it.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do keep gold rare and purposeful (primary CTA + brand emphasis).",
+      "Do label concept portfolio work as concepts — never as shipped client proof.",
+      "Do push the persuasion path toward /quote with clear reply expectations.",
+      "Do preserve Libre + Plex + zero radius as the identity triad."
+    ],
+    "donts": [
+      "Don't invent testimonials, metrics, logos, or awards.",
+      "Don't use purple gradients, glow, soft UI pills, or dashboard chrome on marketing surfaces.",
+      "Don't fill the first viewport with stats, schedules, or secondary promos.",
+      "Don't present inset hero media cards — hero imagery stays full-bleed / edge-dominant."
+    ]
+  }
+}

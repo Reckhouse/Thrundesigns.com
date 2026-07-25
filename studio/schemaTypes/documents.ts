@@ -12,7 +12,11 @@ export const service = defineType({
       options: { source: "title" },
       validation: (r) => r.required(),
     }),
-    defineField({ name: "icon", type: "string", description: "brand | web | print" }),
+    defineField({
+      name: "icon",
+      type: "string",
+      description: "brand | web | audit | print",
+    }),
     defineField({ name: "summary", type: "text", rows: 3 }),
     defineField({ name: "linkLabel", type: "string", initialValue: "Learn more" }),
     defineField({ name: "order", type: "number" }),
