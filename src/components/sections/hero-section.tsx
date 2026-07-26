@@ -46,12 +46,20 @@ export function HeroSection({
 
   return (
     <section
-      className="relative min-h-[100svh] border-b border-line/40 pt-[80px] md:min-h-[920px] md:pt-[96px] lg:min-h-[100svh]"
+      className="relative min-h-[100svh] overflow-hidden border-b border-line/40 pt-[80px] md:min-h-[920px] md:pt-[96px] lg:min-h-[100svh]"
       aria-label="Introduction"
     >
-      <div className="relative z-10 mx-auto flex min-h-[calc(100svh-80px)] w-full max-w-[1440px] flex-col justify-end px-5 pb-16 pt-10 md:min-h-[calc(920px-96px)] md:justify-center md:px-10 md:pb-20 md:pt-12 lg:min-h-[calc(100svh-96px)] lg:px-[74px] lg:pb-24">
+      {/* Full-hero particle stage — explosions stay visible across the section */}
+      {!reduce ? (
+        <div className="pointer-events-auto absolute inset-0 z-[1] hidden lg:block">
+          <HorseParticlesLazy />
+        </div>
+      ) : null}
+
+      {/* Content above the canvas; only the copy column captures pointers */}
+      <div className="pointer-events-none relative z-10 mx-auto flex min-h-[calc(100svh-80px)] w-full max-w-[1440px] flex-col justify-end px-5 pb-16 pt-10 md:min-h-[calc(920px-96px)] md:justify-center md:px-10 md:pb-20 md:pt-12 lg:min-h-[calc(100svh-96px)] lg:px-[74px] lg:pb-24">
         <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,420px)] lg:gap-12 xl:gap-16">
-          <div className="max-w-xl lg:max-w-[42rem]">
+          <div className="pointer-events-auto max-w-xl lg:max-w-[42rem]">
             <motion.p
               className="text-balance font-display text-[clamp(2.25rem,5vw,4.25rem)] leading-[1.02] tracking-[-0.02em] text-gold drop-shadow-[0_2px_24px_rgba(12,13,12,0.45)]"
               {...item(0.08)}
@@ -119,30 +127,20 @@ export function HeroSection({
             ) : null}
           </div>
 
-          {!reduce ? (
-            <motion.div
-              className="relative mx-auto hidden h-[min(48vw,400px)] w-full max-w-[400px] overflow-hidden lg:mx-0 lg:block lg:h-[min(52vh,440px)]"
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                duration: motionTokens.durationSlow,
-                ease: motionTokens.easeOut,
-                delay: 0.35,
-              }}
-            >
-              <HorseParticlesLazy />
-            </motion.div>
-          ) : (
-            <div className="relative mx-auto hidden w-full max-w-[340px] lg:mx-0 lg:block">
-              {/* Static mark fallback when motion is reduced */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* Layout spacer — events pass through to the full-hero canvas */}
+          <div
+            className="relative mx-auto hidden min-h-[min(48vw,400px)] w-full max-w-[400px] lg:mx-0 lg:block lg:min-h-[min(52vh,440px)]"
+            aria-hidden
+          >
+            {reduce ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src="/images/horse-head-mark.png"
                 alt=""
-                className="mx-auto h-auto w-full max-w-[300px] object-contain opacity-90"
+                className="pointer-events-none mx-auto h-auto w-full max-w-[300px] object-contain opacity-90"
               />
-            </div>
-          )}
+            ) : null}
+          </div>
         </div>
 
         <motion.div

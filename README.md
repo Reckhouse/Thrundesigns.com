@@ -142,11 +142,11 @@ scaffold initial commit). Custom domain `thrundesign.com` can be added later.
 ## Hero horse particles
 
 Desktop hero includes an interactive WebGL particle horse head (React Three
-Fiber + custom shaders + GSAP) to the right of the copy:
+Fiber + custom shaders + GSAP) staged across the full hero:
 
-- Stable detailed silhouette when the cursor is away
-- Increasing shake as the pointer approaches
-- Chaotic explosion on hover; particles reform when the pointer leaves
+- Rests on the right; explosions stay visible across the hero section
+- Stable gold silhouette when the cursor is away
+- Shake ramps in within ~6" of the mark; hover explodes; leave reforms
 - Hidden below `lg`; static mark fallback when `prefers-reduced-motion` is set
 
 Source art: `public/images/horse-head.png`  
