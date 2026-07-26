@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import { HeroSection } from "@/components/sections/hero-section";
 import { ServicesSection } from "@/components/sections/services-section";
 import { ProcessSection } from "@/components/sections/process-section";
 import { WorkSection } from "@/components/sections/work-section";
+import { ArtifactSection } from "@/components/sections/artifact-section";
 import { EngageSection } from "@/components/sections/engage-section";
 import { WhySection } from "@/components/sections/why-section";
 import { FinalCtaSection } from "@/components/sections/final-cta-section";
@@ -18,6 +20,32 @@ import {
   servicesQuery,
   siteSettingsQuery,
 } from "@/sanity/lib/queries";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { data } = await sanityFetch({
+    query: homePageQuery,
+    stega: false,
+  }).catch(() => ({ data: null }));
+  const seo = (data as { seo?: { title?: string; description?: string } } | null)
+    ?.seo;
+  const hero = (data as { hero?: { headline?: string; support?: string } } | null)
+    ?.hero;
+  return {
+    title: seo?.title || undefined,
+    description:
+      seo?.description ||
+      hero?.support ||
+      defaultHomeContent.home.hero.support,
+    alternates: { canonical: "/" },
+    openGraph: {
+      title: seo?.title || hero?.headline || "Thrun Design Co.",
+      description:
+        seo?.description ||
+        hero?.support ||
+        defaultHomeContent.home.hero.support,
+    },
+  };
+}
 
 function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
@@ -82,6 +110,18 @@ export default async function HomePage() {
     workIntro: {
       ...defaults.workIntro,
       ...cmsHome?.workIntro,
+    },
+    artifact: {
+      ...defaults.artifact,
+      ...cmsHome?.artifact,
+      items:
+        asArray<(typeof defaults.artifact.items)[number]>(
+          cmsHome?.artifact?.items,
+        ).length > 0
+          ? asArray<(typeof defaults.artifact.items)[number]>(
+              cmsHome?.artifact?.items,
+            )
+          : defaults.artifact.items,
     },
     engage: {
       ...defaults.engage,
@@ -186,6 +226,15 @@ export default async function HomePage() {
               imageSrc:
                 project.cover?.blobUrl || `/images/project-0${index + 1}.jpg`,
             }))}
+          />
+          <ArtifactSection
+            eyebrow={home.artifact?.eyebrow}
+            heading={home.artifact?.heading}
+            intro={home.artifact?.intro}
+            items={home.artifact?.items}
+            footnote={home.artifact?.footnote}
+            ctaLabel={home.artifact?.ctaLabel}
+            ctaHref={home.artifact?.ctaHref}
           />
           <ProcessSection
             heading={home.processIntro?.heading}

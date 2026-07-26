@@ -5,7 +5,10 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     homePage: defineLocations({
       select: { title: "hero.headline" },
       resolve: () => ({
-        locations: [{ title: "Home", href: "/" }],
+        locations: [
+          { title: "Home", href: "/" },
+          { title: "Sample lens", href: "/#sample" },
+        ],
       }),
     }),
     siteSettings: defineLocations({

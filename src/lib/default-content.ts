@@ -2,9 +2,9 @@ export const defaultHomeContent = {
   home: {
     hero: {
       eyebrow: "Thrun Design Co.",
-      headline: "Strategic design for businesses ready to move forward.",
+      headline: "Strategic design when a rebrand, launch, or outdated site can’t wait.",
       support:
-        "We help founders and owners build clearer brands, websites, and marketing systems — so your next chapter feels confident, not chaotic.",
+        "For founders and owners facing a messy brand, a launch that needs to land, or marketing that no longer matches the business — we build clearer systems, websites, and materials so the next step is concrete.",
       servicesMeta: "Brand systems  ·  Web  ·  Audits  ·  Print & digital",
       primaryCta: { label: "Request a project quote", href: "/quote" },
       secondaryCta: { label: "Browse concept studies", href: "/work" },
@@ -21,7 +21,7 @@ export const defaultHomeContent = {
     },
     processIntro: {
       eyebrow: null,
-      heading: "Three phases from brief to handoff.",
+      heading: "How a project runs — from brief to handoff.",
     },
     workIntro: {
       eyebrow: "Concept studies",
@@ -29,8 +29,39 @@ export const defaultHomeContent = {
       intro:
         "These are concept projects — not client case studies — until we replace them with real engagements. They show how we think about advisory, construction, and systems brands.",
     },
+    artifact: {
+      eyebrow: "Sample lens",
+      heading: "What a marketing audit actually looks for.",
+      intro:
+        "Not a case study and not invented metrics — a plain excerpt of the questions we bring to a first review so you can judge the fit before you quote.",
+      items: [
+        {
+          label: "Message vs. reality",
+          detail:
+            "Does the homepage promise match what a real customer hears on a sales call or in the product?",
+        },
+        {
+          label: "Touchpoint friction",
+          detail:
+            "Where do brand, site, and leave-behinds disagree — and which mismatch costs trust first?",
+        },
+        {
+          label: "Priority order",
+          detail:
+            "What to fix this quarter vs. later, written in plain language with scope options.",
+        },
+        {
+          label: "Maintenance load",
+          detail:
+            "What your team can keep current without a redesign every time something ships.",
+        },
+      ],
+      footnote: "Sample review lens — not results from a named client.",
+      ctaLabel: "Request an audit quote",
+      ctaHref: "/quote?type=audit",
+    },
     engage: {
-      heading: "How we engage — and what you’ll get in a reply.",
+      heading: "How an inquiry works — and what’s in our reply.",
       steps: [
         {
           title: "Send a short brief",

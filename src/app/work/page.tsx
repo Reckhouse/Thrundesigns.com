@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Concept studies",
   description:
     "Concept projects from Thrun Design Co. — speculative studies until real client work replaces them.",
+  alternates: { canonical: "/work" },
 };
 
 function asArray<T>(value: unknown): T[] {

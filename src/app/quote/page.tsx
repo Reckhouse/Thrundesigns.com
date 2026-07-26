@@ -7,6 +7,7 @@ import {
   resolveQuoteFormConfig,
   type QuoteFormConfig,
 } from "@/lib/quote/form-config";
+import { parseProjectTypeParam } from "@/lib/quote/project-type";
 import { sanityFetch } from "@/sanity/lib/live";
 import { quoteFormQuery } from "@/sanity/lib/queries";
 
@@ -27,23 +28,33 @@ async function loadQuoteFormConfig(options?: {
 export async function generateMetadata(): Promise<Metadata> {
   const config = await loadQuoteFormConfig({ stega: false });
   return {
-    title: config.seo?.title || "Request a quote | Thrun Design Co.",
+    title: config.seo?.title || "Request a quote",
     description:
       config.seo?.description ||
       config.support ||
       "Tell us what you're building.",
+    alternates: { canonical: "/quote" },
   };
 }
 
-export default async function QuotePage() {
+type QuotePageProps = {
+  searchParams: Promise<{ type?: string | string[] }>;
+};
+
+export default async function QuotePage({ searchParams }: QuotePageProps) {
   const config = await loadQuoteFormConfig();
+  const params = await searchParams;
+  const initialProjectType = parseProjectTypeParam(params.type);
 
   return (
     <>
       <SiteHeader />
       <main className="flex-1 pt-[80px] md:pt-[96px]">
         <section className="border-b border-line">
-          <QuoteForm config={config} />
+          <QuoteForm
+            config={config}
+            initialProjectType={initialProjectType}
+          />
         </section>
       </main>
       <SiteFooter />
