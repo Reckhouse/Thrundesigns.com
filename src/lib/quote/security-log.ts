@@ -12,6 +12,8 @@ type QuoteSecurityEvent =
   | "quote.email_sent"
   | "quote.email_failed"
   | "quote.email_skipped"
+  | "quote.attachment_signed"
+  | "quote.attachment_unlocked"
   | "quote.volume_alert";
 
 type SecurityLogMeta = Record<string, string | number | boolean | undefined>;

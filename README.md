@@ -165,6 +165,23 @@ Project-type options may optionally reference a **Service** document. The option
 on `/quote`, a `service` reference on new submissions, and a Service line in the
 notify email. Options like Mixed can stay unlinked.
 
+### Private attachment downloads
+
+Quote files stay in the private Blob store. Operators get short-lived signed URLs:
+
+- Notify email includes signed download links (~1 hour) when files are attached
+- Studio **Quote submissions → Attachments → Download** opens
+  `/quote-attachments` on the site; enter `QUOTE_ATTACHMENT_SECRET` once to unlock
+  a 1-hour browser session (httpOnly cookie), then redirect to a signed Blob URL
+
+Studio env (public site URL only — never put the secret in Studio):
+
+```bash
+SANITY_STUDIO_SITE_URL=https://thrundesigns-com.vercel.app
+```
+
+`QUOTE_ATTACHMENT_SECRET` (min 16 chars) defaults to `QUOTE_FORM_SECRET` when unset.
+
 ## Design source
 
 Figma handoff: Thrun Design Co. — Website (Student Plan), Version B Dark Editorial.

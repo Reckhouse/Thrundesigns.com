@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { AttachmentPathnamesInput } from "../components/AttachmentPathnamesInput";
 
 export const service = defineType({
   name: "service",
@@ -135,12 +136,15 @@ export const quoteSubmission = defineType({
     defineField({ name: "message", type: "text", readOnly: true }),
     defineField({
       name: "attachments",
-      title: "Attachment pathnames",
+      title: "Attachments",
       description:
-        "Private Vercel Blob pathnames (not public URLs). Download with QUOTE_READ_WRITE_TOKEN.",
+        "Private Vercel Blob pathnames. Use Download to open a short-lived signed link (requires Studio attachment secret).",
       type: "array",
       of: [{ type: "string" }],
       readOnly: true,
+      components: {
+        input: AttachmentPathnamesInput,
+      },
     }),
     defineField({ name: "submittedAt", type: "datetime", readOnly: true }),
   ],
