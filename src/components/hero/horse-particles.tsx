@@ -25,27 +25,27 @@ const vertexShader = /* glsl */ `
 uniform float uTime;
 uniform float uShake;
 uniform float uExplode;
+uniform float uPixelRatio;
 attribute vec3 aRandom;
 
 void main() {
   vec3 origin = position;
-  // aRandom.xy = explosion direction on plane; aRandom.z = phase 0-1
-  vec3 dir = normalize(vec3(aRandom.x, aRandom.y, (aRandom.z - 0.5) * 0.4));
+  vec3 dir = normalize(vec3(aRandom.x, aRandom.y, (aRandom.z - 0.5) * 0.35));
   float phase = aRandom.z * 6.2831853;
 
-  float wobble = sin(uTime * 22.0 + phase) * 0.55
-    + sin(uTime * 37.0 + phase * 1.7) * 0.35;
+  float wobble = sin(uTime * 18.0 + phase) * 0.5
+    + sin(uTime * 29.0 + phase * 1.7) * 0.3;
 
-  vec3 shakeOffset = dir * uShake * (0.05 + abs(wobble) * 0.1);
-  shakeOffset.x += sin(uTime * 31.0 + phase) * uShake * 0.035;
-  shakeOffset.y += cos(uTime * 27.0 + phase * 1.3) * uShake * 0.035;
+  vec3 shakeOffset = dir * uShake * (0.035 + abs(wobble) * 0.06);
+  shakeOffset.x += sin(uTime * 26.0 + phase) * uShake * 0.02;
+  shakeOffset.y += cos(uTime * 22.0 + phase * 1.3) * uShake * 0.02;
 
   float burst = uExplode * uExplode;
-  vec3 explodeOffset = dir * burst * (1.7 + aRandom.z * 2.6);
+  vec3 explodeOffset = dir * burst * (1.8 + aRandom.z * 2.8);
   explodeOffset += vec3(
-    sin(phase + uTime * 2.0) * burst * 0.6,
-    cos(phase * 1.4 + uTime) * burst * 0.6,
-    sin(phase * 2.1) * burst * 1.0
+    sin(phase + uTime * 2.0) * burst * 0.55,
+    cos(phase * 1.4 + uTime) * burst * 0.55,
+    sin(phase * 2.1) * burst * 0.85
   );
 
   vec3 transformed = origin
@@ -55,23 +55,24 @@ void main() {
   vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);
   gl_Position = projectionMatrix * mvPosition;
 
-  float size = mix(2.15, 1.15, uExplode) * (1.0 + uShake * 0.4);
-  gl_PointSize = size * (300.0 / -mvPosition.z);
+  // Keep points tiny so strokes read as a horse, not a filled blob
+  float base = mix(1.35, 1.0, uExplode);
+  float attenuated = base * uPixelRatio * (90.0 / max(1.0, -mvPosition.z));
+  gl_PointSize = clamp(attenuated, 0.85, 2.4);
 }
 `;
 
 const fragmentShader = /* glsl */ `
 uniform vec3 uColor;
 uniform float uExplode;
-uniform float uShake;
 
 void main() {
-  vec2 uv = gl_PointCoord - 0.5;
+  vec2 uv = gl_PointCoord - vec2(0.5);
   float d = length(uv);
-  if (d > 0.5) discard;
-  float alpha = smoothstep(0.5, 0.1, d);
-  alpha *= mix(0.94, 0.5, uExplode);
-  alpha *= mix(1.0, 0.88, uShake);
+  // Harder disc — less soft glow fill
+  if (d > 0.45) discard;
+  float alpha = smoothstep(0.45, 0.2, d);
+  alpha *= mix(0.9, 0.45, uExplode);
   gl_FragColor = vec4(uColor, alpha);
 }
 `;
@@ -103,10 +104,11 @@ function HorseParticleField() {
   const explodeProxy = useRef({ value: 0 });
   const explodeTween = useRef<gsap.core.Tween | null>(null);
   const hovering = useRef(false);
+  const pointerActive = useRef(false);
   const cream = useMemo(() => new Color(CREAM), []);
   const gold = useMemo(() => new Color(GOLD), []);
   const [buffers, setBuffers] = useState<ParticleBuffers | null>(null);
-  const { viewport } = useThree();
+  const { viewport, gl } = useThree();
 
   useEffect(() => {
     let cancelled = false;
@@ -120,6 +122,19 @@ function HorseParticleField() {
       explodeTween.current?.kill();
     };
   }, []);
+
+  useEffect(() => {
+    const el = gl.domElement;
+    const activate = () => {
+      pointerActive.current = true;
+    };
+    el.addEventListener("pointermove", activate, { passive: true });
+    el.addEventListener("pointerenter", activate, { passive: true });
+    return () => {
+      el.removeEventListener("pointermove", activate);
+      el.removeEventListener("pointerenter", activate);
+    };
+  }, [gl]);
 
   const geometry = useMemo(() => {
     if (!buffers) return null;
@@ -146,7 +161,8 @@ function HorseParticleField() {
         uTime: { value: 0 },
         uShake: { value: 0 },
         uExplode: { value: 0 },
-        uColor: { value: new Color(GOLD) },
+        uPixelRatio: { value: 1 },
+        uColor: { value: new Color(CREAM) },
       },
     });
     materialRef.current = mat;
@@ -172,26 +188,39 @@ function HorseParticleField() {
     const mat = materialRef.current;
     if (!mat) return;
     mat.uniforms.uTime.value += delta;
+    mat.uniforms.uPixelRatio.value = Math.min(gl.getPixelRatio(), 1.75);
+
+    // R3F pointer defaults to (0,0) = canvas center. Ignore until real movement.
+    if (!pointerActive.current) {
+      if (Math.hypot(state.pointer.x, state.pointer.y) > 0.002) {
+        pointerActive.current = true;
+      } else {
+        mat.uniforms.uShake.value +=
+          (0 - mat.uniforms.uShake.value) * Math.min(1, delta * 6);
+        const color = mat.uniforms.uColor.value as Color;
+        color.copy(cream).lerp(gold, mat.uniforms.uExplode.value * 0.55);
+        return;
+      }
+    }
 
     const mx = (state.pointer.x * viewport.width) / 2;
     const my = (state.pointer.y * viewport.height) / 2;
 
-    // Distance outside the horse hit rectangle (0 while over it)
-    const hx = 1.4;
-    const hy = 1.4;
+    const hx = 1.35;
+    const hy = 1.35;
     const dx = Math.max(Math.abs(mx) - hx, 0);
     const dy = Math.max(Math.abs(my) - hy, 0);
     const dist = Math.hypot(dx, dy);
-    const proximity = 1 - Math.min(Math.max(dist / 1.85, 0), 1);
+    const proximity = 1 - Math.min(Math.max(dist / 2.1, 0), 1);
     const targetShake = hovering.current
-      ? Math.max(proximity, 0.6)
-      : Math.pow(proximity, 1.4);
+      ? Math.max(proximity, 0.55)
+      : Math.pow(proximity, 1.55);
 
     mat.uniforms.uShake.value +=
       (targetShake - mat.uniforms.uShake.value) * Math.min(1, delta * 8);
 
     const color = mat.uniforms.uColor.value as Color;
-    color.copy(gold).lerp(cream, mat.uniforms.uExplode.value * 0.5);
+    color.copy(cream).lerp(gold, mat.uniforms.uExplode.value * 0.55);
   });
 
   if (!geometry) return null;
@@ -201,8 +230,12 @@ function HorseParticleField() {
       <points ref={pointsRef} geometry={geometry} material={material} />
       <mesh
         position={[0, 0, 0.04]}
+        onPointerMove={() => {
+          pointerActive.current = true;
+        }}
         onPointerOver={(event) => {
           event.stopPropagation();
+          pointerActive.current = true;
           hovering.current = true;
           document.body.style.cursor = "pointer";
           setExplode(1);
@@ -214,7 +247,7 @@ function HorseParticleField() {
           setExplode(0);
         }}
       >
-        <planeGeometry args={[2.7, 2.7]} />
+        <planeGeometry args={[2.6, 2.6]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
     </group>
@@ -226,6 +259,9 @@ export function HorseParticles() {
     <div
       className="relative h-full min-h-[320px] w-full"
       aria-label="Interactive horse head particle field"
+      onPointerMove={() => {
+        /* marks canvas engagement via bubbling into R3F pointer */
+      }}
     >
       <Canvas
         className="h-full w-full touch-none"
@@ -234,10 +270,13 @@ export function HorseParticles() {
           antialias: true,
           powerPreference: "high-performance",
         }}
-        camera={{ position: [0, 0, 4.2], fov: 38, near: 0.1, far: 40 }}
+        camera={{ position: [0, 0, 4.4], fov: 36, near: 0.1, far: 40 }}
         dpr={[1, 1.75]}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
+        }}
+        onPointerMove={() => {
+          /* ensures pointer updates while over canvas */
         }}
       >
         <Suspense fallback={null}>

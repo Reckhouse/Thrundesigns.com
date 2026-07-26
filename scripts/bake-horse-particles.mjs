@@ -7,8 +7,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const source = path.join(root, "public/images/horse-head.png");
 
-const size = 640;
-const TARGET = 28000;
+const size = 720;
+const TARGET = 16000;
 
 const { data, info } = await sharp(source)
   .resize(size, size, {
@@ -21,20 +21,30 @@ const { data, info } = await sharp(source)
 
 const w = info.width;
 const h = info.height;
-const candidates = [];
 
+function isInk(x, y) {
+  if (x < 0 || y < 0 || x >= w || y >= h) return false;
+  const i = (y * w + x) * 4;
+  if (data[i + 3] < 10) return false;
+  return (data[i] + data[i + 1] + data[i + 2]) / 3 < 55;
+}
+
+const candidates = [];
 for (let y = 0; y < h; y++) {
   for (let x = 0; x < w; x++) {
+    if (!isInk(x, y)) continue;
+    let neighbors = 0;
+    for (let oy = -1; oy <= 1; oy++) {
+      for (let ox = -1; ox <= 1; ox++) {
+        if (ox === 0 && oy === 0) continue;
+        if (isInk(x + ox, y + oy)) neighbors++;
+      }
+    }
+    const edge = neighbors < 7;
+    const keepChance = edge ? 0.55 : 0.12;
+    if (Math.random() > keepChance) continue;
     const i = (y * w + x) * 4;
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
-    const a = data[i + 3];
-    if (a < 10) continue;
-    const lum = (r + g + b) / 3;
-    if (lum > 48) continue;
-    const weight = 1 - lum / 48;
-    if (Math.random() > weight * 0.85) continue;
+    const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
     candidates.push([x, y, lum]);
   }
 }
@@ -55,7 +65,7 @@ for (let i = 0; i < picked.length; i++) {
   const [x, y, lum] = picked[i];
   const nx = (x / (w - 1)) * 2 - 1;
   const ny = 1 - (y / (h - 1)) * 2;
-  const nz = (1 - lum / 48) * 0.08 - 0.04;
+  const nz = (1 - lum / 55) * 0.06 - 0.03;
   positions[i * 3] = nx * 1.35;
   positions[i * 3 + 1] = ny * 1.35;
   positions[i * 3 + 2] = nz;
