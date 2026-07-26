@@ -139,17 +139,18 @@ https://thrundesigns-com.vercel.app
 Merge the site PR into `main` so that URL serves the full app (not the
 scaffold initial commit). Custom domain `thrundesign.com` can be added later.
 
-## Hero globe
+## Hero horse particles
 
-Desktop hero includes a see-through WebGL Earth (React Three Fiber) to the
-right of the copy: Natural Earth land coastlines (50m), country nodes, axial
-tilt, and ambient spin. Hover pauses rotation and shows a compact name +
-population popup. Hidden on small screens and when `prefers-reduced-motion`
-is set.
+Desktop hero includes an interactive WebGL particle horse head (React Three
+Fiber + custom shaders + GSAP) to the right of the copy:
 
-- Country markers: `src/data/countries.json`
-- Land outlines: `public/data/land-outlines.bin` (regenerate with
-  `node scripts/generate-land-outlines.mjs /path/to/land-50m.json`)
+- Stable detailed silhouette when the cursor is away
+- Increasing shake as the pointer approaches
+- Chaotic explosion on hover; particles reform when the pointer leaves
+- Hidden below `lg`; static mark fallback when `prefers-reduced-motion` is set
+
+Source art: `public/images/horse-head.png`  
+Particle bake: `node scripts/bake-horse-particles.mjs` → `public/data/horse-particles*`
 
 ## Routes
 

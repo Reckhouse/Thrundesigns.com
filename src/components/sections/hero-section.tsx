@@ -5,7 +5,7 @@ import {
   PrimaryButtonLink,
   TextLink,
 } from "@/components/site/primitives";
-import { WireframeGlobeLazy } from "@/components/hero/wireframe-globe-lazy";
+import { HorseParticlesLazy } from "@/components/hero/horse-particles-lazy";
 import { motion, useReducedMotion } from "framer-motion";
 import { motionTokens } from "@/lib/motion-tokens";
 
@@ -122,7 +122,7 @@ export function HeroSection({
           {!reduce ? (
             <motion.div
               className="relative mx-auto hidden h-[min(52vw,420px)] w-full max-w-[440px] lg:mx-0 lg:block lg:h-[min(58vh,460px)]"
-              initial={{ opacity: 0, scale: 0.94 }}
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{
                 duration: motionTokens.durationSlow,
@@ -130,9 +130,19 @@ export function HeroSection({
                 delay: 0.35,
               }}
             >
-              <WireframeGlobeLazy />
+              <HorseParticlesLazy />
             </motion.div>
-          ) : null}
+          ) : (
+            <div className="relative mx-auto hidden w-full max-w-[360px] lg:mx-0 lg:block">
+              {/* Static mark fallback when motion is reduced */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/horse-head-mark.png"
+                alt=""
+                className="mx-auto h-auto w-full max-w-[320px] object-contain opacity-90"
+              />
+            </div>
+          )}
         </div>
 
         <motion.div
