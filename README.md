@@ -17,8 +17,8 @@ Dark editorial marketing site for Thrun Design Co.
 
 ```bash
 cp .env.example .env.local
-# fill Sanity tokens + BLOB_READ_WRITE_TOKEN
-# for quote security (production): Turnstile, QUOTE_FORM_SECRET, Upstash Redis
+# fill Sanity tokens + QUOTE_READ_WRITE_TOKEN (private Blob for attachments)
+# for quote security (production): Turnstile, QUOTE_FORM_SECRET, Upstash Redis, Resend
 npm install
 npm run dev
 ```
@@ -45,12 +45,22 @@ npm run dev
 - Soft volume alerts at 40 / 80 / 120 accepted quotes per hour (`quote.volume_alert`)
 - Hard global emergency cap: 150 accepted / hour
 
+**P2 — notify + private storage**
+
+- Sanity write first, then Resend notify (`quote.email_sent` / `quote.email_failed`)
+- Fixed `To` + server subject; validated submitter email as `Reply-To` only
+- No file attachments on the email (pathnames listed; download via private Blob token)
+- Quote files go to a **private** Blob store (`QUOTE_READ_WRITE_TOKEN`, `access: "private"`)
+- Unused client upload route removed (`/api/quote/upload`)
+
 Required production env vars (see `.env.example`):
 
 - `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`
 - `QUOTE_FORM_SECRET` (min 16 characters)
 - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`
   (or Marketplace `KV_REST_API_URL` / `KV_REST_API_TOKEN`)
+- `QUOTE_READ_WRITE_TOKEN` (private Blob store for quote attachments)
+- `RESEND_API_KEY` / `QUOTE_NOTIFY_TO` / optional `QUOTE_NOTIFY_FROM`
 
 ### One-shot provision (CLI)
 
@@ -72,18 +82,36 @@ npm run studio:dev
 # hosted: https://thrundesign.sanity.studio
 ```
 
-## Vercel Blob (quote uploads)
+## Vercel Blob
 
-Create a Blob store in the Vercel dashboard (Storage → Blob) and connect it to
-project `thrundesigns-com`, or via CLI:
+Public media (`thrundesign-media` → `BLOB_READ_WRITE_TOKEN`) for site assets.
+
+Private quote attachments (`thrundesign-quote-private` → `QUOTE_READ_WRITE_TOKEN`):
 
 ```bash
 vercel link --scope reckhouses-projects --project thrundesigns-com
-vercel blob create-store thrundesign-media --access public --yes
+vercel blob create-store thrundesign-quote-private --access private --yes
+# connect store with env prefix QUOTE_ so token is QUOTE_READ_WRITE_TOKEN
 vercel env pull .env.local
 ```
 
-Redeploy after `BLOB_READ_WRITE_TOKEN` is set.
+Redeploy after `QUOTE_READ_WRITE_TOKEN` is set. Quote uploads never use the
+public media token.
+
+## Resend (quote notify)
+
+```bash
+# Accept Marketplace terms in the browser if prompted, then:
+npx vercel integration add resend/resend-email \
+  --name thrundesigns-quote-mail \
+  -e production -e preview -e development
+npx vercel env add QUOTE_NOTIFY_TO production preview development
+# optional verified sender (defaults to onboarding@resend.dev in code):
+# npx vercel env add QUOTE_NOTIFY_FROM ...
+```
+
+Notify runs only after Sanity stores the submission. Missing Resend config logs
+`quote.email_skipped` and still returns success to the client.
 
 ## Production URL
 

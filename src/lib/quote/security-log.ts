@@ -9,6 +9,9 @@ type QuoteSecurityEvent =
   | "quote.duplicate"
   | "quote.stored"
   | "quote.storage_failed"
+  | "quote.email_sent"
+  | "quote.email_failed"
+  | "quote.email_skipped"
   | "quote.volume_alert";
 
 type SecurityLogMeta = Record<string, string | number | boolean | undefined>;

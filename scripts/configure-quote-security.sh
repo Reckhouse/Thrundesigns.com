@@ -241,6 +241,40 @@ fi
 log "Publishing staged firewall changes"
 npx vercel firewall publish --yes || log "Firewall publish skipped — publish from dashboard if needed"
 
+log "Installing Resend (resend/resend-email) via Vercel Marketplace (P2 notify)"
+resend_out="$(
+  npx vercel integration add resend/resend-email \
+    --name thrundesigns-quote-mail \
+    -e production -e preview -e development \
+    --format=json 2>&1 || true
+)"
+if printf '%s' "$resend_out" | jq -e '.status == "action_required"' >/dev/null 2>&1; then
+  terms_uri="$(printf '%s' "$resend_out" | jq -r '.verification_uri // empty')"
+  log "Resend needs marketplace terms acceptance (human, interactive):"
+  printf '  1) Open: %s\n' "${terms_uri:-https://vercel.com/reckhouses-projects/~/integrations/accept-terms/resend?source=cli}"
+  printf '  2) Retry:  npx vercel integration add resend/resend-email --name thrundesigns-quote-mail\n'
+elif printf '%s' "$resend_out" | jq -e '.status == "error"' >/dev/null 2>&1; then
+  log "Resend install reported an error — set RESEND_API_KEY manually if needed"
+  printf '%s\n' "$resend_out" >&2
+else
+  log "Resend integration add completed"
+fi
+
+if [[ -z "${QUOTE_NOTIFY_TO:-}" ]]; then
+  log "QUOTE_NOTIFY_TO not set in this shell — add manually:"
+  printf '  printf \"you@example.com\" | npx vercel env add QUOTE_NOTIFY_TO production,preview,development --force --yes\n'
+else
+  add_env "QUOTE_NOTIFY_TO" "$QUOTE_NOTIFY_TO" sensitive
+fi
+
+if [[ -n "${QUOTE_NOTIFY_FROM:-}" ]]; then
+  add_env "QUOTE_NOTIFY_FROM" "$QUOTE_NOTIFY_FROM" sensitive
+fi
+
+log "Pulling env to .env.local (post-Resend)"
+npx vercel env pull .env.local --yes >/dev/null
+
 log "Done. Redeploy production so new env vars take effect:"
 printf '  npx vercel --prod --yes\n'
 printf '  # or merge PR / redeploy from the Vercel dashboard\n'
+printf '  # Ensure private Blob QUOTE_READ_WRITE_TOKEN is connected for attachments\n'
