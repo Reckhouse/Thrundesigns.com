@@ -1,5 +1,9 @@
 import { Resend } from "resend";
 import {
+  createAttachmentDownloadUrls,
+  filenameFromPathname,
+} from "@/lib/quote/attachment-download";
+import {
   findOption,
   labelFor,
   projectTypeDisplayLabel,
@@ -14,7 +18,7 @@ type NotifyQuoteInput = QuoteFields & {
   formConfig: QuoteFormConfig;
 };
 
-function buildPlainText(input: NotifyQuoteInput): string {
+async function buildPlainText(input: NotifyQuoteInput): Promise<string> {
   const { formConfig } = input;
   const projectOption = findOption(
     formConfig.projectTypes,
@@ -44,10 +48,23 @@ function buildPlainText(input: NotifyQuoteInput): string {
   );
 
   if (input.attachmentPathnames.length > 0) {
-    lines.push(
-      "(Private Blob — open Studio / use QUOTE_READ_WRITE_TOKEN to download)",
-      ...input.attachmentPathnames.map((path) => `- ${path}`),
-    );
+    try {
+      const downloads = await createAttachmentDownloadUrls(
+        input.attachmentPathnames,
+      );
+      lines.push(
+        "(Private downloads — links expire in about 1 hour)",
+        ...downloads.map(
+          (item) =>
+            `- ${filenameFromPathname(item.pathname)}: ${item.url}`,
+        ),
+      );
+    } catch {
+      lines.push(
+        "(Private Blob pathnames — open Studio and use Download links)",
+        ...input.attachmentPathnames.map((path) => `- ${path}`),
+      );
+    }
   }
 
   if (input.studioUrl) {
@@ -83,13 +100,14 @@ export async function notifyQuoteStored(input: NotifyQuoteInput): Promise<void> 
   );
 
   try {
+    const text = await buildPlainText(input);
     const resend = new Resend(apiKey);
     const { error } = await resend.emails.send({
       from,
       to: [to],
       replyTo: input.email,
       subject: `New quote — ${projectLabel}`,
-      text: buildPlainText(input),
+      text,
     });
 
     if (error) {

@@ -4,29 +4,26 @@ import { defineArrayMember, defineField, defineType } from "sanity";
 const slugPattern = /^[a-z0-9][a-z0-9+.-]*$/;
 
 function uniqueValuesRule(listTitle: string) {
-  return (Rule: {
-    custom: (
-      fn: (
-        value: { value?: string; enabled?: boolean }[] | undefined,
-      ) => true | string,
-    ) => unknown;
-  }) =>
-    Rule.custom((items) => {
-      if (!items?.length) return `${listTitle} needs at least one option`;
-      const values = items
-        .map((item) => item?.value?.trim())
-        .filter((value): value is string => Boolean(value));
-      if (values.length !== items.length) {
-        return "Every option needs a value slug";
-      }
-      if (new Set(values).size !== values.length) {
-        return "Option values must be unique";
-      }
-      if (!items.some((item) => item.enabled !== false)) {
-        return `${listTitle} needs at least one enabled option`;
-      }
-      return true;
-    });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (Rule: any) =>
+    Rule.custom(
+      (items: { value?: string; enabled?: boolean }[] | undefined) => {
+        if (!items?.length) return `${listTitle} needs at least one option`;
+        const values = items
+          .map((item) => item?.value?.trim())
+          .filter((value): value is string => Boolean(value));
+        if (values.length !== items.length) {
+          return "Every option needs a value slug";
+        }
+        if (new Set(values).size !== values.length) {
+          return "Option values must be unique";
+        }
+        if (!items.some((item) => item.enabled !== false)) {
+          return `${listTitle} needs at least one enabled option`;
+        }
+        return true;
+      },
+    );
 }
 
 export const quoteFormOption = defineType({
