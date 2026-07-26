@@ -52,7 +52,7 @@ export function QuoteForm() {
   const [step, setStep] = useState(0);
   const [files, setFiles] = useState<FileList | null>(null);
   const [status, setStatus] = useState<
-    "idle" | "submitting" | "done" | "error" | "limited"
+    "idle" | "submitting" | "done" | "error" | "server_error" | "limited"
   >("idle");
   const [bootstrap, setBootstrap] = useState<BootstrapState | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -379,6 +379,13 @@ export function QuoteForm() {
               <p className="mt-4 font-sans text-sm text-red-300" role="alert">
                 We couldn&apos;t send your brief. Check your connection and try
                 again — your answers on this step are still here.
+              </p>
+            ) : null}
+            {status === "server_error" ? (
+              <p className="mt-4 font-sans text-sm text-red-300" role="alert">
+                Something went wrong on our side while saving your brief. Please
+                try again in a moment — your answers on this step are still
+                here.
               </p>
             ) : null}
           </>
