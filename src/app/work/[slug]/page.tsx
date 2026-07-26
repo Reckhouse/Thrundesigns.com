@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProjectModules } from "@/components/project/project-modules";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import {
@@ -10,23 +11,42 @@ import {
   SectionHeading,
 } from "@/components/site/primitives";
 import { defaultHomeContent } from "@/lib/default-content";
+import {
+  resolveMediaAlt,
+  resolveMediaUrl,
+  type MediaAssetValue,
+} from "@/lib/media";
+import { urlFor } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
   projectBySlugQuery,
   siteSettingsQuery,
 } from "@/sanity/lib/queries";
+import type { ProjectModule } from "@/types/project-modules";
+import type { ProjectBySlugQueryResult } from "@/sanity/types";
+import type { SanityImageSource } from "@sanity/image-url";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-type ProjectDoc = {
-  title?: string | null;
-  industry?: string | null;
-  services?: string | null;
-  summary?: string | null;
-  cover?: { alt?: string | null; blobUrl?: string | null } | null;
+type ProjectDoc = Partial<
+  Omit<NonNullable<ProjectBySlugQueryResult>, "modules" | "cover" | "seo">
+> & {
+  cover?: MediaAssetValue;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    ogImage?: SanityImageSource | null;
+  } | null;
+  modules?: ProjectModule[] | null;
 };
+
+function coverFallback(slug: string) {
+  if (slug === "northline-advisory") return "/images/project-01.jpg";
+  if (slug === "summit-construction") return "/images/project-02.jpg";
+  return "/images/project-03.jpg";
+}
 
 export async function generateMetadata({
   params,
@@ -41,13 +61,40 @@ export async function generateMetadata({
   const fallback =
     defaultHomeContent.projects.find((item) => item.slug.current === slug) ||
     null;
+
+  const title =
+    cms?.seo?.title || cms?.title || fallback?.title || "Project";
+  const description =
+    cms?.seo?.description ||
+    cms?.summary ||
+    cms?.services ||
+    fallback?.services ||
+    "Case study from Thrun Design Co.";
+
+  let ogImage: string | undefined;
+  if (cms?.seo?.ogImage) {
+    try {
+      ogImage = urlFor(cms.seo.ogImage)
+        .width(1200)
+        .height(630)
+        .auto("format")
+        .url();
+    } catch {
+      ogImage = undefined;
+    }
+  }
+  if (!ogImage) {
+    ogImage = resolveMediaUrl(cms?.cover, 1200) || undefined;
+  }
+
   return {
-    title: cms?.title || fallback?.title || "Project",
-    description:
-      cms?.summary ||
-      cms?.services ||
-      fallback?.services ||
-      "Case study from Thrun Design Co.",
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
   };
 }
 
@@ -79,13 +126,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   if (!project) notFound();
 
-  const imageSrc =
-    project.cover?.blobUrl ||
-    (slug === "northline-advisory"
-      ? "/images/project-01.jpg"
-      : slug === "summit-construction"
-        ? "/images/project-02.jpg"
-        : "/images/project-03.jpg");
+  const imageSrc = resolveMediaUrl(project.cover) || coverFallback(slug);
 
   return (
     <>
@@ -117,7 +158,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               <div className="relative min-h-[420px] overflow-hidden bg-bg-raised lg:min-h-[620px]">
                 <Image
                   src={imageSrc}
-                  alt={project.cover?.alt || project.title || "Project"}
+                  alt={resolveMediaAlt(project.cover, project.title || "Project")}
                   fill
                   className="object-cover grayscale"
                   sizes="(max-width: 1024px) 100vw, 60vw"
@@ -126,6 +167,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               </div>
             </div>
           </section>
+          <ProjectModules modules={project.modules} />
         </article>
       </main>
       <SiteFooter

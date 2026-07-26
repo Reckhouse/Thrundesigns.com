@@ -8,13 +8,18 @@
     "start": "next start",
     "lint": "eslint",
     "studio:dev": "npm --prefix studio run dev",
-    "studio:deploy": "npm --prefix studio run deploy"
+    "studio:deploy": "npm --prefix studio run deploy",
+    "typegen": "npm --prefix studio run typegen",
+    "migrate:project-modules": "node --env-file=.env.local scripts/migrate-project-modules.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.2",
     "@marsidev/react-turnstile": "^1.5.3",
+    "@portabletext/react": "^7.0.1",
+    "@portabletext/types": "^4.0.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
+    "@sanity/client": "^7.25.0",
     "@sanity/image-url": "^2.1.1",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",

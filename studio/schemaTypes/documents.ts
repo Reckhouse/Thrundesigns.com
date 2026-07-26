@@ -54,32 +54,108 @@ export const project = defineType({
   name: "project",
   title: "Project",
   type: "document",
+  groups: [
+    { name: "identity", title: "Identity", default: true },
+    { name: "modules", title: "Page modules" },
+    { name: "seo", title: "SEO" },
+  ],
   fields: [
-    defineField({ name: "title", type: "string", validation: (r) => r.required() }),
+    defineField({
+      name: "title",
+      type: "string",
+      group: "identity",
+      validation: (r) => r.required(),
+    }),
     defineField({
       name: "slug",
       type: "slug",
+      group: "identity",
       options: { source: "title" },
       validation: (r) => r.required(),
     }),
-    defineField({ name: "industry", type: "string" }),
-    defineField({ name: "services", type: "string" }),
-    defineField({ name: "summary", type: "text", rows: 4 }),
-    defineField({ name: "cover", type: "mediaAsset" }),
+    defineField({ name: "industry", type: "string", group: "identity" }),
+    defineField({ name: "services", type: "string", group: "identity" }),
+    defineField({
+      name: "summary",
+      type: "text",
+      rows: 4,
+      group: "identity",
+    }),
+    defineField({ name: "cover", type: "mediaAsset", group: "identity" }),
+    defineField({
+      name: "featured",
+      type: "boolean",
+      group: "identity",
+      initialValue: true,
+    }),
+    defineField({ name: "order", type: "number", group: "identity" }),
+    defineField({
+      name: "modules",
+      title: "Page modules",
+      type: "array",
+      group: "modules",
+      description:
+        "Compose the case study below the fixed project hero. Drag to reorder.",
+      of: [
+        { type: "projectRichText" },
+        { type: "projectGallery" },
+        { type: "projectSplit" },
+        { type: "projectMetrics" },
+        { type: "projectProcess" },
+        { type: "projectQuote" },
+        { type: "projectVideo" },
+        { type: "projectCta" },
+        { type: "projectCredits" },
+      ],
+      options: {
+        insertMenu: {
+          views: [{ name: "grid" }, { name: "list" }],
+        },
+      },
+    }),
     defineField({
       name: "gallery",
       type: "array",
       of: [{ type: "mediaAsset" }],
+      group: "modules",
+      hidden: true,
+      deprecated: {
+        reason: "Use a Gallery page module instead.",
+      },
     }),
     defineField({
       name: "body",
       type: "array",
       of: [{ type: "block" }],
+      group: "modules",
+      hidden: true,
+      deprecated: {
+        reason: "Use a Rich text page module instead.",
+      },
     }),
-    defineField({ name: "featured", type: "boolean", initialValue: true }),
-    defineField({ name: "order", type: "number" }),
-    defineField({ name: "seo", type: "seo" }),
+    defineField({ name: "seo", type: "seo", group: "seo" }),
   ],
+  orderings: [
+    {
+      title: "Order",
+      name: "orderAsc",
+      by: [{ field: "order", direction: "asc" }],
+    },
+  ],
+  preview: {
+    select: {
+      title: "title",
+      industry: "industry",
+      media: "cover.image",
+    },
+    prepare({ title, industry, media }) {
+      return {
+        title: title || "Untitled project",
+        subtitle: industry || "Project",
+        media,
+      };
+    },
+  },
 });
 
 export const quoteSubmission = defineType({

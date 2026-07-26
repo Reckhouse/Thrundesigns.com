@@ -10,4 +10,9 @@ export default defineCliConfig({
     appId: "s90ma13g7u6u98ahd7kgpwwm",
     autoUpdates: true,
   },
+  typegen: {
+    path: "../src/**/*.{ts,tsx}",
+    schema: "./schema.json",
+    generates: "../src/sanity/types.ts",
+  },
 });

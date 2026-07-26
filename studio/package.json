@@ -9,9 +9,12 @@
     "start": "sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "deploy-schema": "sanity schema deploy"
+    "deploy-schema": "sanity schema deploy",
+    "extract-schema": "sanity schema extract --path=./schema.json",
+    "typegen": "npm run extract-schema && sanity typegen generate"
   },
   "dependencies": {
+    "@sanity/icons": "^5.2.1",
     "@sanity/vision": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
