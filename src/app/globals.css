@@ -138,6 +138,24 @@
   }
 }
 
+/* Living Engraving — soft fade into mountain haze (keep silhouette readable) */
+.horse-engraving {
+  -webkit-mask-image: linear-gradient(
+    to top,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to top,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    #000 100%
+  );
+}
+
 @layer utilities {
   .scene-glass {
     background: var(--surface-glass);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { stegaClean } from "@sanity/client/stega";
 import {
   PrimaryButtonLink,
@@ -30,6 +31,8 @@ export function HeroSection({
   imageAlt,
 }: HeroSectionProps) {
   const reduce = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
 
   const item = (delay: number) =>
     reduce
@@ -46,17 +49,19 @@ export function HeroSection({
 
   return (
     <section
+      ref={sectionRef}
       className="relative min-h-[100svh] overflow-hidden border-b border-line/40 pt-[96px] md:min-h-[920px] md:pt-[112px] lg:min-h-[100svh] lg:pt-[120px]"
       aria-label="Introduction"
     >
-      {/* Full-hero particle stage — explosions stay visible across the section */}
-      {!reduce ? (
-        <div className="pointer-events-auto absolute inset-0 z-[1] hidden lg:block">
-          <HorseParticlesLazy />
-        </div>
-      ) : null}
+      {/* Full-hero Living Engraving stage — static pose when reduced motion */}
+      <div className="pointer-events-none absolute inset-0 z-[1] hidden lg:block">
+        <HorseParticlesLazy
+          staticMode={Boolean(reduce)}
+          ctaRef={ctaRef}
+          sectionRef={sectionRef}
+        />
+      </div>
 
-      {/* Content above the canvas; only the copy column captures pointers */}
       <div className="pointer-events-none relative z-10 mx-auto flex min-h-[calc(100svh-96px)] w-full max-w-[1440px] flex-col justify-end px-5 pb-16 pt-10 md:min-h-[calc(920px-112px)] md:justify-center md:px-10 md:pb-20 md:pt-12 lg:min-h-[calc(100svh-120px)] lg:px-[74px] lg:pb-24">
         <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,420px)] lg:gap-12 xl:gap-16">
           <div className="pointer-events-auto max-w-xl lg:max-w-[42rem]">
@@ -99,14 +104,16 @@ export function HeroSection({
               className="mt-9 flex flex-col items-stretch gap-4 sm:mt-11 sm:flex-row sm:items-center sm:gap-5"
               {...item(0.44)}
             >
-              <PrimaryButtonLink
-                href={
-                  primaryCta?.href ? stegaClean(primaryCta.href) : "/quote"
-                }
-                className="w-full justify-center sm:w-auto"
-              >
-                {primaryCta?.label || "Request a project quote"}
-              </PrimaryButtonLink>
+              <div ref={ctaRef} className="w-full sm:w-auto">
+                <PrimaryButtonLink
+                  href={
+                    primaryCta?.href ? stegaClean(primaryCta.href) : "/quote"
+                  }
+                  className="w-full justify-center sm:w-auto"
+                >
+                  {primaryCta?.label || "Request a project quote"}
+                </PrimaryButtonLink>
+              </div>
               <TextLink
                 href={
                   secondaryCta?.href ? stegaClean(secondaryCta.href) : "/work"
@@ -127,20 +134,11 @@ export function HeroSection({
             ) : null}
           </div>
 
-          {/* Layout spacer — events pass through to the full-hero canvas */}
+          {/* Layout spacer — composition column for the engraving */}
           <div
             className="relative mx-auto hidden min-h-[min(48vw,400px)] w-full max-w-[400px] lg:mx-0 lg:block lg:min-h-[min(52vh,440px)]"
             aria-hidden
-          >
-            {reduce ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src="/images/horse-head-mark.png"
-                alt=""
-                className="pointer-events-none mx-auto h-auto w-full max-w-[300px] object-contain opacity-90"
-              />
-            ) : null}
-          </div>
+          />
         </div>
 
         <motion.div

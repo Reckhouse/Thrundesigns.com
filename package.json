@@ -10,7 +10,8 @@
     "studio:dev": "npm --prefix studio run dev",
     "studio:deploy": "npm --prefix studio run deploy",
     "typegen": "npm --prefix studio run typegen",
-    "migrate:project-modules": "node --env-file=.env.local scripts/migrate-project-modules.mjs"
+    "migrate:project-modules": "node --env-file=.env.local scripts/migrate-project-modules.mjs",
+    "bake:horse": "node scripts/bake-horse-particles.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.2",
