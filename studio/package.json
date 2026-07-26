@@ -9,14 +9,17 @@
     "start": "sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "deploy-schema": "sanity schema deploy"
+    "deploy-schema": "sanity schema deploy",
+    "extract-schema": "sanity schema extract --path=./schema.json",
+    "typegen": "npm run extract-schema && sanity typegen generate"
   },
   "dependencies": {
-    "@sanity/vision": "^4.0.0",
+    "@sanity/icons": "^5.2.1",
+    "@sanity/vision": "^6.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "sanity": "^4.0.0",
-    "styled-components": "^6.1.0"
+    "sanity": "^6.6.0",
+    "styled-components": "^6.4.4"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

@@ -100,10 +100,46 @@ export const projectBySlugQuery = defineQuery(`
     industry,
     services,
     summary,
-    cover,
+    cover{
+      alt,
+      blobUrl,
+      image
+    },
+    seo{
+      title,
+      description,
+      ogImage
+    },
+    modules[]{
+      ...,
+      _type == "projectGallery" => {
+        ...,
+        items[]{
+          alt,
+          blobUrl,
+          image
+        }
+      },
+      _type == "projectSplit" => {
+        ...,
+        media{
+          alt,
+          blobUrl,
+          image
+        }
+      },
+      _type == "projectVideo" => {
+        ...,
+        poster{
+          alt,
+          blobUrl,
+          image
+        }
+      }
+    },
+    // Legacy fields kept for one-time migration tooling
     gallery,
-    body,
-    seo
+    body
   }
 `);
 
