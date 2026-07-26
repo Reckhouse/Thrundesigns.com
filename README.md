@@ -139,6 +139,19 @@ https://thrundesigns-com.vercel.app
 Merge the site PR into `main` so that URL serves the full app (not the
 scaffold initial commit). Custom domain `thrundesign.com` can be added later.
 
+## Hero horse particles
+
+Desktop hero includes an interactive WebGL particle horse head (React Three
+Fiber + custom shaders + GSAP) staged across the full hero:
+
+- Rests on the right; explosions stay visible across the hero section
+- Stable gold silhouette when the cursor is away
+- Shake ramps in within ~6" of the mark; hover explodes; leave reforms
+- Hidden below `lg`; static mark fallback when `prefers-reduced-motion` is set
+
+Source art: `public/images/horse-head.png`  
+Particle bake: `node scripts/bake-horse-particles.mjs` → `public/data/horse-particles*`
+
 ## Routes
 
 - `/` — homepage
