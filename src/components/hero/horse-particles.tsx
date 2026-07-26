@@ -27,7 +27,7 @@ const PARTICLE = "#f4f1e9";
 /** Soft champagne accent on explode — cooler than button gold. */
 const PARTICLE_HOT = "#e6d9b8";
 
-const HORSE_SCALE = 1.3;
+const HORSE_SCALE = 1.42;
 const HORSE_HALF = 1.35;
 /** ~6 inches at CSS 96px/in from the silhouette edge. */
 const NO_SHAKE_PX = 6 * 96;
@@ -67,9 +67,10 @@ void main() {
   vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);
   gl_Position = projectionMatrix * mvPosition;
 
-  float base = mix(1.4, 1.1, uExplode);
-  float attenuated = base * uPixelRatio * (100.0 / max(1.0, -mvPosition.z));
-  gl_PointSize = clamp(attenuated, 0.95, 2.7);
+  // Slightly smaller discs so dense rest samples read as sharp strokes
+  float base = mix(1.15, 1.0, uExplode);
+  float attenuated = base * uPixelRatio * (88.0 / max(1.0, -mvPosition.z));
+  gl_PointSize = clamp(attenuated, 0.8, 2.1);
 }
 `;
 
@@ -115,7 +116,7 @@ function useHorseLayout() {
   const offsetY = viewport.height * 0.02;
   const scale = Math.min(
     HORSE_SCALE,
-    (viewport.height * 0.48) / (HORSE_HALF * 2),
+    (viewport.height * 0.52) / (HORSE_HALF * 2),
   );
   return { offsetX, offsetY, scale };
 }
