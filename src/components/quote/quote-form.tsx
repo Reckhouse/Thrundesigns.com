@@ -18,13 +18,20 @@ import {
   createQuoteClientSchema,
   type QuoteClientValues,
 } from "@/lib/quote/schema";
+import type { ProjectType } from "@/lib/quote/project-type";
 
 type BootstrapState = {
   formToken: string;
   turnstileRequired: boolean;
 };
 
-export function QuoteForm({ config }: { config: QuoteFormConfig }) {
+export function QuoteForm({
+  config,
+  initialProjectType,
+}: {
+  config: QuoteFormConfig;
+  initialProjectType?: ProjectType;
+}) {
   const [step, setStep] = useState(0);
   const [files, setFiles] = useState<FileList | null>(null);
   const [status, setStatus] = useState<
@@ -49,19 +56,34 @@ export function QuoteForm({ config }: { config: QuoteFormConfig }) {
     [config.timelines],
   );
 
+  const resolvedInitialType = useMemo(() => {
+    if (!initialProjectType) return undefined;
+    return findOption(projectOptions, initialProjectType)
+      ? initialProjectType
+      : undefined;
+  }, [initialProjectType, projectOptions]);
+
   const form = useForm<QuoteClientValues>({
     resolver: zodResolver(clientSchema),
     defaultValues: {
       name: "",
       email: "",
       company: "",
-      projectType: undefined,
+      projectType: resolvedInitialType,
       budget: undefined,
       timeline: undefined,
       message: "",
     },
     mode: "onTouched",
   });
+
+  useEffect(() => {
+    if (!resolvedInitialType) return;
+    form.setValue("projectType", resolvedInitialType, {
+      shouldDirty: false,
+      shouldValidate: false,
+    });
+  }, [form, resolvedInitialType]);
 
   const selectedProjectType = form.watch("projectType");
   const selectedProjectOption = useMemo(

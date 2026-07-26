@@ -45,6 +45,37 @@ export const homePage = defineType({
       ],
     }),
     defineField({
+      name: "artifact",
+      title: "Credibility sample",
+      description:
+        "A non-fictional sample (audit lens, guidelines snippet, etc.). Never invent client results or testimonials.",
+      type: "object",
+      fields: [
+        defineField({ name: "eyebrow", type: "string" }),
+        defineField({ name: "heading", type: "string" }),
+        defineField({ name: "intro", type: "text", rows: 3 }),
+        defineField({
+          name: "items",
+          type: "array",
+          of: [
+            {
+              type: "object",
+              fields: [
+                defineField({ name: "label", type: "string" }),
+                defineField({ name: "detail", type: "text", rows: 2 }),
+              ],
+              preview: {
+                select: { title: "label" },
+              },
+            },
+          ],
+        }),
+        defineField({ name: "footnote", type: "string" }),
+        defineField({ name: "ctaLabel", type: "string" }),
+        defineField({ name: "ctaHref", type: "string" }),
+      ],
+    }),
+    defineField({
       name: "engage",
       title: "How we engage",
       type: "object",

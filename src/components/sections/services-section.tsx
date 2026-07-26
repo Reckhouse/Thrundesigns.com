@@ -21,6 +21,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { motion, useReducedMotion } from "framer-motion";
 import { motionTokens } from "@/lib/motion-tokens";
+import {
+  projectTypeFromServiceIcon,
+  quoteHrefForProjectType,
+} from "@/lib/quote/project-type";
 
 type Service = {
   _id: string;
@@ -107,8 +111,12 @@ export function ServicesSection({
                       </CardDescription>
                     </CardContent>
                     <CardFooter className="border-line/70 bg-transparent">
-                      <TextLink href="/quote">
-                        {service.linkLabel || "Talk about this"}
+                      <TextLink
+                        href={quoteHrefForProjectType(
+                          projectTypeFromServiceIcon(service.icon),
+                        )}
+                      >
+                        {service.linkLabel || "Request a quote"}
                       </TextLink>
                     </CardFooter>
                   </Card>

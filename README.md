@@ -145,6 +145,11 @@ scaffold initial commit). Custom domain `thrundesign.com` can be added later.
 - `/work` — work index
 - `/work/[slug]` — project detail
 - `/quote` — multi-step quote form (optional Blob attachments)
+- `/quote?type=brand|website|audit|print|mixed` — prefills project type
+- `/sitemap.xml` / `/robots.txt` — SEO discovery
+
+Service CTAs on the homepage deep-link into `/quote?type=…` so the project
+step starts with the matching offer selected.
 
 ## Quote form CMS (Studio)
 

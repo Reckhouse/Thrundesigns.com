@@ -27,6 +27,15 @@ export const homePageQuery = defineQuery(`
     servicesIntro,
     processIntro,
     workIntro,
+    artifact{
+      eyebrow,
+      heading,
+      intro,
+      items[]{ label, detail },
+      footnote,
+      ctaLabel,
+      ctaHref
+    },
     engage{
       heading,
       steps[]{ title, copy },

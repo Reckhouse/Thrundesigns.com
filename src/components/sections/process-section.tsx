@@ -49,7 +49,7 @@ export function ProcessSection({ heading, steps }: ProcessSectionProps) {
                 Process
               </Badge>
               <ClipHeading className="mt-5 max-w-xl text-balance font-display text-[clamp(1.85rem,4vw,3.5rem)] leading-[1.08] tracking-[-0.02em] text-fg drop-shadow-[0_2px_16px_rgba(12,13,12,0.5)]">
-                {heading || "A clear path from brief to launch."}
+                {heading || "How a project runs — from brief to handoff."}
               </ClipHeading>
             </div>
             <TextLink
