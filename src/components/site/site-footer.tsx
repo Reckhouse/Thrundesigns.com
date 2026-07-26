@@ -50,8 +50,8 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
     >
       <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-16 md:px-10 lg:grid-cols-[1.1fr_2fr] lg:gap-20 lg:px-[74px] lg:py-20">
         <div>
-          <BrandLogo className="h-[72px] w-auto" />
-          <p className="mt-10 max-w-[40ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+          <BrandLogo className="h-24 w-auto md:h-[112px] lg:h-[128px]" />
+          <p className="mt-8 max-w-[40ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-10">
             {tagline ||
               "Strategic design for founders and owners ready to move forward."}
           </p>
