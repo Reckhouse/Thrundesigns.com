@@ -13,8 +13,14 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Magnetic } from "@/components/site/magnetic";
+import { NavLink } from "@/components/site/nav-link";
 import { cn } from "@/lib/utils";
-import { motion, useReducedMotion, useScroll, useMotionValueEvent } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useMotionValueEvent,
+} from "framer-motion";
 import { useState } from "react";
 
 const defaultNav = [
@@ -41,6 +47,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
   const [solid, setSolid] = useState(false);
+  const [hovered, setHovered] = useState<string | null>(null);
 
   useMotionValueEvent(scrollY, "change", (value) => {
     setSolid(value > 48);
@@ -55,7 +62,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
           : "border-transparent bg-transparent",
       )}
     >
-      <div className="mx-auto flex h-[80px] w-full max-w-[1440px] items-center justify-between px-5 md:h-[96px] md:px-10 lg:px-[74px]">
+      <div className="mx-auto flex h-[96px] w-full max-w-[1440px] items-center justify-between px-5 md:h-[112px] md:px-10 lg:h-[120px] lg:px-[74px]">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -66,37 +73,43 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
             className="inline-flex shrink-0 items-center overflow-visible"
             aria-label="Thrun Design Co. home"
           >
-            <BrandLogo className="h-14 w-auto md:h-16 lg:h-[72px]" />
+            <BrandLogo className="h-16 w-auto md:h-[76px] lg:h-[88px]" />
           </Link>
         </motion.div>
 
-        <nav className="hidden items-center gap-10 lg:flex" aria-label="Primary">
-          {items.map((item, index) => (
-            <motion.div
-              key={item.href}
-              initial={reduce ? false : { opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.08 + index * 0.05,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-            >
-              <Link
-                href={item.href}
-                className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-fg transition-colors hover:text-gold focus-visible:text-gold"
+        <nav
+          className="hidden items-center gap-11 lg:flex xl:gap-14"
+          aria-label="Primary"
+          onMouseLeave={() => setHovered(null)}
+        >
+          {items.map((item, index) => {
+            const dimmed =
+              hovered !== null && hovered !== item.href && !reduce;
+            return (
+              <motion.div
+                key={item.href}
+                initial={reduce ? false : { opacity: 0, y: -8 }}
+                animate={{ opacity: dimmed ? 0.35 : 1, y: 0 }}
+                transition={{
+                  duration: 0.45,
+                  delay: hovered === null ? 0.08 + index * 0.05 : 0,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                onMouseEnter={() => setHovered(item.href)}
+                onFocus={() => setHovered(item.href)}
+                onBlur={() => setHovered(null)}
               >
-                {item.label}
-              </Link>
-            </motion.div>
-          ))}
+                <NavLink href={item.href}>{item.label}</NavLink>
+              </motion.div>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <Magnetic strength={0.2}>
             <Button
               asChild
-              className="group relative inline-flex h-11 overflow-hidden rounded-none bg-gold px-3 font-mono text-[10px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bronze hover:text-fg focus-visible:ring-2 focus-visible:ring-gold sm:h-12 sm:px-4 sm:text-[11px]"
+              className="group relative inline-flex h-12 overflow-hidden rounded-none bg-gold px-3.5 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bronze hover:text-fg focus-visible:ring-2 focus-visible:ring-gold sm:h-[52px] sm:px-5 sm:text-[12px]"
             >
               <Link href="/quote">
                 <span
@@ -115,7 +128,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
           <Sheet>
             <SheetTrigger
               className={cn(
-                "inline-flex h-11 items-center justify-center border border-line px-3 font-mono text-[11px] uppercase tracking-[0.14em] text-fg transition-colors hover:border-gold hover:text-gold sm:px-4 lg:hidden",
+                "inline-flex h-12 items-center justify-center border border-line px-3 font-mono text-[12px] uppercase tracking-[0.14em] text-fg transition-colors hover:border-gold hover:text-gold sm:px-4 lg:hidden",
               )}
             >
               Menu
@@ -129,19 +142,15 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
                   Menu
                 </SheetTitle>
               </SheetHeader>
-              <nav className="mt-8 flex flex-col gap-5" aria-label="Mobile">
+              <nav className="mt-8 flex flex-col gap-6" aria-label="Mobile">
                 {items.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="font-mono text-sm uppercase tracking-[0.14em] text-fg hover:text-gold"
-                  >
+                  <NavLink key={item.href} href={item.href} size="sheet">
                     {item.label}
-                  </Link>
+                  </NavLink>
                 ))}
                 <Link
                   href="/quote"
-                  className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 bg-gold px-4 py-3 font-mono text-[11px] uppercase tracking-[0.12em] text-ink hover:bg-bronze hover:text-fg"
+                  className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 bg-gold px-4 py-3 font-mono text-[12px] uppercase tracking-[0.12em] text-ink hover:bg-bronze hover:text-fg"
                 >
                   Request a quote
                   <ArrowUpRight className="size-3.5" aria-hidden />
