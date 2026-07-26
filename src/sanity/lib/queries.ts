@@ -97,3 +97,27 @@ export const projectBySlugQuery = defineQuery(`
     seo
   }
 `);
+
+export const quoteFormQuery = defineQuery(`
+  *[_type == "quoteForm" && _id == "quoteForm"][0]{
+    eyebrow,
+    headline,
+    support,
+    stepLabels,
+    successHeading,
+    successBody,
+    submitLabel,
+    nameField{ label, placeholder, helperText },
+    emailField{ label, placeholder, helperText },
+    companyField{ label, placeholder, helperText },
+    projectTypeField{ label, placeholder, helperText },
+    budgetField{ label, placeholder, helperText },
+    timelineField{ label, placeholder, helperText },
+    messageField{ label, placeholder, helperText },
+    attachmentsField{ label, placeholder, helperText },
+    projectTypes[]{ value, label, enabled },
+    budgetRanges[]{ value, label, enabled },
+    timelines[]{ value, label, enabled },
+    seo
+  }
+`);

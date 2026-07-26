@@ -86,13 +86,43 @@ export const quoteSubmission = defineType({
   title: "Quote submission",
   type: "document",
   fields: [
-    defineField({ name: "name", type: "string" }),
-    defineField({ name: "email", type: "string" }),
-    defineField({ name: "company", type: "string" }),
-    defineField({ name: "projectType", type: "string" }),
-    defineField({ name: "budget", type: "string" }),
-    defineField({ name: "timeline", type: "string" }),
-    defineField({ name: "message", type: "text" }),
+    defineField({
+      name: "status",
+      title: "Status",
+      type: "string",
+      options: {
+        list: [
+          { title: "New", value: "new" },
+          { title: "Read", value: "read" },
+          { title: "Archived", value: "archived" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "new",
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({ name: "name", type: "string", readOnly: true }),
+    defineField({ name: "email", type: "string", readOnly: true }),
+    defineField({ name: "company", type: "string", readOnly: true }),
+    defineField({
+      name: "projectType",
+      title: "Project type (slug)",
+      type: "string",
+      readOnly: true,
+    }),
+    defineField({
+      name: "budget",
+      title: "Budget (slug)",
+      type: "string",
+      readOnly: true,
+    }),
+    defineField({
+      name: "timeline",
+      title: "Timeline (slug)",
+      type: "string",
+      readOnly: true,
+    }),
+    defineField({ name: "message", type: "text", readOnly: true }),
     defineField({
       name: "attachments",
       title: "Attachment pathnames",
@@ -100,10 +130,33 @@ export const quoteSubmission = defineType({
         "Private Vercel Blob pathnames (not public URLs). Download with QUOTE_READ_WRITE_TOKEN.",
       type: "array",
       of: [{ type: "string" }],
+      readOnly: true,
     }),
-    defineField({ name: "submittedAt", type: "datetime" }),
+    defineField({ name: "submittedAt", type: "datetime", readOnly: true }),
+  ],
+  orderings: [
+    {
+      title: "Submitted (newest)",
+      name: "submittedAtDesc",
+      by: [{ field: "submittedAt", direction: "desc" }],
+    },
   ],
   preview: {
-    select: { title: "name", subtitle: "email" },
+    select: {
+      title: "name",
+      email: "email",
+      projectType: "projectType",
+      status: "status",
+      submittedAt: "submittedAt",
+    },
+    prepare({ title, email, projectType, status, submittedAt }) {
+      const when = submittedAt
+        ? new Date(submittedAt).toLocaleDateString()
+        : "—";
+      return {
+        title: title || "Untitled submission",
+        subtitle: `${status || "new"} · ${projectType || "—"} · ${email || "—"} · ${when}`,
+      };
+    },
   },
 });

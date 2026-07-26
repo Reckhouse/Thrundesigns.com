@@ -3,6 +3,7 @@ import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { validateAttachments } from "@/lib/quote/attachments";
 import { verifyFormToken } from "@/lib/quote/form-token";
+import { getQuoteFormConfig } from "@/lib/quote/get-form-config";
 import { notifyQuoteStored } from "@/lib/quote/notify";
 import {
   enforceQuoteRateLimits,
@@ -15,7 +16,7 @@ import {
   genericSuccess,
   getClientIp,
 } from "@/lib/quote/request-guards";
-import { quoteFieldsSchema } from "@/lib/quote/schema";
+import { createQuoteFieldsSchema } from "@/lib/quote/schema";
 import {
   hashIdentifier,
   logQuoteSecurity,
@@ -62,6 +63,8 @@ export async function POST(request: Request) {
     return genericError(413);
   }
 
+  const formConfig = await getQuoteFormConfig();
+  const quoteFieldsSchema = createQuoteFieldsSchema(formConfig);
   const parsed = quoteFieldsSchema.safeParse({
     ...rawFields,
     company: rawFields.company || undefined,
@@ -183,6 +186,7 @@ export async function POST(request: Request) {
 
     await writeClient.create({
       _type: "quoteSubmission",
+      status: "new",
       ...parsed.data,
       attachments,
       submittedAt: new Date().toISOString(),
@@ -207,6 +211,7 @@ export async function POST(request: Request) {
     ...parsed.data,
     attachmentPathnames: attachments,
     studioUrl: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL,
+    formConfig,
   });
 
   await trackAcceptedQuoteVolume();
