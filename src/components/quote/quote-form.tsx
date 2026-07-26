@@ -132,7 +132,10 @@ export function QuoteForm() {
         setStatus("limited");
         return;
       }
-      if (!res.ok) throw new Error("Failed");
+      if (!res.ok) {
+        setStatus(res.status >= 500 ? "server_error" : "error");
+        return;
+      }
       setStatus("done");
     } catch {
       setStatus("error");
