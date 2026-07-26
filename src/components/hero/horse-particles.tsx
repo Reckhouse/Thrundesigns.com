@@ -30,9 +30,13 @@ const HORSE_HALF = 1.35;
 /** Pointer influence only near the silhouette (page px). */
 const INTERACT_PX = 140;
 const DEAD_ZONE_PX = 28;
-/** Micro tilt limits (radians). */
+/** Micro tilt limits (radians) — idle pointer tracking. */
 const TILT_YAW = (9 * Math.PI) / 180;
 const TILT_PITCH = (4.5 * Math.PI) / 180;
+/** Click-and-hold orbit limits. */
+const ORBIT_YAW = (52 * Math.PI) / 180;
+const ORBIT_PITCH = (30 * Math.PI) / 180;
+const ORBIT_DRAG = 0.0055;
 
 const TIER_HIGH = 12000;
 const TIER_STANDARD = 8000;
@@ -47,6 +51,7 @@ uniform float uIdle;
 uniform float uPixelRatio;
 uniform vec2 uPointerLocal;
 uniform float uStatic;
+uniform float uOrbit; // 0–1 while click-holding — deepens relief
 
 attribute vec3 aRandom;
 attribute vec3 aMeta; // edge, tone, rear
@@ -62,6 +67,17 @@ void main() {
   vRear = aMeta.z;
 
   vec3 origin = position;
+
+  // Cameo relief — project flat bake onto a shallow dome so orbit reads in 3D
+  float radial = length(origin.xy) / 1.35;
+  float dome = sqrt(max(0.0, 1.0 - clamp(radial * radial, 0.0, 1.0)));
+  float reliefAmt = mix(0.22, 0.48, uOrbit);
+  float cameoZ = dome * reliefAmt * mix(0.65, 1.15, vEdge);
+  // Interior sits slightly back; edges / features push forward
+  cameoZ += mix(-0.06, 0.05, vEdge) * mix(0.7, 1.2, uOrbit);
+  cameoZ *= mix(0.85, 1.0, 1.0 - vRear * 0.35);
+  origin.z += cameoZ;
+
   float phase = aRandom.z * 6.2831853;
   vec3 dir = normalize(vec3(aRandom.x, aRandom.y, (aRandom.z - 0.5) * 0.25));
 
@@ -242,6 +258,14 @@ function HorseParticleField({
   const pointerNdc = useRef({ x: 0, y: 0, inside: false });
   const ctaHover = useRef(0);
   const scrollFade = useRef(0);
+  const orbit = useRef({
+    holding: false,
+    yaw: 0,
+    pitch: 0,
+    lastX: 0,
+    lastY: 0,
+    amount: 0,
+  });
   const horseAnchorRef = useRef({
     x: 0.78,
     y: 0.48,
@@ -254,6 +278,30 @@ function HorseParticleField({
   const { offsetX, offsetY, scale } = useHorseLayout();
   const finePointer = useRef(preferFinePointer());
   const tiltCurrent = useRef({ yaw: 0, pitch: 0 });
+
+  const isOverHorse = (clientX: number, clientY: number, pad = INTERACT_PX) => {
+    const canvas = gl.domElement;
+    const rect = canvas.getBoundingClientRect();
+    const anchor = horseAnchorRef.current;
+    const cx = rect.left + rect.width * anchor.x;
+    const cy = rect.top + rect.height * anchor.y;
+    const halfW = rect.width * anchor.halfW;
+    const halfH = rect.height * anchor.halfH;
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+    const dist = Math.hypot(
+      Math.max(Math.abs(dx) - halfW, 0),
+      Math.max(Math.abs(dy) - halfH, 0),
+    );
+    return {
+      over: dist <= pad && appearProxy.current.value >= 0.85,
+      dx,
+      dy,
+      halfW,
+      halfH,
+      rect,
+    };
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -323,43 +371,76 @@ function HorseParticleField({
 
   useEffect(() => {
     if (staticMode) return;
-    const canvas = gl.domElement;
+
+    const setCursor = (value: string) => {
+      document.body.style.cursor = value;
+    };
 
     const onMove = (event: PointerEvent) => {
       if (!finePointer.current) return;
-      const rect = canvas.getBoundingClientRect();
-      const anchor = horseAnchorRef.current;
-      const cx = rect.left + rect.width * anchor.x;
-      const cy = rect.top + rect.height * anchor.y;
-      const halfW = rect.width * anchor.halfW;
-      const halfH = rect.height * anchor.halfH;
-      const dx = event.clientX - cx;
-      const dy = event.clientY - cy;
-      const dist = Math.hypot(
-        Math.max(Math.abs(dx) - halfW, 0),
-        Math.max(Math.abs(dy) - halfH, 0),
-      );
 
-      if (dist > INTERACT_PX || appearProxy.current.value < 0.85) {
+      // Click-hold orbit — drag rotates into 3D
+      if (orbit.current.holding) {
+        const dX = event.clientX - orbit.current.lastX;
+        const dY = event.clientY - orbit.current.lastY;
+        orbit.current.lastX = event.clientX;
+        orbit.current.lastY = event.clientY;
+        orbit.current.yaw = Math.max(
+          -ORBIT_YAW,
+          Math.min(ORBIT_YAW, orbit.current.yaw + dX * ORBIT_DRAG),
+        );
+        orbit.current.pitch = Math.max(
+          -ORBIT_PITCH,
+          Math.min(ORBIT_PITCH, orbit.current.pitch + dY * ORBIT_DRAG),
+        );
+        setCursor("grabbing");
+        return;
+      }
+
+      const hit = isOverHorse(event.clientX, event.clientY);
+      if (!hit.over) {
         pointerNdc.current.inside = false;
         pointerLocal.current.set(10, 10);
+        if (document.body.style.cursor === "grab") setCursor("auto");
         return;
       }
 
       pointerNdc.current.inside = true;
-      const localX = (dx / Math.max(halfW, 1)) * HORSE_HALF * 0.85;
-      const localY = (-dy / Math.max(halfH, 1)) * HORSE_HALF * 0.85;
+      const localX = (hit.dx / Math.max(hit.halfW, 1)) * HORSE_HALF * 0.85;
+      const localY = (-hit.dy / Math.max(hit.halfH, 1)) * HORSE_HALF * 0.85;
       pointerLocal.current.set(localX, localY);
 
-      const nx = dx / (rect.width * 0.35);
-      const ny = -dy / (rect.height * 0.35);
+      const nx = hit.dx / (hit.rect.width * 0.35);
+      const ny = -hit.dy / (hit.rect.height * 0.35);
       pointerNdc.current.x = Math.max(-1, Math.min(1, nx));
       pointerNdc.current.y = Math.max(-1, Math.min(1, ny));
+      setCursor("grab");
+    };
+
+    const onDown = (event: PointerEvent) => {
+      if (!finePointer.current || event.button !== 0) return;
+      const hit = isOverHorse(event.clientX, event.clientY, 24);
+      if (!hit.over) return;
+      event.preventDefault();
+      orbit.current.holding = true;
+      orbit.current.lastX = event.clientX;
+      orbit.current.lastY = event.clientY;
+      document.body.style.userSelect = "none";
+      setCursor("grabbing");
+    };
+
+    const endOrbit = () => {
+      if (!orbit.current.holding) return;
+      orbit.current.holding = false;
+      document.body.style.userSelect = "";
+      setCursor(pointerNdc.current.inside ? "grab" : "auto");
     };
 
     const onLeave = () => {
+      if (orbit.current.holding) return;
       pointerNdc.current.inside = false;
       pointerLocal.current.set(10, 10);
+      setCursor("auto");
     };
 
     const media = window.matchMedia("(pointer: fine)");
@@ -367,15 +448,29 @@ function HorseParticleField({
       finePointer.current = media.matches;
     };
 
+    const onBlur = () => {
+      endOrbit();
+      onLeave();
+    };
+
     window.addEventListener("pointermove", onMove, { passive: true });
-    window.addEventListener("blur", onLeave);
+    window.addEventListener("pointerdown", onDown, { passive: false });
+    window.addEventListener("pointerup", endOrbit);
+    window.addEventListener("pointercancel", endOrbit);
+    window.addEventListener("blur", onBlur);
     media.addEventListener("change", onPointerType);
 
     return () => {
       window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("blur", onLeave);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", endOrbit);
+      window.removeEventListener("pointercancel", endOrbit);
+      window.removeEventListener("blur", onBlur);
       media.removeEventListener("change", onPointerType);
+      setCursor("auto");
     };
+    // isOverHorse closes over gl + appearProxy refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gl, staticMode]);
 
   useEffect(() => {
@@ -454,6 +549,7 @@ function HorseParticleField({
         uStatic: { value: staticMode ? 1 : 0 },
         uPixelRatio: { value: 1 },
         uPointerLocal: { value: new Vector2(10, 10) },
+        uOrbit: { value: 0 },
         uStone: { value: new Color(COLOR_STONE) },
         uBronze: { value: new Color(COLOR_BRONZE) },
         uGold: { value: new Color(COLOR_GOLD) },
@@ -479,9 +575,24 @@ function HorseParticleField({
     mat.uniforms.uCta.value +=
       (ctaHover.current - mat.uniforms.uCta.value) * Math.min(1, delta * 4);
 
+    const holding = orbit.current.holding;
+    const targetOrbit = holding ? 1 : 0;
+    orbit.current.amount +=
+      (targetOrbit - orbit.current.amount) * Math.min(1, delta * (holding ? 5 : 2.2));
+    mat.uniforms.uOrbit.value = orbit.current.amount;
+
+    // Ease orbit angles back to rest after release
+    if (!holding) {
+      const settle = 1 - Math.exp(-delta * 2.4);
+      orbit.current.yaw *= 1 - settle;
+      orbit.current.pitch *= 1 - settle;
+      if (Math.abs(orbit.current.yaw) < 0.0008) orbit.current.yaw = 0;
+      if (Math.abs(orbit.current.pitch) < 0.0008) orbit.current.pitch = 0;
+    }
+
     const targetIdle =
-      staticMode || pointerNdc.current.inside
-        ? 0.35
+      staticMode || holding || pointerNdc.current.inside
+        ? 0.2
         : appearProxy.current.value > 0.9
           ? 1
           : 0;
@@ -501,31 +612,33 @@ function HorseParticleField({
         DEAD_ZONE_PX;
 
     let targetTension = 0;
-    if (!staticMode && pointerNdc.current.inside && !inDeadZone) {
+    if (!staticMode && !holding && pointerNdc.current.inside && !inDeadZone) {
       targetTension = Math.min(1, Math.max(0, 1 - distFromCenter * 0.45));
     }
     mat.uniforms.uTension.value +=
       (targetTension - mat.uniforms.uTension.value) * Math.min(1, delta * 3.5);
     (mat.uniforms.uPointerLocal.value as Vector2).copy(ptr);
 
-    let targetYaw = 0;
-    let targetPitch = 0;
-    if (!staticMode && pointerNdc.current.inside && !inDeadZone) {
-      targetYaw = pointerNdc.current.x * TILT_YAW;
-      targetPitch = pointerNdc.current.y * TILT_PITCH;
-    }
-    if (!staticMode && ctaHover.current > 0.5) {
-      targetYaw += (-1.5 * Math.PI) / 180;
-      targetPitch += (0.4 * Math.PI) / 180;
+    let targetYaw = orbit.current.yaw;
+    let targetPitch = orbit.current.pitch;
+    if (!staticMode && !holding) {
+      if (pointerNdc.current.inside && !inDeadZone) {
+        targetYaw += pointerNdc.current.x * TILT_YAW;
+        targetPitch += pointerNdc.current.y * TILT_PITCH;
+      }
+      if (ctaHover.current > 0.5) {
+        targetYaw += (-1.5 * Math.PI) / 180;
+        targetPitch += (0.4 * Math.PI) / 180;
+      }
     }
 
-    const ease = 1 - Math.exp(-delta * 2.1);
+    const ease = 1 - Math.exp(-delta * (holding ? 10 : 2.1));
     tiltCurrent.current.yaw += (targetYaw - tiltCurrent.current.yaw) * ease;
     tiltCurrent.current.pitch +=
       (targetPitch - tiltCurrent.current.pitch) * ease;
 
     const idleYaw =
-      !staticMode && appearProxy.current.value > 0.95
+      !staticMode && !holding && appearProxy.current.value > 0.95
         ? Math.sin(mat.uniforms.uTime.value * 0.28) * ((1 * Math.PI) / 180)
         : 0;
 
@@ -582,7 +695,7 @@ export function HorseParticles({
   return (
     <div
       className="horse-engraving absolute inset-0 h-full w-full"
-      aria-label="Horse head engraving"
+      aria-label="Horse head engraving. Click and drag to rotate."
     >
       <Canvas
         className="h-full w-full touch-none"
