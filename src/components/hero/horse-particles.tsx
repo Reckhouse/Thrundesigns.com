@@ -2,11 +2,11 @@
 
 import {
   Suspense,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
+  type RefObject,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import gsap from "gsap";
@@ -14,77 +14,157 @@ import {
   BufferAttribute,
   BufferGeometry,
   Color,
-  Points,
+  Group,
+  NormalBlending,
   ShaderMaterial,
+  Vector2,
 } from "three";
 
-/**
- * Editorial cream (same family as --fg / --contrast).
- * Reads as brand ink on the mountain — high contrast without the orange
- * cast solid --gold picks up as translucent particles.
- */
-const PARTICLE = "#f4f1e9";
-/** Soft champagne accent on explode — cooler than button gold. */
-const PARTICLE_HOT = "#e6d9b8";
+/** Living Engraving palette — stone base, bronze mid, gold accent. */
+const COLOR_STONE = "#c8c2b4";
+const COLOR_BRONZE = "#8a7349";
+const COLOR_GOLD = "#c9a84c";
 
-const HORSE_SCALE = 1.42;
+const HORSE_SCALE = 1.48;
 const HORSE_HALF = 1.35;
-/** ~6 inches at CSS 96px/in from the silhouette edge. */
-const NO_SHAKE_PX = 6 * 96;
+/** Pointer influence only near the silhouette (page px). */
+const INTERACT_PX = 140;
+const DEAD_ZONE_PX = 28;
+/** Micro tilt limits (radians). */
+const TILT_YAW = (9 * Math.PI) / 180;
+const TILT_PITCH = (4.5 * Math.PI) / 180;
+
+const TIER_HIGH = 9000;
+const TIER_STANDARD = 6000;
 
 const vertexShader = /* glsl */ `
 uniform float uTime;
-uniform float uShake;
-uniform float uExplode;
+uniform float uAppear;
+uniform float uScroll;
+uniform float uTension;
+uniform float uCta;
+uniform float uIdle;
 uniform float uPixelRatio;
+uniform vec2 uPointerLocal;
+uniform float uStatic;
+
 attribute vec3 aRandom;
+attribute vec3 aMeta; // edge, tone, rear
+
+varying float vEdge;
+varying float vTone;
+varying float vRear;
+varying float vTwinkle;
 
 void main() {
+  vEdge = aMeta.x;
+  vTone = aMeta.y;
+  vRear = aMeta.z;
+
   vec3 origin = position;
-  vec3 dir = normalize(vec3(aRandom.x, aRandom.y, (aRandom.z - 0.5) * 0.35));
   float phase = aRandom.z * 6.2831853;
+  vec3 dir = normalize(vec3(aRandom.x, aRandom.y, (aRandom.z - 0.5) * 0.25));
 
-  float wobble = sin(uTime * 18.0 + phase) * 0.5
-    + sin(uTime * 29.0 + phase * 1.7) * 0.3;
+  // Entrance: particles resolve a few pixels into place from haze
+  float appear = clamp(uAppear, 0.0, 1.0);
+  float appearEase = appear * appear * (3.0 - 2.0 * appear);
+  vec3 fromHaze = dir * (1.0 - appearEase) * 0.045;
+  fromHaze.z -= (1.0 - appearEase) * 0.08;
 
-  vec3 shakeOffset = dir * uShake * (0.04 + abs(wobble) * 0.07);
-  shakeOffset.x += sin(uTime * 26.0 + phase) * uShake * 0.022;
-  shakeOffset.y += cos(uTime * 22.0 + phase * 1.3) * uShake * 0.022;
+  // Idle breath + slow traveling wave (disabled when static)
+  float wave = sin(uTime * 0.55 + origin.y * 2.4 + origin.x * 1.1 + phase);
+  float breath = uIdle * (1.0 - uStatic) * wave * 0.012;
+  vec3 idleOffset = vec3(0.0, breath, breath * 0.35);
 
-  float burst = uExplode * uExplode;
-  // Wider scatter so particles travel across the full hero canvas
-  vec3 explodeOffset = dir * burst * (3.4 + aRandom.z * 4.2);
-  explodeOffset += vec3(
-    sin(phase + uTime * 2.0) * burst * 1.1,
-    cos(phase * 1.4 + uTime) * burst * 1.1,
-    sin(phase * 2.1) * burst * 1.35
-  );
+  // Sparse twinkle scale factor passed to point size
+  float twinkleGate = step(0.72, aRandom.z);
+  float twinkle = 1.0 + twinkleGate * uIdle * (1.0 - uStatic)
+    * sin(uTime * 1.1 + phase * 2.0) * 0.04;
+  vTwinkle = twinkle;
+
+  // Minimal surface tension near pointer (local horse space)
+  vec2 toPtr = origin.xy - uPointerLocal;
+  float dist = length(toPtr);
+  float tensionRadius = 0.65;
+  float tension = uTension * (1.0 - uStatic)
+    * smoothstep(tensionRadius, 0.0, dist);
+  vec3 tensionOffset = vec3(0.0);
+  float tLen = length(toPtr);
+  if (tLen > 0.0001) {
+    tensionOffset = vec3(toPtr.x, toPtr.y, 0.0) / tLen * tension * 0.045;
+  }
+
+  // Scroll recession — drift deeper / right
+  vec3 scrollOffset = vec3(uScroll * 0.08, -uScroll * 0.02, -uScroll * 0.14);
 
   vec3 transformed = origin
-    + shakeOffset * (1.0 - uExplode)
-    + explodeOffset;
+    + fromHaze
+    + idleOffset
+    + tensionOffset
+    + scrollOffset;
+
+  // CTA: subtle forward rim lift on front/edge points
+  transformed.z += uCta * vEdge * 0.03 * (1.0 - vRear);
 
   vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);
   gl_Position = projectionMatrix * mvPosition;
 
-  // Slightly smaller discs so dense rest samples read as sharp strokes
-  float base = mix(1.15, 1.0, uExplode);
-  float attenuated = base * uPixelRatio * (88.0 / max(1.0, -mvPosition.z));
-  gl_PointSize = clamp(attenuated, 0.8, 2.1);
+  float sizeBase = mix(0.55, 1.05, vEdge);
+  sizeBase *= mix(0.9, 1.08, vTone);
+  sizeBase *= twinkle;
+  sizeBase *= mix(0.35, 1.0, appearEase);
+  float attenuated = sizeBase * uPixelRatio * (72.0 / max(1.0, -mvPosition.z));
+  gl_PointSize = clamp(attenuated, 0.55, 1.65);
 }
 `;
 
 const fragmentShader = /* glsl */ `
-uniform vec3 uColor;
-uniform float uExplode;
+uniform vec3 uStone;
+uniform vec3 uBronze;
+uniform vec3 uGold;
+uniform float uAppear;
+uniform float uScroll;
+uniform float uCta;
+
+varying float vEdge;
+varying float vTone;
+varying float vRear;
+varying float vTwinkle;
 
 void main() {
+  // Squared engraving stroke
   vec2 uv = gl_PointCoord - vec2(0.5);
-  float d = length(uv);
-  if (d > 0.45) discard;
-  float alpha = smoothstep(0.45, 0.18, d);
-  alpha *= mix(0.95, 0.55, uExplode);
-  gl_FragColor = vec4(uColor, alpha);
+  vec2 a = abs(uv);
+  float d = max(a.x, a.y);
+  if (d > 0.48) discard;
+  float alpha = 1.0 - smoothstep(0.28, 0.48, d);
+  alpha *= mix(0.72, 0.92, vEdge);
+
+  vec3 color = uStone;
+  if (vTone > 0.75) {
+    color = uGold;
+  } else if (vTone > 0.25) {
+    color = mix(uStone, uBronze, 0.85);
+  }
+
+  alpha *= mix(1.0, 0.42, vRear);
+  alpha *= mix(0.55, 1.0, clamp(vEdge * 1.2, 0.0, 1.0));
+
+  float appear = clamp(uAppear, 0.0, 1.0);
+  float depthGate = mix(0.55, 1.0, 1.0 - vRear);
+  float toneGate = mix(1.0, smoothstep(0.55, 0.95, appear), vTone);
+  alpha *= smoothstep(0.0, 0.85, appear * depthGate) * toneGate;
+
+  alpha *= 1.0 - uScroll * mix(0.55, 1.0, vRear);
+
+  color = mix(color, uGold, uCta * vEdge * 0.55 * (1.0 - vRear));
+  alpha *= mix(1.0, 1.08, uCta * vEdge);
+
+  alpha *= mix(0.96, 1.0, vTwinkle);
+  alpha = clamp(alpha, 0.0, 0.78);
+
+  if (alpha < 0.02) discard;
+  gl_FragColor = vec4(color, alpha);
 }
 `;
 
@@ -92,50 +172,106 @@ type ParticleBuffers = {
   count: number;
   positions: Float32Array;
   randoms: Float32Array;
+  metas: Float32Array;
 };
 
+export type HorseParticlesProps = {
+  staticMode?: boolean;
+  ctaRef?: RefObject<HTMLElement | null>;
+  sectionRef?: RefObject<HTMLElement | null>;
+};
+
+function preferFinePointer() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(pointer: fine)").matches;
+}
+
+function pickTierCount(max: number) {
+  if (typeof window === "undefined") return Math.min(TIER_STANDARD, max);
+  const cores = navigator.hardwareConcurrency || 4;
+  const mem =
+    "deviceMemory" in navigator
+      ? (navigator as Navigator & { deviceMemory?: number }).deviceMemory || 4
+      : 4;
+  const fine = preferFinePointer();
+  if (fine && cores >= 8 && mem >= 8) return Math.min(TIER_HIGH, max);
+  return Math.min(TIER_STANDARD, max);
+}
+
 async function loadParticleBuffers(): Promise<ParticleBuffers> {
-  const [metaRes, posRes, randRes] = await Promise.all([
+  const [metaRes, posRes, randRes, attrRes] = await Promise.all([
     fetch("/data/horse-particles.json"),
     fetch("/data/horse-particles-pos.bin"),
     fetch("/data/horse-particles-rand.bin"),
+    fetch("/data/horse-particles-meta.bin"),
   ]);
-  if (!metaRes.ok || !posRes.ok || !randRes.ok) {
+  if (!metaRes.ok || !posRes.ok || !randRes.ok || !attrRes.ok) {
     throw new Error("Failed to load horse particle data");
   }
   const meta = (await metaRes.json()) as { count: number };
-  const positions = new Float32Array(await posRes.arrayBuffer());
-  const randoms = new Float32Array(await randRes.arrayBuffer());
-  return { count: meta.count, positions, randoms };
+  return {
+    count: meta.count,
+    positions: new Float32Array(await posRes.arrayBuffer()),
+    randoms: new Float32Array(await randRes.arrayBuffer()),
+    metas: new Float32Array(await attrRes.arrayBuffer()),
+  };
 }
 
-/** Horse rests on the right side of the full-hero viewport. */
 function useHorseLayout() {
   const { viewport } = useThree();
-  const offsetX = Math.min(viewport.width * 0.3, 4.2);
-  const offsetY = viewport.height * 0.02;
+  const offsetX = Math.min(viewport.width * 0.34, 4.6);
+  const offsetY = viewport.height * 0.04;
   const scale = Math.min(
     HORSE_SCALE,
-    (viewport.height * 0.52) / (HORSE_HALF * 2),
+    (viewport.height * 0.56) / (HORSE_HALF * 2),
   );
   return { offsetX, offsetY, scale };
 }
 
-function HorseParticleField() {
-  const pointsRef = useRef<Points>(null);
+function HorseParticleField({
+  staticMode = false,
+  ctaRef,
+  sectionRef,
+  active,
+}: HorseParticlesProps & { active: boolean }) {
+  const groupRef = useRef<Group>(null);
   const materialRef = useRef<ShaderMaterial | null>(null);
-  const explodeProxy = useRef({ value: 0 });
-  const explodeTween = useRef<gsap.core.Tween | null>(null);
-  const hovering = useRef(false);
-  const distPxRef = useRef(NO_SHAKE_PX);
-  const horseAnchorRef = useRef({ x: 0.72, y: 0.5, halfW: 0.14, halfH: 0.22 });
-  const particle = useMemo(() => new Color(PARTICLE), []);
-  const particleHot = useMemo(() => new Color(PARTICLE_HOT), []);
+  const appearProxy = useRef({ value: staticMode ? 1 : 0 });
+  const pointerLocal = useRef(new Vector2(10, 10));
+  const pointerNdc = useRef({ x: 0, y: 0, inside: false });
+  const ctaHover = useRef(0);
+  const scrollFade = useRef(0);
+  const horseAnchorRef = useRef({
+    x: 0.78,
+    y: 0.48,
+    halfW: 0.12,
+    halfH: 0.2,
+  });
   const [buffers, setBuffers] = useState<ParticleBuffers | null>(null);
+  const [drawCount, setDrawCount] = useState(TIER_STANDARD);
   const { gl, size, viewport } = useThree();
   const { offsetX, offsetY, scale } = useHorseLayout();
+  const finePointer = useRef(preferFinePointer());
+  const tiltCurrent = useRef({ yaw: 0, pitch: 0 });
 
-  // Keep page-space horse anchor in sync with the 3D layout
+  useEffect(() => {
+    let cancelled = false;
+    void loadParticleBuffers()
+      .then((data) => {
+        if (cancelled) return;
+        setBuffers(data);
+        setDrawCount(
+          staticMode
+            ? Math.min(TIER_STANDARD, data.count)
+            : pickTierCount(data.count),
+        );
+      })
+      .catch((error) => console.error(error));
+    return () => {
+      cancelled = true;
+    };
+  }, [staticMode]);
+
   useEffect(() => {
     const worldToPxX = size.width / viewport.width;
     const worldToPxY = size.height / viewport.height;
@@ -149,65 +285,149 @@ function HorseParticleField() {
       halfW: Math.max(halfW, 0.08),
       halfH: Math.max(halfH, 0.12),
     };
-  }, [offsetX, offsetY, scale, size.height, size.width, viewport.height, viewport.width]);
+  }, [
+    offsetX,
+    offsetY,
+    scale,
+    size.height,
+    size.width,
+    viewport.height,
+    viewport.width,
+  ]);
 
   useEffect(() => {
-    let cancelled = false;
-    void loadParticleBuffers()
-      .then((data) => {
-        if (!cancelled) setBuffers(data);
-      })
-      .catch((error) => console.error(error));
+    if (staticMode) {
+      appearProxy.current.value = 1;
+      if (materialRef.current) {
+        materialRef.current.uniforms.uAppear.value = 1;
+      }
+      return;
+    }
+    const tween = gsap.to(appearProxy.current, {
+      value: 1,
+      duration: 1.55,
+      delay: 0.38,
+      ease: "power3.out",
+      onUpdate: () => {
+        if (materialRef.current) {
+          materialRef.current.uniforms.uAppear.value =
+            appearProxy.current.value;
+        }
+      },
+    });
     return () => {
-      cancelled = true;
-      explodeTween.current?.kill();
+      tween.kill();
     };
-  }, []);
+  }, [staticMode]);
 
   useEffect(() => {
+    if (staticMode) return;
     const canvas = gl.domElement;
 
-    const updateDistance = (clientX: number, clientY: number) => {
+    const onMove = (event: PointerEvent) => {
+      if (!finePointer.current) return;
       const rect = canvas.getBoundingClientRect();
       const anchor = horseAnchorRef.current;
       const cx = rect.left + rect.width * anchor.x;
       const cy = rect.top + rect.height * anchor.y;
       const halfW = rect.width * anchor.halfW;
       const halfH = rect.height * anchor.halfH;
-      const dx = Math.max(Math.abs(clientX - cx) - halfW, 0);
-      const dy = Math.max(Math.abs(clientY - cy) - halfH, 0);
-      distPxRef.current = Math.hypot(dx, dy);
-    };
+      const dx = event.clientX - cx;
+      const dy = event.clientY - cy;
+      const dist = Math.hypot(
+        Math.max(Math.abs(dx) - halfW, 0),
+        Math.max(Math.abs(dy) - halfH, 0),
+      );
 
-    const onMove = (event: PointerEvent) => {
-      updateDistance(event.clientX, event.clientY);
+      if (dist > INTERACT_PX || appearProxy.current.value < 0.85) {
+        pointerNdc.current.inside = false;
+        pointerLocal.current.set(10, 10);
+        return;
+      }
+
+      pointerNdc.current.inside = true;
+      const localX = (dx / Math.max(halfW, 1)) * HORSE_HALF * 0.85;
+      const localY = (-dy / Math.max(halfH, 1)) * HORSE_HALF * 0.85;
+      pointerLocal.current.set(localX, localY);
+
+      const nx = dx / (rect.width * 0.35);
+      const ny = -dy / (rect.height * 0.35);
+      pointerNdc.current.x = Math.max(-1, Math.min(1, nx));
+      pointerNdc.current.y = Math.max(-1, Math.min(1, ny));
     };
 
     const onLeave = () => {
-      distPxRef.current = NO_SHAKE_PX;
-      if (hovering.current) {
-        hovering.current = false;
-        document.body.style.cursor = "auto";
-      }
+      pointerNdc.current.inside = false;
+      pointerLocal.current.set(10, 10);
+    };
+
+    const media = window.matchMedia("(pointer: fine)");
+    const onPointerType = () => {
+      finePointer.current = media.matches;
     };
 
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("blur", onLeave);
-    distPxRef.current = NO_SHAKE_PX;
+    media.addEventListener("change", onPointerType);
 
     return () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("blur", onLeave);
+      media.removeEventListener("change", onPointerType);
     };
-  }, [gl]);
+  }, [gl, staticMode]);
+
+  useEffect(() => {
+    if (staticMode) return;
+    const el = ctaRef?.current;
+    if (!el) return;
+    const enter = () => {
+      ctaHover.current = 1;
+    };
+    const leave = () => {
+      ctaHover.current = 0;
+    };
+    el.addEventListener("pointerenter", enter);
+    el.addEventListener("pointerleave", leave);
+    el.addEventListener("focusin", enter);
+    el.addEventListener("focusout", leave);
+    return () => {
+      el.removeEventListener("pointerenter", enter);
+      el.removeEventListener("pointerleave", leave);
+      el.removeEventListener("focusin", enter);
+      el.removeEventListener("focusout", leave);
+    };
+  }, [ctaRef, staticMode]);
+
+  useEffect(() => {
+    if (staticMode) return;
+    const section = sectionRef?.current;
+    if (!section) return;
+
+    const onScroll = () => {
+      const rect = section.getBoundingClientRect();
+      const viewH = window.innerHeight || 1;
+      const progress = Math.min(
+        1,
+        Math.max(0, -rect.top / Math.max(rect.height * 0.65, viewH * 0.5)),
+      );
+      scrollFade.current = progress;
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [sectionRef, staticMode]);
 
   const geometry = useMemo(() => {
     if (!buffers) return null;
     const geo = new BufferGeometry();
     geo.setAttribute("position", new BufferAttribute(buffers.positions, 3));
     geo.setAttribute("aRandom", new BufferAttribute(buffers.randoms, 3));
+    geo.setAttribute("aMeta", new BufferAttribute(buffers.metas, 3));
+    geo.setDrawRange(0, drawCount);
     return geo;
-  }, [buffers]);
+  }, [buffers, drawCount]);
 
   useEffect(() => {
     return () => {
@@ -222,104 +442,146 @@ function HorseParticleField() {
       fragmentShader,
       transparent: true,
       depthWrite: false,
+      blending: NormalBlending,
       uniforms: {
         uTime: { value: 0 },
-        uShake: { value: 0 },
-        uExplode: { value: 0 },
+        uAppear: { value: staticMode ? 1 : 0 },
+        uScroll: { value: 0 },
+        uTension: { value: 0 },
+        uCta: { value: 0 },
+        uIdle: { value: staticMode ? 0 : 1 },
+        uStatic: { value: staticMode ? 1 : 0 },
         uPixelRatio: { value: 1 },
-        uColor: { value: new Color(PARTICLE) },
+        uPointerLocal: { value: new Vector2(10, 10) },
+        uStone: { value: new Color(COLOR_STONE) },
+        uBronze: { value: new Color(COLOR_BRONZE) },
+        uGold: { value: new Color(COLOR_GOLD) },
       },
     });
     materialRef.current = mat;
     return mat;
-  }, []);
-
-  const setExplode = useCallback((to: number) => {
-    explodeTween.current?.kill();
-    explodeTween.current = gsap.to(explodeProxy.current, {
-      value: to,
-      duration: to > 0 ? 0.7 : 1.5,
-      ease: to > 0 ? "power3.out" : "power2.inOut",
-      onUpdate: () => {
-        if (materialRef.current) {
-          materialRef.current.uniforms.uExplode.value =
-            explodeProxy.current.value;
-        }
-      },
-      onComplete: () => {
-        if (to === 0 && materialRef.current) {
-          explodeProxy.current.value = 0;
-          materialRef.current.uniforms.uExplode.value = 0;
-          materialRef.current.uniforms.uShake.value = 0;
-        }
-      },
-    });
-  }, []);
+  }, [staticMode]);
 
   useFrame((_, delta) => {
     const mat = materialRef.current;
     if (!mat) return;
-    mat.uniforms.uTime.value += delta;
-    mat.uniforms.uPixelRatio.value = Math.min(gl.getPixelRatio(), 1.75);
+    if (!active && !staticMode) return;
 
-    const color = mat.uniforms.uColor.value as Color;
-    color.copy(particle).lerp(particleHot, mat.uniforms.uExplode.value * 0.4);
+    if (!staticMode) {
+      mat.uniforms.uTime.value += delta;
+    }
+    mat.uniforms.uPixelRatio.value = Math.min(gl.getPixelRatio(), 1.5);
+    mat.uniforms.uAppear.value = appearProxy.current.value;
+    mat.uniforms.uScroll.value +=
+      (scrollFade.current - mat.uniforms.uScroll.value) *
+      Math.min(1, delta * 2.2);
+    mat.uniforms.uCta.value +=
+      (ctaHover.current - mat.uniforms.uCta.value) * Math.min(1, delta * 4);
 
-    const distPx = distPxRef.current;
-    let targetShake = 0;
+    const targetIdle =
+      staticMode || pointerNdc.current.inside
+        ? 0.35
+        : appearProxy.current.value > 0.9
+          ? 1
+          : 0;
+    mat.uniforms.uIdle.value +=
+      (targetIdle - mat.uniforms.uIdle.value) * Math.min(1, delta * 1.2);
 
-    if (hovering.current) {
-      targetShake = 0.2;
-    } else if (distPx < NO_SHAKE_PX) {
-      const t = 1 - distPx / NO_SHAKE_PX;
-      targetShake = t * t;
+    const ptr = pointerLocal.current;
+    const distFromCenter = Math.hypot(
+      ptr.x / HORSE_HALF,
+      ptr.y / HORSE_HALF,
+    );
+    const inDeadZone =
+      !pointerNdc.current.inside ||
+      Math.hypot(pointerNdc.current.x, pointerNdc.current.y) *
+        Math.min(size.width, size.height) *
+        0.12 <
+        DEAD_ZONE_PX;
+
+    let targetTension = 0;
+    if (!staticMode && pointerNdc.current.inside && !inDeadZone) {
+      targetTension = Math.min(1, Math.max(0, 1 - distFromCenter * 0.45));
+    }
+    mat.uniforms.uTension.value +=
+      (targetTension - mat.uniforms.uTension.value) * Math.min(1, delta * 3.5);
+    (mat.uniforms.uPointerLocal.value as Vector2).copy(ptr);
+
+    let targetYaw = 0;
+    let targetPitch = 0;
+    if (!staticMode && pointerNdc.current.inside && !inDeadZone) {
+      targetYaw = pointerNdc.current.x * TILT_YAW;
+      targetPitch = pointerNdc.current.y * TILT_PITCH;
+    }
+    if (!staticMode && ctaHover.current > 0.5) {
+      targetYaw += (-1.5 * Math.PI) / 180;
+      targetPitch += (0.4 * Math.PI) / 180;
     }
 
-    if (targetShake === 0 && !hovering.current) {
-      mat.uniforms.uShake.value *= Math.max(0, 1 - delta * 10);
-      if (mat.uniforms.uShake.value < 0.002) {
-        mat.uniforms.uShake.value = 0;
-      }
-    } else {
-      mat.uniforms.uShake.value +=
-        (targetShake - mat.uniforms.uShake.value) * Math.min(1, delta * 8);
+    const ease = 1 - Math.exp(-delta * 2.1);
+    tiltCurrent.current.yaw += (targetYaw - tiltCurrent.current.yaw) * ease;
+    tiltCurrent.current.pitch +=
+      (targetPitch - tiltCurrent.current.pitch) * ease;
+
+    const idleYaw =
+      !staticMode && appearProxy.current.value > 0.95
+        ? Math.sin(mat.uniforms.uTime.value * 0.28) * ((1 * Math.PI) / 180)
+        : 0;
+
+    if (groupRef.current) {
+      groupRef.current.rotation.y = tiltCurrent.current.yaw + idleYaw;
+      groupRef.current.rotation.x = tiltCurrent.current.pitch;
     }
   });
 
   if (!geometry) return null;
 
-  const hitSize = HORSE_HALF * 2 * 0.92;
-
   return (
-    <group position={[offsetX, offsetY, 0]} scale={scale}>
-      <points ref={pointsRef} geometry={geometry} material={material} />
-      <mesh
-        position={[0, 0, 0.04]}
-        onPointerOver={(event) => {
-          event.stopPropagation();
-          hovering.current = true;
-          document.body.style.cursor = "pointer";
-          setExplode(1);
-        }}
-        onPointerOut={(event) => {
-          event.stopPropagation();
-          hovering.current = false;
-          document.body.style.cursor = "auto";
-          setExplode(0);
-        }}
-      >
-        <planeGeometry args={[hitSize, hitSize]} />
-        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-      </mesh>
+    <group ref={groupRef} position={[offsetX, offsetY, 0]} scale={scale}>
+      <points geometry={geometry} material={material} />
     </group>
   );
 }
 
-export function HorseParticles() {
+export function HorseParticles({
+  staticMode = false,
+  ctaRef,
+  sectionRef,
+}: HorseParticlesProps) {
+  const [tabActive, setTabActive] = useState(true);
+  const [inView, setInView] = useState(true);
+
+  useEffect(() => {
+    const section = sectionRef?.current;
+    let io: IntersectionObserver | null = null;
+    if (section) {
+      io = new IntersectionObserver(
+        ([entry]) => {
+          setInView(entry.isIntersecting);
+        },
+        { threshold: 0.05 },
+      );
+      io.observe(section);
+    }
+
+    const onVisibility = () => {
+      setTabActive(document.visibilityState === "visible");
+    };
+    onVisibility();
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      io?.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [sectionRef]);
+
+  const running = staticMode || (tabActive && inView);
+
   return (
     <div
-      className="absolute inset-0 h-full w-full"
-      aria-label="Interactive horse head particle field"
+      className="horse-engraving absolute inset-0 h-full w-full"
+      aria-label="Horse head engraving"
     >
       <Canvas
         className="h-full w-full touch-none"
@@ -329,13 +591,19 @@ export function HorseParticles() {
           powerPreference: "high-performance",
         }}
         camera={{ position: [0, 0, 6], fov: 40, near: 0.1, far: 50 }}
-        dpr={[1, 1.75]}
+        dpr={[1, 1.5]}
+        frameloop={running ? "always" : "never"}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
         <Suspense fallback={null}>
-          <HorseParticleField />
+          <HorseParticleField
+            staticMode={staticMode}
+            ctaRef={ctaRef}
+            sectionRef={sectionRef}
+            active={running}
+          />
         </Suspense>
       </Canvas>
     </div>

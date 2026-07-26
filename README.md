@@ -139,15 +139,16 @@ https://thrundesigns-com.vercel.app
 Merge the site PR into `main` so that URL serves the full app (not the
 scaffold initial commit). Custom domain `thrundesign.com` can be added later.
 
-## Hero horse particles
+## Hero horse particles (Living Engraving)
 
-Desktop hero includes an interactive WebGL particle horse head (React Three
+Desktop hero includes a restrained WebGL particle horse head (React Three
 Fiber + custom shaders + GSAP) staged across the full hero:
 
-- Rests on the right; explosions stay visible across the hero section
-- Stable gold silhouette when the cursor is away
-- Shake ramps in within ~6" of the mark; hover explodes; leave reforms
-- Hidden below `lg`; static mark fallback when `prefers-reduced-motion` is set
+- Edge-weighted “engraving” bake (~9k); stone / bronze / gold accent mix
+- Micro tilt + surface tension near the silhouette only (no explode)
+- Haze entrance, scroll recession, CTA-linked gold rim highlight
+- Adaptive particle tiers; pauses offscreen / hidden tab
+- Hidden below `lg`; static engraved pose when `prefers-reduced-motion` is set
 
 Source art: `public/images/horse-head.png`  
 Particle bake: `node scripts/bake-horse-particles.mjs` → `public/data/horse-particles*`

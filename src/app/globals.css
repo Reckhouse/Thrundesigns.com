@@ -138,6 +138,18 @@
   }
 }
 
+/* Living Engraving — fade horse into mountain haze at bottom / outer edge */
+.horse-engraving {
+  -webkit-mask-image:
+    radial-gradient(ellipse 72% 78% at 74% 40%, #000 32%, transparent 80%),
+    linear-gradient(to top, transparent 0%, #000 18%, #000 100%);
+  mask-image:
+    radial-gradient(ellipse 72% 78% at 74% 40%, #000 32%, transparent 80%),
+    linear-gradient(to top, transparent 0%, #000 18%, #000 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
 @layer utilities {
   .scene-glass {
     background: var(--surface-glass);
