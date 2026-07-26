@@ -122,8 +122,9 @@ printf '%s' '<your-resend-api-key>' | npx vercel env add RESEND_API_KEY developm
 ```
 
 With the free key, keep `QUOTE_NOTIFY_FROM` as
-`Thrun Design Co <onboarding@resend.dev>` (already set). Resend only delivers
-test mail to the account owner until a domain is verified.
+`Thrun Design Co <onboarding@resend.dev>` (already set). Until a domain is
+verified, Resend only delivers to the Resend account owner email — set
+`QUOTE_NOTIFY_TO` to that address (not a different inbox).
 
 `QUOTE_NOTIFY_TO` is already set. Notify runs only after Sanity stores the
 submission. Missing Resend config logs `quote.email_skipped` and still returns
