@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { stegaClean } from "@sanity/client/stega";
 import { ArrowUpRight } from "lucide-react";
 import { BrandLogo } from "@/components/icons/brand-logo";
 import { Button } from "@/components/ui/button";
@@ -28,10 +29,15 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ nav }: SiteHeaderProps) {
-  const items = (nav?.length ? nav : defaultNav).filter(
-    (item): item is { label: string; href: string } =>
-      Boolean(item?.label && item?.href),
-  );
+  const items = (nav?.length ? nav : defaultNav)
+    .map((item) => ({
+      label: item?.label ? stegaClean(item.label) : "",
+      href: item?.href ? stegaClean(item.href) : "",
+    }))
+    .filter(
+      (item): item is { label: string; href: string } =>
+        Boolean(item.label && item.href),
+    );
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
   const [solid, setSolid] = useState(false);

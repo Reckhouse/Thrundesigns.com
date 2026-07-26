@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Libre_Baskerville } from "next/font/google";
+import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity/visual-editing";
+import { DisableDraftMode } from "@/components/sanity/disable-draft-mode";
 import { SanityLive } from "@/sanity/lib/live";
 import { ScrollProgress } from "@/components/site/scroll-progress";
 import "./globals.css";
@@ -41,11 +44,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isDraft = (await draftMode()).isEnabled;
+
   return (
     <html
       lang="en"
@@ -55,6 +60,12 @@ export default function RootLayout({
         <ScrollProgress />
         {children}
         <SanityLive />
+        {isDraft ? (
+          <>
+            <DisableDraftMode />
+            <VisualEditing />
+          </>
+        ) : null}
       </body>
     </html>
   );

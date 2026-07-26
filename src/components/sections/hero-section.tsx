@@ -1,5 +1,6 @@
 "use client";
 
+import { stegaClean } from "@sanity/client/stega";
 import {
   PrimaryButtonLink,
   TextLink,
@@ -89,13 +90,17 @@ export function HeroSection({
             {...item(0.44)}
           >
             <PrimaryButtonLink
-              href={primaryCta?.href || "/quote"}
+              href={
+                primaryCta?.href ? stegaClean(primaryCta.href) : "/quote"
+              }
               className="w-full justify-center sm:w-auto"
             >
               {primaryCta?.label || "Request a project quote"}
             </PrimaryButtonLink>
             <TextLink
-              href={secondaryCta?.href || "/work"}
+              href={
+                secondaryCta?.href ? stegaClean(secondaryCta.href) : "/work"
+              }
               className="justify-center text-fg hover:text-gold sm:justify-start"
             >
               {secondaryCta?.label || "Browse concept studies"}

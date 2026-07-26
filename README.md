@@ -182,6 +182,37 @@ SANITY_STUDIO_SITE_URL=https://thrundesigns-com.vercel.app
 
 `QUOTE_ATTACHMENT_SECRET` (min 16 chars) defaults to `QUOTE_FORM_SECRET` when unset.
 
+## Visual Editing (Presentation)
+
+Sanity Presentation Tool embeds the production (or local) site with Draft Mode so
+editors can click content and jump to the matching field.
+
+**Site (Next.js)**
+
+- `SANITY_API_READ_TOKEN` — Viewer token (server-only)
+- Routes: `/api/draft-mode/enable`, `/api/draft-mode/disable`
+- When Draft Mode is on, the root layout mounts `<VisualEditing />` and an
+  “Exit draft mode” control (hidden inside Presentation)
+
+**Studio**
+
+- `presentationTool` in `studio/sanity.config.ts`
+- Preview origin: `SANITY_STUDIO_PREVIEW_ORIGIN` or `SANITY_STUDIO_SITE_URL`
+  (defaults to the Vercel production URL)
+- Locations resolve for Home, Site settings, Projects, Services, Process steps,
+  and Quote form
+
+**CORS** (Sanity Manage → API → CORS origins): allow the site origin and
+`http://localhost:3000` with **Allow credentials** enabled so Presentation can
+fetch drafts.
+
+Redeploy Studio after changing Presentation config:
+
+```bash
+# Use a human Sanity login token for deploy (not a robot CI token)
+cd studio && npx sanity deploy
+```
+
 ## Design source
 
 Figma handoff: Thrun Design Co. — Website (Student Plan), Version B Dark Editorial.

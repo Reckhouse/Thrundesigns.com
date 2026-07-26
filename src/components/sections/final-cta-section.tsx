@@ -1,5 +1,6 @@
 "use client";
 
+import { stegaClean } from "@sanity/client/stega";
 import {
   PrecisionMark,
   PrimaryButtonLink,
@@ -64,13 +65,17 @@ export function FinalCtaSection({
             </p>
             <div className="mt-10 flex flex-col items-stretch gap-4 sm:mt-12 sm:flex-row sm:items-center sm:gap-5">
               <PrimaryButtonLink
-                href={primaryCta?.href || "/quote"}
+                href={
+                  primaryCta?.href ? stegaClean(primaryCta.href) : "/quote"
+                }
                 className="w-full justify-center sm:w-auto"
               >
                 {primaryCta?.label || "Request a project quote"}
               </PrimaryButtonLink>
               <TextLink
-                href={secondaryCta?.href || "/work"}
+                href={
+                  secondaryCta?.href ? stegaClean(secondaryCta.href) : "/work"
+                }
                 className="justify-center text-fg hover:text-gold sm:justify-start"
               >
                 {secondaryCta?.label || "Browse concept studies"}

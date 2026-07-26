@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { stegaClean } from "@sanity/client/stega";
 import { BrandLogo } from "@/components/icons/brand-logo";
 
 const defaultColumns = [
@@ -63,18 +64,21 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
                 {column.heading}
               </p>
               <ul className="mt-5 space-y-3">
-                {column.links?.map((link) =>
-                  link?.label && link?.href ? (
-                    <li key={`${column.heading}-${link.label}-${link.href}`}>
+                {column.links?.map((link) => {
+                  const label = link?.label ? stegaClean(link.label) : "";
+                  const href = link?.href ? stegaClean(link.href) : "";
+                  if (!label || !href) return null;
+                  return (
+                    <li key={`${column.heading}-${label}-${href}`}>
                       <Link
-                        href={link.href}
+                        href={href}
                         className="font-sans text-[15px] text-fg transition-colors hover:text-gold"
                       >
-                        {link.label}
+                        {label}
                       </Link>
                     </li>
-                  ) : null,
-                )}
+                  );
+                })}
               </ul>
             </div>
           ))}
