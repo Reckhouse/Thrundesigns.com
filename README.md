@@ -139,6 +139,13 @@ https://thrundesigns-com.vercel.app
 Merge the site PR into `main` so that URL serves the full app (not the
 scaffold initial commit). Custom domain `thrundesign.com` can be added later.
 
+## Hero globe
+
+Desktop hero includes a see-through WebGL wireframe Earth (React Three Fiber)
+to the right of the copy. All countries are nodes; hover pauses spin and shows
+name + estimated population. Hidden on small screens and when
+`prefers-reduced-motion` is set. Country data: `src/data/countries.json`.
+
 ## Routes
 
 - `/` — homepage
