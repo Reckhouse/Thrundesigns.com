@@ -115,7 +115,18 @@ export const quoteFormQuery = defineQuery(`
     timelineField{ label, placeholder, helperText },
     messageField{ label, placeholder, helperText },
     attachmentsField{ label, placeholder, helperText },
-    projectTypes[]{ value, label, enabled },
+    projectTypes[]{
+      value,
+      label,
+      enabled,
+      service->{
+        _id,
+        title,
+        "slug": slug.current,
+        summary,
+        icon
+      }
+    },
     budgetRanges[]{ value, label, enabled },
     timelines[]{ value, label, enabled },
     seo

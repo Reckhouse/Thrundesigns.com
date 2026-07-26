@@ -3,6 +3,7 @@ import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { validateAttachments } from "@/lib/quote/attachments";
 import { verifyFormToken } from "@/lib/quote/form-token";
+import { findOption } from "@/lib/quote/form-config";
 import { getQuoteFormConfig } from "@/lib/quote/get-form-config";
 import { notifyQuoteStored } from "@/lib/quote/notify";
 import {
@@ -184,10 +185,24 @@ export async function POST(request: Request) {
       useCdn: false,
     });
 
+    const linkedService = findOption(
+      formConfig.projectTypes,
+      parsed.data.projectType,
+    )?.service;
+
     await writeClient.create({
       _type: "quoteSubmission",
       status: "new",
       ...parsed.data,
+      ...(linkedService?._id
+        ? {
+            service: {
+              _type: "reference" as const,
+              _ref: linkedService._id,
+              _weak: true,
+            },
+          }
+        : {}),
       attachments,
       submittedAt: new Date().toISOString(),
     });

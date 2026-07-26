@@ -1,6 +1,8 @@
 import { Resend } from "resend";
 import {
+  findOption,
   labelFor,
+  projectTypeDisplayLabel,
   type QuoteFormConfig,
 } from "@/lib/quote/form-config";
 import type { QuoteFields } from "@/lib/quote/schema";
@@ -14,13 +16,24 @@ type NotifyQuoteInput = QuoteFields & {
 
 function buildPlainText(input: NotifyQuoteInput): string {
   const { formConfig } = input;
+  const projectOption = findOption(
+    formConfig.projectTypes,
+    input.projectType,
+  );
   const lines = [
     "New quote request stored in Sanity.",
     "",
     `Name: ${input.name}`,
     `Email: ${input.email}`,
     `Company: ${input.company ?? "—"}`,
-    `Project: ${labelFor(formConfig.projectTypes, input.projectType)}`,
+    `Project: ${projectTypeDisplayLabel(formConfig.projectTypes, input.projectType)}`,
+  ];
+
+  if (projectOption?.service?.title) {
+    lines.push(`Service: ${projectOption.service.title}`);
+  }
+
+  lines.push(
     `Budget: ${labelFor(formConfig.budgetRanges, input.budget)}`,
     `Timeline: ${labelFor(formConfig.timelines, input.timeline)}`,
     "",
@@ -28,7 +41,7 @@ function buildPlainText(input: NotifyQuoteInput): string {
     input.message,
     "",
     `Attachments: ${input.attachmentPathnames.length}`,
-  ];
+  );
 
   if (input.attachmentPathnames.length > 0) {
     lines.push(
@@ -64,7 +77,7 @@ export async function notifyQuoteStored(input: NotifyQuoteInput): Promise<void> 
     return;
   }
 
-  const projectLabel = labelFor(
+  const projectLabel = projectTypeDisplayLabel(
     input.formConfig.projectTypes,
     input.projectType,
   );

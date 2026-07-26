@@ -4,10 +4,20 @@ import {
   TIMELINES,
 } from "@/lib/quote/options";
 
+export type LinkedService = {
+  _id: string;
+  title?: string | null;
+  slug?: string | null;
+  summary?: string | null;
+  icon?: string | null;
+};
+
 export type QuoteFormOption = {
   value: string;
   label: string;
   enabled?: boolean | null;
+  /** Present on project-type options when a Service is linked. */
+  service?: LinkedService | null;
 };
 
 export type QuoteFormFieldCopy = {
@@ -115,17 +125,37 @@ function asField(
   };
 }
 
+function asService(
+  value: LinkedService | null | undefined,
+): LinkedService | null {
+  if (!value?._id) return null;
+  return {
+    _id: value._id,
+    title: value.title ?? null,
+    slug: value.slug ?? null,
+    summary: value.summary ?? null,
+    icon: value.icon ?? null,
+  };
+}
+
 function asOptions(
   value: QuoteFormOption[] | null | undefined,
   fallback: QuoteFormOption[],
+  withService = false,
 ): QuoteFormOption[] {
   if (!Array.isArray(value) || value.length === 0) return fallback;
   const cleaned = value
-    .map((item) => ({
-      value: String(item?.value || "").trim(),
-      label: String(item?.label || "").trim(),
-      enabled: item?.enabled !== false,
-    }))
+    .map((item) => {
+      const option: QuoteFormOption = {
+        value: String(item?.value || "").trim(),
+        label: String(item?.label || "").trim(),
+        enabled: item?.enabled !== false,
+      };
+      if (withService) {
+        option.service = asService(item?.service);
+      }
+      return option;
+    })
     .filter((item) => item.value && item.label);
   return cleaned.length > 0 ? cleaned : fallback;
 }
@@ -161,7 +191,7 @@ export function resolveQuoteFormConfig(
     timelineField: asField(cms?.timelineField, d.timelineField),
     messageField: asField(cms?.messageField, d.messageField),
     attachmentsField: asField(cms?.attachmentsField, d.attachmentsField),
-    projectTypes: asOptions(cms?.projectTypes, d.projectTypes),
+    projectTypes: asOptions(cms?.projectTypes, d.projectTypes, true),
     budgetRanges: asOptions(cms?.budgetRanges, d.budgetRanges),
     timelines: asOptions(cms?.timelines, d.timelines),
     seo: cms?.seo ?? null,
@@ -187,4 +217,21 @@ export function labelFor(
   value: string,
 ): string {
   return labelMap(options)[value] ?? value;
+}
+
+export function findOption(
+  options: QuoteFormOption[],
+  value: string,
+): QuoteFormOption | undefined {
+  return options.find((option) => option.value === value);
+}
+
+/** Prefer form label; fall back to linked service title. */
+export function projectTypeDisplayLabel(
+  options: QuoteFormOption[],
+  value: string,
+): string {
+  const option = findOption(options, value);
+  if (!option) return value;
+  return option.label || option.service?.title || value;
 }

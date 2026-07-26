@@ -46,7 +46,7 @@ export const quoteFormOption = defineType({
             name: "slug",
             invert: false,
           })
-          .error("Use lowercase letters, numbers, and hyphens only"),
+          .error("Use lowercase letters, numbers, hyphens, +, and dots"),
     }),
     defineField({
       name: "label",
@@ -67,6 +67,69 @@ export const quoteFormOption = defineType({
       return {
         title: title || subtitle || "Option",
         subtitle: `${subtitle || "—"}${enabled === false ? " · disabled" : ""}`,
+      };
+    },
+  },
+});
+
+/** Project-type option with optional link to a Service document. */
+export const quoteFormProjectTypeOption = defineType({
+  name: "quoteFormProjectTypeOption",
+  title: "Project type option",
+  type: "object",
+  fields: [
+    defineField({
+      name: "value",
+      title: "Value (slug)",
+      type: "string",
+      description:
+        "Stable id stored on submissions (e.g. brand). Keep even when a Service is linked.",
+      validation: (Rule) =>
+        Rule.required()
+          .regex(slugPattern, {
+            name: "slug",
+            invert: false,
+          })
+          .error("Use lowercase letters, numbers, hyphens, +, and dots"),
+    }),
+    defineField({
+      name: "label",
+      title: "Label",
+      type: "string",
+      description:
+        "Shown in the form. Prefer matching the linked Service title when one is set.",
+      validation: (Rule) => Rule.required().min(1).max(80),
+    }),
+    defineField({
+      name: "service",
+      title: "Linked service",
+      type: "reference",
+      to: [{ type: "service" }],
+      description:
+        "Optional. Ties this option to a Services document for summary copy and inbox context. Leave empty for options like Mixed.",
+      weak: true,
+    }),
+    defineField({
+      name: "enabled",
+      title: "Enabled",
+      type: "boolean",
+      initialValue: true,
+    }),
+  ],
+  preview: {
+    select: {
+      title: "label",
+      subtitle: "value",
+      enabled: "enabled",
+      serviceTitle: "service.title",
+    },
+    prepare({ title, subtitle, enabled, serviceTitle }) {
+      const bits = [subtitle || "—"];
+      if (serviceTitle) bits.push(`→ ${serviceTitle}`);
+      if (enabled === false) bits.push("disabled");
+      return {
+        title: title || subtitle || "Project type",
+        subtitle: bits.join(" · "),
       };
     },
   },
@@ -215,8 +278,10 @@ export const quoteForm = defineType({
       title: "Project types",
       type: "array",
       group: "options",
-      of: [defineArrayMember({ type: "quoteFormOption" })],
+      of: [defineArrayMember({ type: "quoteFormProjectTypeOption" })],
       validation: uniqueValuesRule("Project types"),
+      description:
+        "Each option can optionally reference a Service. The option value slug is what submissions store.",
     }),
     defineField({
       name: "budgetRanges",
