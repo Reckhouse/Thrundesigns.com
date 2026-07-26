@@ -146,6 +146,21 @@ scaffold initial commit). Custom domain `thrundesign.com` can be added later.
 - `/work/[slug]` — project detail
 - `/quote` — multi-step quote form (optional Blob attachments)
 
+## Quote form CMS (Studio)
+
+In Sanity Studio under **Forms**:
+
+- **Quote form** — page copy, field labels, and select options (project types,
+  budgets, timelines). Option `value` slugs are what the API stores; change
+  labels freely. Prefer disabling an option over deleting it so old submissions
+  stay meaningful.
+- **Quote submissions** — inbound briefs with triage `status`
+  (`new` / `read` / `archived`). Newest first.
+
+Code fallbacks in `src/lib/quote/form-config.ts` keep `/quote` working if the
+singleton is missing. Linking project-type options to Services documents is
+planned for a later pass.
+
 ## Design source
 
 Figma handoff: Thrun Design Co. — Website (Student Plan), Version B Dark Editorial.

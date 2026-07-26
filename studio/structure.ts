@@ -17,5 +17,31 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem("processStep").title("Process steps"),
       S.documentTypeListItem("project").title("Projects"),
       S.divider(),
-      S.documentTypeListItem("quoteSubmission").title("Quote submissions"),
+      S.listItem()
+        .title("Forms")
+        .id("forms")
+        .child(
+          S.list()
+            .title("Forms")
+            .items([
+              S.listItem()
+                .title("Quote form")
+                .id("quoteForm")
+                .child(
+                  S.document()
+                    .schemaType("quoteForm")
+                    .documentId("quoteForm"),
+                ),
+              S.listItem()
+                .title("Quote submissions")
+                .id("quoteSubmissions")
+                .child(
+                  S.documentTypeList("quoteSubmission")
+                    .title("Quote submissions")
+                    .defaultOrdering([
+                      { field: "submittedAt", direction: "desc" },
+                    ]),
+                ),
+            ]),
+        ),
     ]);

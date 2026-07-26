@@ -1,49 +1,28 @@
 import { Resend } from "resend";
 import {
-  BUDGET_RANGES,
-  PROJECT_TYPES,
-  TIMELINES,
-} from "@/lib/quote/options";
+  labelFor,
+  type QuoteFormConfig,
+} from "@/lib/quote/form-config";
 import type { QuoteFields } from "@/lib/quote/schema";
 import { logQuoteSecurity } from "@/lib/quote/security-log";
-
-const projectLabels: Record<(typeof PROJECT_TYPES)[number], string> = {
-  brand: "Brand identity",
-  website: "Website / digital",
-  audit: "Audit / refresh",
-  print: "Print / packaging",
-  mixed: "Mixed / other",
-};
-
-const budgetLabels: Record<(typeof BUDGET_RANGES)[number], string> = {
-  "5-15k": "$5k–$15k",
-  "15-40k": "$15k–$40k",
-  "40k+": "$40k+",
-  unsure: "Not sure yet",
-};
-
-const timelineLabels: Record<(typeof TIMELINES)[number], string> = {
-  asap: "ASAP",
-  "1-3": "1–3 months",
-  "3-6": "3–6 months",
-  exploring: "Just exploring",
-};
 
 type NotifyQuoteInput = QuoteFields & {
   attachmentPathnames: string[];
   studioUrl?: string;
+  formConfig: QuoteFormConfig;
 };
 
 function buildPlainText(input: NotifyQuoteInput): string {
+  const { formConfig } = input;
   const lines = [
     "New quote request stored in Sanity.",
     "",
     `Name: ${input.name}`,
     `Email: ${input.email}`,
     `Company: ${input.company ?? "—"}`,
-    `Project: ${projectLabels[input.projectType]}`,
-    `Budget: ${budgetLabels[input.budget]}`,
-    `Timeline: ${timelineLabels[input.timeline]}`,
+    `Project: ${labelFor(formConfig.projectTypes, input.projectType)}`,
+    `Budget: ${labelFor(formConfig.budgetRanges, input.budget)}`,
+    `Timeline: ${labelFor(formConfig.timelines, input.timeline)}`,
     "",
     "Message:",
     input.message,
@@ -85,13 +64,18 @@ export async function notifyQuoteStored(input: NotifyQuoteInput): Promise<void> 
     return;
   }
 
+  const projectLabel = labelFor(
+    input.formConfig.projectTypes,
+    input.projectType,
+  );
+
   try {
     const resend = new Resend(apiKey);
     const { error } = await resend.emails.send({
       from,
       to: [to],
       replyTo: input.email,
-      subject: `New quote — ${projectLabels[input.projectType]}`,
+      subject: `New quote — ${projectLabel}`,
       text: buildPlainText(input),
     });
 

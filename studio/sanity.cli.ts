@@ -6,5 +6,8 @@ export default defineCliConfig({
     dataset: "production",
   },
   studioHost: "thrundesign",
-  autoUpdates: true,
+  deployment: {
+    appId: "s90ma13g7u6u98ahd7kgpwwm",
+    autoUpdates: true,
+  },
 });

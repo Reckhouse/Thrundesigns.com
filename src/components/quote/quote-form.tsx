@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, cloneElement, isValidElement } from "react";
+import { useEffect, useMemo, useState, cloneElement, isValidElement } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Turnstile } from "@marsidev/react-turnstile";
@@ -10,45 +10,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  quoteClientSchema,
+  enabledOptions,
+  type QuoteFormConfig,
+} from "@/lib/quote/form-config";
+import {
+  createQuoteClientSchema,
   type QuoteClientValues,
 } from "@/lib/quote/schema";
-import {
-  BUDGET_RANGES,
-  PROJECT_TYPES,
-  TIMELINES,
-} from "@/lib/quote/options";
-
-const steps = ["Contact", "Project", "Details"] as const;
-
-const projectLabels: Record<(typeof PROJECT_TYPES)[number], string> = {
-  brand: "Brand & system architecture",
-  website: "Web design & maintenance",
-  audit: "Business marketing audit",
-  print: "Print & digital assets",
-  mixed: "Mixed engagement",
-};
-
-const budgetLabels: Record<(typeof BUDGET_RANGES)[number], string> = {
-  "5-15k": "$5k–$15k",
-  "15-40k": "$15k–$40k",
-  "40k+": "$40k+",
-  unsure: "Not sure yet",
-};
-
-const timelineLabels: Record<(typeof TIMELINES)[number], string> = {
-  asap: "ASAP",
-  "1-3": "1–3 months",
-  "3-6": "3–6 months",
-  exploring: "Exploring",
-};
 
 type BootstrapState = {
   formToken: string;
   turnstileRequired: boolean;
 };
 
-export function QuoteForm() {
+export function QuoteForm({ config }: { config: QuoteFormConfig }) {
   const [step, setStep] = useState(0);
   const [files, setFiles] = useState<FileList | null>(null);
   const [status, setStatus] = useState<
@@ -59,9 +34,22 @@ export function QuoteForm() {
   const [bootstrapError, setBootstrapError] = useState(false);
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+  const clientSchema = useMemo(() => createQuoteClientSchema(config), [config]);
+  const projectOptions = useMemo(
+    () => enabledOptions(config.projectTypes),
+    [config.projectTypes],
+  );
+  const budgetOptions = useMemo(
+    () => enabledOptions(config.budgetRanges),
+    [config.budgetRanges],
+  );
+  const timelineOptions = useMemo(
+    () => enabledOptions(config.timelines),
+    [config.timelines],
+  );
 
   const form = useForm<QuoteClientValues>({
-    resolver: zodResolver(quoteClientSchema),
+    resolver: zodResolver(clientSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -149,23 +137,27 @@ export function QuoteForm() {
       ["message"],
     ];
     const valid = await form.trigger(fields[step]);
-    if (valid) setStep((s) => Math.min(s + 1, steps.length - 1));
+    if (valid) setStep((s) => Math.min(s + 1, config.stepLabels.length - 1));
   }
 
   return (
     <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[1fr_1fr] lg:px-[74px]">
       <div>
+        {config.eyebrow ? (
+          <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+            {config.eyebrow}
+          </p>
+        ) : null}
         <SectionHeading className="text-balance">
-          Tell us what you&apos;re building.
+          {config.headline}
         </SectionHeading>
         <p className="mt-6 max-w-[42ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
-          A short brief is enough. We’ll reply within a few business days with
-          scope options and next steps.
+          {config.support}
         </p>
         <ol className="mt-8 flex flex-wrap gap-x-4 gap-y-2 md:mt-10">
-          {steps.map((label, index) => (
+          {config.stepLabels.map((label, index) => (
             <li
-              key={label}
+              key={`${label}-${index}`}
               className={`font-mono text-[11px] uppercase tracking-[0.14em] ${
                 index === step ? "text-gold" : "text-fg-muted"
               }`}
@@ -200,37 +192,46 @@ export function QuoteForm() {
         {status === "done" ? (
           <div>
             <h2 className="text-balance font-display text-3xl text-fg">
-              Thanks — your brief is in.
+              {config.successHeading}
             </h2>
             <p className="mt-4 max-w-[40ch] text-pretty font-sans text-fg-muted">
-              We’ll review it and reply within a few business days with scope
-              options and clear next steps. No need to resubmit unless something
-              changes.
+              {config.successBody}
             </p>
           </div>
         ) : (
           <>
             {step === 0 && (
               <div className="space-y-5">
-                <Field label="Name" error={form.formState.errors.name?.message}>
+                <Field
+                  label={config.nameField.label}
+                  helperText={config.nameField.helperText}
+                  error={form.formState.errors.name?.message}
+                >
                   <Input
                     className="rounded-none border-line bg-bg"
+                    placeholder={config.nameField.placeholder || undefined}
                     {...form.register("name")}
                   />
                 </Field>
                 <Field
-                  label="Email"
+                  label={config.emailField.label}
+                  helperText={config.emailField.helperText}
                   error={form.formState.errors.email?.message}
                 >
                   <Input
                     type="email"
                     className="rounded-none border-line bg-bg"
+                    placeholder={config.emailField.placeholder || undefined}
                     {...form.register("email")}
                   />
                 </Field>
-                <Field label="Company">
+                <Field
+                  label={config.companyField.label}
+                  helperText={config.companyField.helperText}
+                >
                   <Input
                     className="rounded-none border-line bg-bg"
+                    placeholder={config.companyField.placeholder || undefined}
                     {...form.register("company")}
                   />
                 </Field>
@@ -240,7 +241,8 @@ export function QuoteForm() {
             {step === 1 && (
               <div className="space-y-5">
                 <Field
-                  label="Project type"
+                  label={config.projectTypeField.label}
+                  helperText={config.projectTypeField.helperText}
                   error={form.formState.errors.projectType?.message}
                 >
                   <select
@@ -248,15 +250,16 @@ export function QuoteForm() {
                     {...form.register("projectType")}
                   >
                     <option value="">Select</option>
-                    {PROJECT_TYPES.map((value) => (
-                      <option key={value} value={value}>
-                        {projectLabels[value]}
+                    {projectOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
                       </option>
                     ))}
                   </select>
                 </Field>
                 <Field
-                  label="Budget"
+                  label={config.budgetField.label}
+                  helperText={config.budgetField.helperText}
                   error={form.formState.errors.budget?.message}
                 >
                   <select
@@ -264,15 +267,16 @@ export function QuoteForm() {
                     {...form.register("budget")}
                   >
                     <option value="">Select</option>
-                    {BUDGET_RANGES.map((value) => (
-                      <option key={value} value={value}>
-                        {budgetLabels[value]}
+                    {budgetOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
                       </option>
                     ))}
                   </select>
                 </Field>
                 <Field
-                  label="Timeline"
+                  label={config.timelineField.label}
+                  helperText={config.timelineField.helperText}
                   error={form.formState.errors.timeline?.message}
                 >
                   <select
@@ -280,9 +284,9 @@ export function QuoteForm() {
                     {...form.register("timeline")}
                   >
                     <option value="">Select</option>
-                    {TIMELINES.map((value) => (
-                      <option key={value} value={value}>
-                        {timelineLabels[value]}
+                    {timelineOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
                       </option>
                     ))}
                   </select>
@@ -293,17 +297,23 @@ export function QuoteForm() {
             {step === 2 && (
               <div className="space-y-5">
                 <Field
-                  label="Project notes"
+                  label={config.messageField.label}
+                  helperText={config.messageField.helperText}
                   error={form.formState.errors.message?.message}
                 >
                   <Textarea
                     rows={6}
                     className="rounded-none border-line bg-bg"
-                    placeholder="Goals, audience, constraints, references…"
+                    placeholder={
+                      config.messageField.placeholder || undefined
+                    }
                     {...form.register("message")}
                   />
                 </Field>
-                <Field label="Attachments (optional)">
+                <Field
+                  label={config.attachmentsField.label}
+                  helperText={config.attachmentsField.helperText}
+                >
                   <Input
                     type="file"
                     multiple
@@ -311,9 +321,6 @@ export function QuoteForm() {
                     className="rounded-none border-line bg-bg file:mr-3 file:border-0 file:bg-gold file:px-3 file:py-1 file:font-mono file:text-[10px] file:uppercase file:text-ink"
                     onChange={(event) => setFiles(event.target.files)}
                   />
-                  <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
-                    Up to 5 files · 8MB each · JPG, PNG, WEBP, PDF
-                  </p>
                 </Field>
 
                 {siteKey ? (
@@ -340,7 +347,7 @@ export function QuoteForm() {
               >
                 Back
               </Button>
-              {step < steps.length - 1 ? (
+              {step < config.stepLabels.length - 1 ? (
                 <Button
                   type="button"
                   className="rounded-none bg-gold text-ink hover:bg-bronze hover:text-fg"
@@ -359,7 +366,7 @@ export function QuoteForm() {
                     (Boolean(siteKey) && !turnstileToken)
                   }
                 >
-                  {status === "submitting" ? "Sending…" : "Submit quote"}
+                  {status === "submitting" ? "Sending…" : config.submitLabel}
                 </Button>
               )}
             </div>
@@ -397,10 +404,12 @@ export function QuoteForm() {
 
 function Field({
   label,
+  helperText,
   error,
   children,
 }: {
   label: string;
+  helperText?: string | null;
   error?: string;
   children: React.ReactNode;
 }) {
@@ -416,6 +425,11 @@ function Field({
       {isValidElement<{ id?: string }>(children)
         ? cloneElement(children, { id })
         : children}
+      {helperText ? (
+        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
+          {helperText}
+        </p>
+      ) : null}
       {error ? (
         <p className="text-sm text-red-300" role="alert">
           {error}
