@@ -214,16 +214,29 @@ if ! grep -q '^UPSTASH_REDIS_REST_URL=' .env.local 2>/dev/null; then
   fi
 fi
 
-log "Staging Vercel Firewall rate-limit rule for POST /api/quote"
-npx vercel firewall rules add "Quote API rate limit" \
-  --condition '{"type":"path","op":"eq","value":"/api/quote"}' \
-  --condition '{"type":"method","op":"eq","value":"POST"}' \
-  --action rate_limit \
-  --rate-limit-window 600 \
-  --rate-limit-requests 3 \
-  --rate-limit-keys ip \
-  --rate-limit-action log \
-  --yes || log "Firewall rule add skipped (may already exist or plan-limited)"
+log "Ensuring Vercel Firewall rate-limit rule for POST /api/quote (P1 challenge enforce)"
+if npx vercel firewall rules inspect "Quote API rate limit" >/dev/null 2>&1; then
+  npx vercel firewall rules edit "Quote API rate limit" \
+    --action rate_limit \
+    --rate-limit-window 600 \
+    --rate-limit-requests 3 \
+    --rate-limit-keys ip \
+    --rate-limit-algo fixed_window \
+    --rate-limit-action challenge \
+    --description "P1 enforce: challenge when POST /api/quote exceeds 3/10m by IP" \
+    --yes || log "Firewall rule edit skipped"
+else
+  npx vercel firewall rules add "Quote API rate limit" \
+    --condition '{"type":"path","op":"eq","value":"/api/quote"}' \
+    --condition '{"type":"method","op":"eq","value":"POST"}' \
+    --action rate_limit \
+    --rate-limit-window 600 \
+    --rate-limit-requests 3 \
+    --rate-limit-keys ip \
+    --rate-limit-action challenge \
+    --description "P1 enforce: challenge when POST /api/quote exceeds 3/10m by IP" \
+    --yes || log "Firewall rule add skipped (may already exist or plan-limited)"
+fi
 
 log "Publishing staged firewall changes"
 npx vercel firewall publish --yes || log "Firewall publish skipped — publish from dashboard if needed"

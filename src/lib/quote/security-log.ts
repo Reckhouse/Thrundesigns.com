@@ -8,7 +8,8 @@ type QuoteSecurityEvent =
   | "quote.turnstile_failed"
   | "quote.duplicate"
   | "quote.stored"
-  | "quote.storage_failed";
+  | "quote.storage_failed"
+  | "quote.volume_alert";
 
 type SecurityLogMeta = Record<string, string | number | boolean | undefined>;
 

@@ -23,9 +23,11 @@ npm install
 npm run dev
 ```
 
-## Quote form security (P0)
+## Quote form security
 
 `POST /api/quote` is server-only and applies:
+
+**P0 — application hardening**
 
 - Strict Zod validation (enums + max lengths)
 - Origin / Fetch Metadata checks
@@ -33,8 +35,15 @@ npm run dev
 - Honeypot field
 - Cloudflare Turnstile (server Siteverify when keys are set)
 - IP + email + global rate limits (Upstash when configured; in-memory fallback)
-- Duplicate submission suppression
+- Duplicate submission suppression (`sha256(email+projectType+message)`, 1h TTL)
 - Attachment MIME + size checks
+
+**P1 — edge + ops**
+
+- Vercel Firewall on `POST /api/quote`: 3 req / 10 min by IP; exceed → **challenge**
+- Redacted abuse events (`quote.rate_limited`, `quote.turnstile_failed`, …)
+- Soft volume alerts at 40 / 80 / 120 accepted quotes per hour (`quote.volume_alert`)
+- Hard global emergency cap: 150 accepted / hour
 
 Required production env vars (see `.env.example`):
 
@@ -42,8 +51,6 @@ Required production env vars (see `.env.example`):
 - `QUOTE_FORM_SECRET` (min 16 characters)
 - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`
   (or Marketplace `KV_REST_API_URL` / `KV_REST_API_TOKEN`)
-
-Also enable a Vercel Firewall rule for `POST /api/quote` (start in log mode).
 
 ### One-shot provision (CLI)
 
@@ -56,7 +63,7 @@ npx vercel --prod --yes
 ```
 
 This creates the Turnstile widget, sets env vars, installs Upstash when possible,
-and stages a log-mode Firewall rate limit on `POST /api/quote`.
+and publishes the Firewall rate-limit rule (challenge on exceed).
 
 Studio (local package or hosted):
 

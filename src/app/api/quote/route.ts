@@ -20,6 +20,7 @@ import {
   logQuoteSecurity,
 } from "@/lib/quote/security-log";
 import { verifyTurnstileToken } from "@/lib/quote/turnstile";
+import { trackAcceptedQuoteVolume } from "@/lib/quote/volume-alert";
 import { apiVersion, dataset, projectId } from "@/sanity/env";
 
 export async function POST(request: Request) {
@@ -79,6 +80,7 @@ export async function POST(request: Request) {
     logQuoteSecurity("quote.rate_limited", {
       ipHash: hashIdentifier(ip),
       emailHash: hashIdentifier(parsed.data.email),
+      limiter: rate.limiter,
     });
     return genericError(429, rate.retryAfterSec);
   }
@@ -197,6 +199,8 @@ export async function POST(request: Request) {
     projectType: parsed.data.projectType,
     attachmentCount: attachments.length,
   });
+
+  await trackAcceptedQuoteVolume();
 
   return genericSuccess();
 }
