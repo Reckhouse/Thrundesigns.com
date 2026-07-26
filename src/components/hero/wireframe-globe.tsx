@@ -3,13 +3,19 @@
 import {
   Suspense,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
-import type { Group, Mesh } from "three";
+import {
+  BufferGeometry,
+  Float32BufferAttribute,
+  type Group,
+  type Mesh,
+} from "three";
 
 import countries from "@/data/countries.json";
 import { formatPopulation, latLonToVector3 } from "@/lib/geo";
@@ -27,9 +33,56 @@ type HoveredCountry = Country & {
 };
 
 const GLOBE_RADIUS = 1.55;
-const NODE_RADIUS = GLOBE_RADIUS * 1.012;
+const NODE_RADIUS = GLOBE_RADIUS * 1.008;
+/** Earth axial tilt */
+const AXIAL_TILT = (23.44 * Math.PI) / 180;
 const GOLD = "#d4af6a";
 const CREAM = "#ebe7df";
+const BG_DEEP = "#0c0d0c";
+const LINE = "rgba(255,255,255,0.18)";
+
+function LandOutlines({ radius }: { radius: number }) {
+  const [geometry, setGeometry] = useState<BufferGeometry | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const geo = new BufferGeometry();
+
+    async function load() {
+      const res = await fetch("/data/land-outlines.bin");
+      if (!res.ok) throw new Error("Failed to load land outlines");
+      const buffer = await res.arrayBuffer();
+      const unit = new Float32Array(buffer);
+      const scaled = new Float32Array(unit.length);
+      for (let i = 0; i < unit.length; i++) scaled[i] = unit[i] * radius;
+      geo.setAttribute("position", new Float32BufferAttribute(scaled, 3));
+      if (!cancelled) setGeometry(geo);
+    }
+
+    void load().catch((error) => {
+      console.error(error);
+      geo.dispose();
+    });
+
+    return () => {
+      cancelled = true;
+      geo.dispose();
+    };
+  }, [radius]);
+
+  if (!geometry) return null;
+
+  return (
+    <lineSegments geometry={geometry} frustumCulled={false}>
+      <lineBasicMaterial
+        color={GOLD}
+        transparent
+        opacity={0.72}
+        depthWrite={false}
+      />
+    </lineSegments>
+  );
+}
 
 function CountryNode({
   country,
@@ -51,14 +104,13 @@ function CountryNode({
   useFrame(({ clock }) => {
     if (!meshRef.current) return;
     const pulse = active
-      ? 1.55 + Math.sin(clock.getElapsedTime() * 5.5) * 0.22
+      ? 1.45 + Math.sin(clock.getElapsedTime() * 5.2) * 0.18
       : 1;
     meshRef.current.scale.setScalar(pulse);
   });
 
   return (
     <group position={position}>
-      {/* Invisible hit target */}
       <mesh
         onPointerOver={(event) => {
           event.stopPropagation();
@@ -71,16 +123,15 @@ function CountryNode({
           onLeave();
         }}
       >
-        <sphereGeometry args={[0.05, 10, 10]} />
+        <sphereGeometry args={[0.042, 10, 10]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      {/* Visible node */}
       <mesh ref={meshRef}>
-        <sphereGeometry args={[active ? 0.022 : 0.013, 12, 12]} />
+        <sphereGeometry args={[active ? 0.016 : 0.01, 12, 12]} />
         <meshBasicMaterial
-          color={GOLD}
+          color={active ? GOLD : CREAM}
           transparent
-          opacity={active ? 0.98 : 0.58}
+          opacity={active ? 0.95 : 0.5}
           depthWrite={false}
         />
       </mesh>
@@ -99,88 +150,82 @@ function GlobeScene({
   onHover: (country: HoveredCountry) => void;
   onLeave: () => void;
 }) {
-  const groupRef = useRef<Group>(null);
+  const spinRef = useRef<Group>(null);
   const countryList = countries as Country[];
 
   useFrame((_, delta) => {
-    if (!groupRef.current || paused) return;
-    groupRef.current.rotation.y += delta * 0.18;
+    if (!spinRef.current || paused) return;
+    spinRef.current.rotation.y += delta * 0.14;
   });
 
   return (
     <>
-      <ambientLight intensity={0.6} />
-      <pointLight position={[4, 3, 5]} intensity={1.05} color={GOLD} />
-      <pointLight position={[-3.5, -2, -3]} intensity={0.32} color={CREAM} />
+      <ambientLight intensity={0.55} />
+      <pointLight position={[4, 3, 5]} intensity={0.9} color={GOLD} />
+      <pointLight position={[-3.5, -2, -3]} intensity={0.28} color={CREAM} />
 
-      <group ref={groupRef} rotation={[0.35, -0.45, 0]}>
-        {/* Glass fill — keeps the mountain readable behind */}
-        <mesh>
-          <sphereGeometry args={[GLOBE_RADIUS, 48, 32]} />
-          <meshBasicMaterial
-            color="#0c0d0c"
-            transparent
-            opacity={0.14}
-            depthWrite={false}
-          />
-        </mesh>
+      {/* Axial tilt, then daily spin */}
+      <group rotation={[0, 0, AXIAL_TILT]}>
+        <group ref={spinRef} rotation={[0, -0.55, 0]}>
+          {/* Subtle ocean sphere — no latitude/longitude grid */}
+          <mesh>
+            <sphereGeometry args={[GLOBE_RADIUS, 64, 48]} />
+            <meshBasicMaterial
+              color={BG_DEEP}
+              transparent
+              opacity={0.2}
+              depthWrite={false}
+            />
+          </mesh>
 
-        {/* Dense wireframe shell */}
-        <mesh>
-          <sphereGeometry args={[GLOBE_RADIUS * 1.002, 36, 24]} />
-          <meshBasicMaterial
-            color={CREAM}
-            wireframe
-            transparent
-            opacity={0.28}
-            depthWrite={false}
-          />
-        </mesh>
+          {/* Natural Earth land coastlines (50m) */}
+          <LandOutlines radius={GLOBE_RADIUS * 1.002} />
 
-        {/* Coarser gold latitude/longitude accents */}
-        <mesh>
-          <sphereGeometry args={[GLOBE_RADIUS * 1.004, 16, 12]} />
-          <meshBasicMaterial
-            color={GOLD}
-            wireframe
-            transparent
-            opacity={0.2}
-            depthWrite={false}
-          />
-        </mesh>
+          {countryList.map((country) => (
+            <CountryNode
+              key={country.code || country.name}
+              country={country}
+              active={hovered?.name === country.name}
+              onHover={onHover}
+              onLeave={onLeave}
+            />
+          ))}
 
-        {countryList.map((country) => (
-          <CountryNode
-            key={country.code || country.name}
-            country={country}
-            active={hovered?.name === country.name}
-            onHover={onHover}
-            onLeave={onLeave}
-          />
-        ))}
-
-        {hovered ? (
-          <Html
-            position={[
-              hovered.position[0] * 1.14,
-              hovered.position[1] * 1.14,
-              hovered.position[2] * 1.14,
-            ]}
-            center
-            distanceFactor={6.2}
-            style={{ pointerEvents: "none" }}
-            zIndexRange={[40, 0]}
-          >
-            <div className="min-w-[11rem] border border-line bg-bg-deep/92 px-3 py-2 shadow-[0_12px_40px_rgba(0,0,0,0.5)] backdrop-blur-sm">
-              <p className="font-display text-[15px] leading-snug text-fg">
-                {hovered.name}
-              </p>
-              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
-                Est. pop. {formatPopulation(hovered.population)}
-              </p>
-            </div>
-          </Html>
-        ) : null}
+          {hovered ? (
+            <Html
+              position={[
+                hovered.position[0] * 1.1,
+                hovered.position[1] * 1.1,
+                hovered.position[2] * 1.1,
+              ]}
+              center
+              distanceFactor={18}
+              style={{ pointerEvents: "none" }}
+              zIndexRange={[40, 0]}
+            >
+              <div
+                className="w-max max-w-[7.5rem] border px-1.5 py-1"
+                style={{
+                  borderColor: LINE,
+                  backgroundColor: "rgba(12, 13, 12, 0.92)",
+                }}
+              >
+                <p
+                  className="truncate font-sans text-[9px] leading-tight"
+                  style={{ color: "#f4f1e9" }}
+                >
+                  {hovered.name}
+                </p>
+                <p
+                  className="mt-0.5 font-mono text-[7px] uppercase tracking-[0.12em]"
+                  style={{ color: GOLD }}
+                >
+                  Est. {formatPopulation(hovered.population)}
+                </p>
+              </div>
+            </Html>
+          ) : null}
+        </group>
       </group>
     </>
   );
@@ -200,7 +245,7 @@ export function WireframeGlobe() {
   return (
     <div
       className="relative h-full min-h-[320px] w-full"
-      aria-label="Interactive wireframe globe of countries"
+      aria-label="Interactive Earth globe with country markers"
     >
       <Canvas
         className="h-full w-full touch-none"
@@ -209,7 +254,7 @@ export function WireframeGlobe() {
           antialias: true,
           powerPreference: "high-performance",
         }}
-        camera={{ position: [0, 0, 4.35], fov: 42, near: 0.1, far: 40 }}
+        camera={{ position: [0, 0.15, 4.2], fov: 40, near: 0.1, far: 40 }}
         dpr={[1, 1.75]}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
@@ -226,7 +271,10 @@ export function WireframeGlobe() {
         </Suspense>
       </Canvas>
 
-      <p className="pointer-events-none absolute bottom-1 left-0 right-0 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-fg-muted/75">
+      <p
+        className="pointer-events-none absolute bottom-1 left-0 right-0 text-center font-mono text-[9px] uppercase tracking-[0.14em]"
+        style={{ color: "rgba(199, 194, 184, 0.7)" }}
+      >
         Hover a node · {countries.length} countries
       </p>
     </div>

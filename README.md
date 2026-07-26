@@ -141,10 +141,15 @@ scaffold initial commit). Custom domain `thrundesign.com` can be added later.
 
 ## Hero globe
 
-Desktop hero includes a see-through WebGL wireframe Earth (React Three Fiber)
-to the right of the copy. All countries are nodes; hover pauses spin and shows
-name + estimated population. Hidden on small screens and when
-`prefers-reduced-motion` is set. Country data: `src/data/countries.json`.
+Desktop hero includes a see-through WebGL Earth (React Three Fiber) to the
+right of the copy: Natural Earth land coastlines (50m), country nodes, axial
+tilt, and ambient spin. Hover pauses rotation and shows a compact name +
+population popup. Hidden on small screens and when `prefers-reduced-motion`
+is set.
+
+- Country markers: `src/data/countries.json`
+- Land outlines: `public/data/land-outlines.bin` (regenerate with
+  `node scripts/generate-land-outlines.mjs /path/to/land-50m.json`)
 
 ## Routes
 
