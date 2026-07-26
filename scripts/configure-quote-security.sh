@@ -35,6 +35,13 @@ need_cmd openssl
 need_cmd jq
 need_cmd npx
 
+TMPDIR_SECURE="$(mktemp -d)"
+chmod 700 "$TMPDIR_SECURE"
+cleanup() {
+  rm -rf "$TMPDIR_SECURE"
+}
+trap cleanup EXIT
+
 log "Checking Vercel CLI auth"
 npx vercel whoami >/dev/null || die "run: npx vercel login"
 
@@ -47,58 +54,150 @@ if [[ ! -f .vercel/project.json ]]; then
 fi
 
 add_env() {
+  # Usage: add_env KEY VALUE [public|sensitive]
+  # - public: all envs, --no-sensitive (for NEXT_PUBLIC_*)
+  # - sensitive (default): Production+Preview as sensitive; Development as non-sensitive
   local key="$1"
   local value="$2"
-  local sensitive_flag=()
-  if [[ "${3:-}" == "sensitive" ]]; then
-    sensitive_flag=(--sensitive)
-  fi
-  # Remove existing values so re-runs are idempotent.
+  local kind="${3:-sensitive}"
+  local out
+
   npx vercel env rm "$key" production --yes >/dev/null 2>&1 || true
   npx vercel env rm "$key" preview --yes >/dev/null 2>&1 || true
   npx vercel env rm "$key" development --yes >/dev/null 2>&1 || true
-  printf '%s' "$value" | npx vercel env add "$key" production preview development \
-    "${sensitive_flag[@]}" --force >/dev/null
+
+  run_add() {
+    local targets="$1"
+    shift
+    out="$(printf '%s' "$value" | npx vercel env add "$key" "$targets" "$@" --force --yes 2>&1)" || {
+      printf '%s\n' "$out" >&2
+      die "vercel env add failed for ${key} (${targets})"
+    }
+    if printf '%s' "$out" | jq -e '.status == "error"' >/dev/null 2>&1; then
+      printf '%s\n' "$out" >&2
+      die "vercel env add rejected ${key} (${targets})"
+    fi
+  }
+
+  if [[ "$kind" == "public" ]]; then
+    run_add "production,preview,development" --no-sensitive
+  else
+    run_add "production,preview" --sensitive
+    run_add "development" --no-sensitive
+  fi
   log "Set ${key}"
 }
 
-log "Creating Cloudflare Turnstile widget (${WIDGET_NAME})"
-domain_flags=()
-for d in "${DOMAINS[@]}"; do
-  domain_flags+=(--domain "$d")
-done
+extract_json_object() {
+  # Prefer a pure JSON file; fall back to first {...} block.
+  local file="$1"
+  if jq -e 'type == "object" or type == "array"' "$file" >/dev/null 2>&1; then
+    cat "$file"
+    return 0
+  fi
+  python3 - "$file" <<'PY'
+import pathlib, re, sys
+text = pathlib.Path(sys.argv[1]).read_text()
+match = re.search(r"\{[\s\S]*\}|\[[\s\S]*\]", text)
+if not match:
+    raise SystemExit("no JSON found")
+sys.stdout.write(match.group(0))
+PY
+}
 
-# Capture JSON once; never echo the secret.
-WIDGET_JSON="$(
-  WRANGLER_WRITE_LOGS=false WRANGLER_LOG=error WRANGLER_LOG_SANITIZE=true \
+resolve_turnstile_widget() {
+  local list_file="$TMPDIR_SECURE/widgets.json"
+  local create_file="$TMPDIR_SECURE/create.json"
+  local get_file="$TMPDIR_SECURE/widget.json"
+
+  # Do NOT set WRANGLER_LOG_SANITIZE=true here — it redacts JSON that contains secrets.
+  npx wrangler turnstile widget list --json >"$list_file"
+
+  SITEKEY="$(
+    extract_json_object "$list_file" | jq -r --arg name "$WIDGET_NAME" '
+      [.[] | select(.name == $name)]
+      | sort_by((.domains // []) | length)
+      | reverse
+      | .[0].sitekey // empty
+    '
+  )"
+
+  if [[ -z "$SITEKEY" || "$SITEKEY" == "null" ]]; then
+    log "Creating Cloudflare Turnstile widget (${WIDGET_NAME})"
+    domain_flags=()
+    for d in "${DOMAINS[@]}"; do
+      domain_flags+=(--domain "$d")
+    done
     npx wrangler turnstile widget create "$WIDGET_NAME" \
       "${domain_flags[@]}" \
       --mode managed \
-      --json
-)"
-SITEKEY="$(printf '%s' "$WIDGET_JSON" | jq -r '.sitekey // .siteKey // empty')"
-SECRET="$(printf '%s' "$WIDGET_JSON" | jq -r '.secret // .secret_key // .secretKey // empty')"
-unset WIDGET_JSON
+      --json >"$create_file"
+    SITEKEY="$(extract_json_object "$create_file" | jq -r '.sitekey // empty')"
+  else
+    log "Reusing existing Turnstile widget (${WIDGET_NAME})"
+  fi
 
-[[ -n "$SITEKEY" && "$SITEKEY" != "null" ]] || die "Turnstile sitekey missing from wrangler response"
-[[ -n "$SECRET" && "$SECRET" != "null" ]] || die "Turnstile secret missing from wrangler response"
-log "Turnstile sitekey: ${SITEKEY}"
+  [[ -n "$SITEKEY" && "$SITEKEY" != "null" ]] || die "Turnstile sitekey missing from wrangler response"
+  log "Turnstile sitekey: ${SITEKEY}"
+
+  # Always fetch via `get` so we have the secret, even when create JSON was incomplete.
+  npx wrangler turnstile widget get "$SITEKEY" --json >"$get_file"
+  SECRET="$(extract_json_object "$get_file" | jq -r '.secret // .secret_key // .secretKey // empty')"
+  [[ -n "$SECRET" && "$SECRET" != "null" ]] || die "Turnstile secret missing from wrangler response"
+
+  # Ensure required domains are registered on the chosen widget.
+  local missing=()
+  for d in "${DOMAINS[@]}"; do
+    if ! extract_json_object "$get_file" | jq -e --arg d "$d" '.domains | index($d) != null' >/dev/null; then
+      missing+=("$d")
+    fi
+  done
+  if ((${#missing[@]} > 0)); then
+    log "Updating widget domains: ${missing[*]}"
+    domain_flags=()
+    for d in "${DOMAINS[@]}"; do
+      domain_flags+=(--domain "$d")
+    done
+    npx wrangler turnstile widget update "$SITEKEY" "${domain_flags[@]}" --json >"$get_file"
+    SECRET="$(extract_json_object "$get_file" | jq -r '.secret // .secret_key // .secretKey // empty')"
+    [[ -n "$SECRET" && "$SECRET" != "null" ]] || {
+      npx wrangler turnstile widget get "$SITEKEY" --json >"$get_file"
+      SECRET="$(extract_json_object "$get_file" | jq -r '.secret // .secret_key // .secretKey // empty')"
+    }
+    [[ -n "$SECRET" && "$SECRET" != "null" ]] || die "Turnstile secret missing after domain update"
+  fi
+}
+
+resolve_turnstile_widget
 
 QUOTE_FORM_SECRET="$(openssl rand -base64 32)"
 
-add_env "NEXT_PUBLIC_TURNSTILE_SITE_KEY" "$SITEKEY"
+add_env "NEXT_PUBLIC_TURNSTILE_SITE_KEY" "$SITEKEY" public
 add_env "TURNSTILE_SECRET_KEY" "$SECRET" sensitive
 add_env "QUOTE_FORM_SECRET" "$QUOTE_FORM_SECRET" sensitive
 unset SECRET QUOTE_FORM_SECRET
 
-log "Installing Upstash Redis via Vercel Marketplace (if not already connected)"
-if npx vercel integration add upstash --yes 2>/dev/null; then
-  log "Upstash integration add completed"
+log "Installing Upstash Redis (upstash/upstash-kv) via Vercel Marketplace"
+upstash_out="$(
+  npx vercel integration add upstash/upstash-kv \
+    --name thrundesigns-quote-kv \
+    -e production -e preview -e development \
+    --format=json 2>&1 || true
+)"
+if printf '%s' "$upstash_out" | jq -e '.status == "action_required"' >/dev/null 2>&1; then
+  terms_uri="$(printf '%s' "$upstash_out" | jq -r '.verification_uri // empty')"
+  log "Upstash needs marketplace terms acceptance (human, interactive):"
+  printf '  1) Open: %s\n' "${terms_uri:-https://vercel.com/reckhouses-projects/~/integrations/accept-terms/upstash?source=cli}"
+  printf '  2) Or run: npx vercel integration accept-terms upstash\n'
+  printf '  3) Retry:  npx vercel integration add upstash/upstash-kv --name thrundesigns-quote-kv\n'
+elif printf '%s' "$upstash_out" | jq -e '.status == "error"' >/dev/null 2>&1; then
+  log "Upstash install reported an error — see output above; rate limits still fall back in-memory"
+  printf '%s\n' "$upstash_out" >&2
 else
-  log "Upstash integration add needs dashboard confirmation — open with: npx vercel integration open upstash"
+  log "Upstash integration add completed"
 fi
 
-log "Pulling env to .env.local (keeps existing unrelated keys)"
+log "Pulling env to .env.local"
 npx vercel env pull .env.local --yes >/dev/null
 
 # Prefer canonical UPSTASH_* names; mirror marketplace KV_* if present.
