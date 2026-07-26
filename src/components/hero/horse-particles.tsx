@@ -21,16 +21,11 @@ import {
 const GOLD = "#d4af6a";
 const CREAM = "#ebe7df";
 
-/** Visual scale of the particle horse in world units. */
-const HORSE_SCALE = 1.62;
-/** Half-extents of the horse silhouette in unscaled particle space. */
+/** Fits inside the hero column without clipping. */
+const HORSE_SCALE = 1.12;
 const HORSE_HALF = 1.35;
-/**
- * No shake beyond this distance from the silhouette edge.
- * ~6 inches at the CSS reference density (96px/in).
- */
-const NO_SHAKE_INCHES = 6;
-const NO_SHAKE_PX = NO_SHAKE_INCHES * 96;
+/** ~6 inches at CSS 96px/in — measured in page pixels from the silhouette. */
+const NO_SHAKE_PX = 6 * 96;
 
 const vertexShader = /* glsl */ `
 uniform float uTime;
@@ -47,7 +42,6 @@ void main() {
   float wobble = sin(uTime * 18.0 + phase) * 0.5
     + sin(uTime * 29.0 + phase * 1.7) * 0.3;
 
-  // Moderate shake — proximity drives intensity in JS
   vec3 shakeOffset = dir * uShake * (0.04 + abs(wobble) * 0.07);
   shakeOffset.x += sin(uTime * 26.0 + phase) * uShake * 0.022;
   shakeOffset.y += cos(uTime * 22.0 + phase * 1.3) * uShake * 0.022;
@@ -60,17 +54,17 @@ void main() {
     sin(phase * 2.1) * burst * 1.0
   );
 
-  // While reforming (uExplode → 0), shake fades and origin wins
+  // When both uniforms are 0, transformed == origin (perfect rest pose)
   vec3 transformed = origin
-    + shakeOffset * (1.0 - uExplode * 0.55)
+    + shakeOffset * (1.0 - uExplode)
     + explodeOffset;
 
   vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);
   gl_Position = projectionMatrix * mvPosition;
 
-  float base = mix(1.4, 1.05, uExplode);
+  float base = mix(1.35, 1.05, uExplode);
   float attenuated = base * uPixelRatio * (95.0 / max(1.0, -mvPosition.z));
-  gl_PointSize = clamp(attenuated, 0.9, 2.6);
+  gl_PointSize = clamp(attenuated, 0.9, 2.5);
 }
 `;
 
@@ -115,11 +109,12 @@ function HorseParticleField() {
   const explodeProxy = useRef({ value: 0 });
   const explodeTween = useRef<gsap.core.Tween | null>(null);
   const hovering = useRef(false);
-  const pointerActive = useRef(false);
+  /** Page-pixel distance from pointer to horse silhouette rect (outside edge). */
+  const distPxRef = useRef(NO_SHAKE_PX);
   const cream = useMemo(() => new Color(CREAM), []);
   const gold = useMemo(() => new Color(GOLD), []);
   const [buffers, setBuffers] = useState<ParticleBuffers | null>(null);
-  const { viewport, gl, size } = useThree();
+  const { gl } = useThree();
 
   useEffect(() => {
     let cancelled = false;
@@ -134,16 +129,44 @@ function HorseParticleField() {
     };
   }, []);
 
+  // Track pointer in page space so distance works even over the hero copy.
   useEffect(() => {
-    const el = gl.domElement;
-    const activate = () => {
-      pointerActive.current = true;
+    const canvas = gl.domElement;
+
+    const updateDistance = (clientX: number, clientY: number) => {
+      const rect = canvas.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      // Tighter than full canvas — approx visible stroke bounds
+      const halfW = rect.width * 0.34;
+      const halfH = rect.height * 0.4;
+      const dx = Math.max(Math.abs(clientX - cx) - halfW, 0);
+      const dy = Math.max(Math.abs(clientY - cy) - halfH, 0);
+      distPxRef.current = Math.hypot(dx, dy);
     };
-    el.addEventListener("pointermove", activate, { passive: true });
-    el.addEventListener("pointerenter", activate, { passive: true });
+
+    const onMove = (event: PointerEvent) => {
+      updateDistance(event.clientX, event.clientY);
+    };
+
+    const onLeave = () => {
+      distPxRef.current = NO_SHAKE_PX;
+      if (hovering.current) {
+        hovering.current = false;
+        document.body.style.cursor = "auto";
+      }
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("blur", onLeave);
+    canvas.addEventListener("pointerleave", onLeave);
+    // Start at rest (no shake) until we see a real pointer position
+    distPxRef.current = NO_SHAKE_PX;
+
     return () => {
-      el.removeEventListener("pointermove", activate);
-      el.removeEventListener("pointerenter", activate);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("blur", onLeave);
+      canvas.removeEventListener("pointerleave", onLeave);
     };
   }, [gl]);
 
@@ -184,7 +207,7 @@ function HorseParticleField() {
     explodeTween.current?.kill();
     explodeTween.current = gsap.to(explodeProxy.current, {
       value: to,
-      duration: to > 0 ? 0.75 : 1.45,
+      duration: to > 0 ? 0.7 : 1.5,
       ease: to > 0 ? "power3.out" : "power2.inOut",
       onUpdate: () => {
         if (materialRef.current) {
@@ -192,10 +215,18 @@ function HorseParticleField() {
             explodeProxy.current.value;
         }
       },
+      onComplete: () => {
+        // Snap to exact rest so the horse is mathematically perfect
+        if (to === 0 && materialRef.current) {
+          explodeProxy.current.value = 0;
+          materialRef.current.uniforms.uExplode.value = 0;
+          materialRef.current.uniforms.uShake.value = 0;
+        }
+      },
     });
   }, []);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     const mat = materialRef.current;
     if (!mat) return;
     mat.uniforms.uTime.value += delta;
@@ -204,58 +235,43 @@ function HorseParticleField() {
     const color = mat.uniforms.uColor.value as Color;
     color.copy(cream).lerp(gold, mat.uniforms.uExplode.value * 0.55);
 
-    // Ignore default centered pointer until the user moves
-    if (!pointerActive.current) {
-      if (Math.hypot(state.pointer.x, state.pointer.y) > 0.002) {
-        pointerActive.current = true;
-      } else {
-        mat.uniforms.uShake.value +=
-          (0 - mat.uniforms.uShake.value) * Math.min(1, delta * 7);
-        return;
-      }
-    }
-
-    // Pointer in CSS pixels from canvas center
-    const px = (state.pointer.x * size.width) / 2;
-    const py = (state.pointer.y * size.height) / 2;
-
-    // Horse AABB half-size in CSS pixels
-    const worldToPx = size.width / viewport.width;
-    const halfPx = HORSE_HALF * HORSE_SCALE * worldToPx;
-
-    const dx = Math.max(Math.abs(px) - halfPx, 0);
-    const dy = Math.max(Math.abs(py) - halfPx, 0);
-    const distPx = Math.hypot(dx, dy);
-
+    const distPx = distPxRef.current;
     let targetShake = 0;
+
     if (hovering.current) {
-      // On the horse: explosion owns the motion; keep a light residual shake
-      targetShake = 0.25;
+      // Contact: explosion handles chaos; keep residual shake low
+      targetShake = 0.2;
     } else if (distPx < NO_SHAKE_PX) {
-      // 0 at ~6" away → 1 at the silhouette edge; ease-in as it nears
+      // 0 at 6" away → 1 at silhouette edge
       const t = 1 - distPx / NO_SHAKE_PX;
       targetShake = t * t;
+    } else {
+      targetShake = 0;
     }
 
-    mat.uniforms.uShake.value +=
-      (targetShake - mat.uniforms.uShake.value) * Math.min(1, delta * 7);
+    // When far away, snap quickly to a perfect still pose
+    if (targetShake === 0 && !hovering.current) {
+      mat.uniforms.uShake.value *= Math.max(0, 1 - delta * 10);
+      if (mat.uniforms.uShake.value < 0.002) {
+        mat.uniforms.uShake.value = 0;
+      }
+    } else {
+      mat.uniforms.uShake.value +=
+        (targetShake - mat.uniforms.uShake.value) * Math.min(1, delta * 8);
+    }
   });
 
   if (!geometry) return null;
 
-  const hitSize = HORSE_HALF * 2 * 1.05;
+  const hitSize = HORSE_HALF * 2 * 0.92;
 
   return (
     <group scale={HORSE_SCALE}>
       <points ref={pointsRef} geometry={geometry} material={material} />
       <mesh
         position={[0, 0, 0.04]}
-        onPointerMove={() => {
-          pointerActive.current = true;
-        }}
         onPointerOver={(event) => {
           event.stopPropagation();
-          pointerActive.current = true;
           hovering.current = true;
           document.body.style.cursor = "pointer";
           setExplode(1);
@@ -277,7 +293,7 @@ function HorseParticleField() {
 export function HorseParticles() {
   return (
     <div
-      className="relative h-full min-h-[360px] w-full"
+      className="relative h-full min-h-[320px] w-full overflow-hidden"
       aria-label="Interactive horse head particle field"
     >
       <Canvas
@@ -287,7 +303,7 @@ export function HorseParticles() {
           antialias: true,
           powerPreference: "high-performance",
         }}
-        camera={{ position: [0, 0, 4.6], fov: 34, near: 0.1, far: 40 }}
+        camera={{ position: [0, 0, 4.5], fov: 36, near: 0.1, far: 40 }}
         dpr={[1, 1.75]}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);

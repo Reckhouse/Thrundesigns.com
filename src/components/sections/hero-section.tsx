@@ -50,7 +50,7 @@ export function HeroSection({
       aria-label="Introduction"
     >
       <div className="relative z-10 mx-auto flex min-h-[calc(100svh-80px)] w-full max-w-[1440px] flex-col justify-end px-5 pb-16 pt-10 md:min-h-[calc(920px-96px)] md:justify-center md:px-10 md:pb-20 md:pt-12 lg:min-h-[calc(100svh-96px)] lg:px-[74px] lg:pb-24">
-        <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,520px)] lg:gap-10 xl:gap-14">
+        <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,420px)] lg:gap-12 xl:gap-16">
           <div className="max-w-xl lg:max-w-[42rem]">
             <motion.p
               className="text-balance font-display text-[clamp(2.25rem,5vw,4.25rem)] leading-[1.02] tracking-[-0.02em] text-gold drop-shadow-[0_2px_24px_rgba(12,13,12,0.45)]"
@@ -121,7 +121,7 @@ export function HeroSection({
 
           {!reduce ? (
             <motion.div
-              className="relative mx-auto hidden h-[min(58vw,520px)] w-full max-w-[520px] lg:mx-0 lg:block lg:h-[min(68vh,560px)]"
+              className="relative mx-auto hidden h-[min(48vw,400px)] w-full max-w-[400px] overflow-hidden lg:mx-0 lg:block lg:h-[min(52vh,440px)]"
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{
@@ -133,13 +133,13 @@ export function HeroSection({
               <HorseParticlesLazy />
             </motion.div>
           ) : (
-            <div className="relative mx-auto hidden w-full max-w-[420px] lg:mx-0 lg:block">
+            <div className="relative mx-auto hidden w-full max-w-[340px] lg:mx-0 lg:block">
               {/* Static mark fallback when motion is reduced */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/horse-head-mark.png"
                 alt=""
-                className="mx-auto h-auto w-full max-w-[380px] object-contain opacity-90"
+                className="mx-auto h-auto w-full max-w-[300px] object-contain opacity-90"
               />
             </div>
           )}
