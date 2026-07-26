@@ -6,6 +6,7 @@ import {
   quoteForm,
   quoteFormField,
   quoteFormOption,
+  quoteFormProjectTypeOption,
 } from "./quoteForm";
 
 export const schemaTypes = [
@@ -13,6 +14,7 @@ export const schemaTypes = [
   seo,
   mediaAsset,
   quoteFormOption,
+  quoteFormProjectTypeOption,
   quoteFormField,
   siteSettings,
   homePage,

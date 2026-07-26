@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   enabledOptions,
+  findOption,
   type QuoteFormConfig,
 } from "@/lib/quote/form-config";
 import {
@@ -61,6 +62,15 @@ export function QuoteForm({ config }: { config: QuoteFormConfig }) {
     },
     mode: "onTouched",
   });
+
+  const selectedProjectType = form.watch("projectType");
+  const selectedProjectOption = useMemo(
+    () =>
+      selectedProjectType
+        ? findOption(projectOptions, selectedProjectType)
+        : undefined,
+    [projectOptions, selectedProjectType],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -243,6 +253,7 @@ export function QuoteForm({ config }: { config: QuoteFormConfig }) {
                 <Field
                   label={config.projectTypeField.label}
                   helperText={config.projectTypeField.helperText}
+                  description={selectedProjectOption?.service?.summary}
                   error={form.formState.errors.projectType?.message}
                 >
                   <select
@@ -405,11 +416,13 @@ export function QuoteForm({ config }: { config: QuoteFormConfig }) {
 function Field({
   label,
   helperText,
+  description,
   error,
   children,
 }: {
   label: string;
   helperText?: string | null;
+  description?: string | null;
   error?: string;
   children: React.ReactNode;
 }) {
@@ -425,6 +438,11 @@ function Field({
       {isValidElement<{ id?: string }>(children)
         ? cloneElement(children, { id })
         : children}
+      {description ? (
+        <p className="max-w-[42ch] text-pretty font-sans text-sm leading-6 text-fg-muted">
+          {description}
+        </p>
+      ) : null}
       {helperText ? (
         <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
           {helperText}

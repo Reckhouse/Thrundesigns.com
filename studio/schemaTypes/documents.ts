@@ -111,6 +111,16 @@ export const quoteSubmission = defineType({
       readOnly: true,
     }),
     defineField({
+      name: "service",
+      title: "Linked service",
+      type: "reference",
+      to: [{ type: "service" }],
+      readOnly: true,
+      weak: true,
+      description:
+        "Filled automatically when the chosen project type option links a Service.",
+    }),
+    defineField({
       name: "budget",
       title: "Budget (slug)",
       type: "string",
@@ -146,16 +156,18 @@ export const quoteSubmission = defineType({
       title: "name",
       email: "email",
       projectType: "projectType",
+      serviceTitle: "service.title",
       status: "status",
       submittedAt: "submittedAt",
     },
-    prepare({ title, email, projectType, status, submittedAt }) {
+    prepare({ title, email, projectType, serviceTitle, status, submittedAt }) {
       const when = submittedAt
         ? new Date(submittedAt).toLocaleDateString()
         : "—";
+      const project = serviceTitle || projectType || "—";
       return {
         title: title || "Untitled submission",
-        subtitle: `${status || "new"} · ${projectType || "—"} · ${email || "—"} · ${when}`,
+        subtitle: `${status || "new"} · ${project} · ${email || "—"} · ${when}`,
       };
     },
   },

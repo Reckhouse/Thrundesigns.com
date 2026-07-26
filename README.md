@@ -158,8 +158,12 @@ In Sanity Studio under **Forms**:
   (`new` / `read` / `archived`). Newest first.
 
 Code fallbacks in `src/lib/quote/form-config.ts` keep `/quote` working if the
-singleton is missing. Linking project-type options to Services documents is
-planned for a later pass.
+singleton is missing.
+
+Project-type options may optionally reference a **Service** document. The option
+`value` slug is still what the form submits; the Service link adds summary copy
+on `/quote`, a `service` reference on new submissions, and a Service line in the
+notify email. Options like Mixed can stay unlinked.
 
 ## Design source
 
