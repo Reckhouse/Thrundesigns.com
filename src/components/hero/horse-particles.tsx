@@ -20,12 +20,12 @@ import {
   Vector2,
 } from "three";
 
-/** Living Engraving palette — stone base, bronze mid, gold accent. */
-const COLOR_STONE = "#c8c2b4";
-const COLOR_BRONZE = "#8a7349";
-const COLOR_GOLD = "#c9a84c";
+/** Living Engraving palette — cream ink base, bronze mid, gold accent. */
+const COLOR_STONE = "#efe9dc";
+const COLOR_BRONZE = "#b0894a";
+const COLOR_GOLD = "#d4af6a";
 
-const HORSE_SCALE = 1.48;
+const HORSE_SCALE = 1.58;
 const HORSE_HALF = 1.35;
 /** Pointer influence only near the silhouette (page px). */
 const INTERACT_PX = 140;
@@ -34,8 +34,8 @@ const DEAD_ZONE_PX = 28;
 const TILT_YAW = (9 * Math.PI) / 180;
 const TILT_PITCH = (4.5 * Math.PI) / 180;
 
-const TIER_HIGH = 9000;
-const TIER_STANDARD = 6000;
+const TIER_HIGH = 12000;
+const TIER_STANDARD = 8000;
 
 const vertexShader = /* glsl */ `
 uniform float uTime;
@@ -109,12 +109,12 @@ void main() {
   vec4 mvPosition = modelViewMatrix * vec4(transformed, 1.0);
   gl_Position = projectionMatrix * mvPosition;
 
-  float sizeBase = mix(0.55, 1.05, vEdge);
-  sizeBase *= mix(0.9, 1.08, vTone);
+  float sizeBase = mix(0.95, 1.35, vEdge);
+  sizeBase *= mix(0.95, 1.12, vTone);
   sizeBase *= twinkle;
-  sizeBase *= mix(0.35, 1.0, appearEase);
-  float attenuated = sizeBase * uPixelRatio * (72.0 / max(1.0, -mvPosition.z));
-  gl_PointSize = clamp(attenuated, 0.55, 1.65);
+  sizeBase *= mix(0.5, 1.0, appearEase);
+  float attenuated = sizeBase * uPixelRatio * (96.0 / max(1.0, -mvPosition.z));
+  gl_PointSize = clamp(attenuated, 0.9, 2.4);
 }
 `;
 
@@ -132,36 +132,37 @@ varying float vRear;
 varying float vTwinkle;
 
 void main() {
-  // Squared engraving stroke
+  // Squared engraving stroke — slightly softer core for readable density
   vec2 uv = gl_PointCoord - vec2(0.5);
   vec2 a = abs(uv);
   float d = max(a.x, a.y);
-  if (d > 0.48) discard;
-  float alpha = 1.0 - smoothstep(0.28, 0.48, d);
-  alpha *= mix(0.72, 0.92, vEdge);
+  if (d > 0.5) discard;
+  float alpha = 1.0 - smoothstep(0.22, 0.5, d);
+  alpha *= mix(0.82, 0.98, vEdge);
 
   vec3 color = uStone;
   if (vTone > 0.75) {
     color = uGold;
   } else if (vTone > 0.25) {
-    color = mix(uStone, uBronze, 0.85);
+    color = mix(uStone, uBronze, 0.7);
   }
 
-  alpha *= mix(1.0, 0.42, vRear);
-  alpha *= mix(0.55, 1.0, clamp(vEdge * 1.2, 0.0, 1.0));
+  // Keep rear/interior quieter, but still legible on the mountain
+  alpha *= mix(1.0, 0.62, vRear);
+  alpha *= mix(0.78, 1.0, clamp(vEdge * 1.15, 0.0, 1.0));
 
   float appear = clamp(uAppear, 0.0, 1.0);
-  float depthGate = mix(0.55, 1.0, 1.0 - vRear);
-  float toneGate = mix(1.0, smoothstep(0.55, 0.95, appear), vTone);
-  alpha *= smoothstep(0.0, 0.85, appear * depthGate) * toneGate;
+  float depthGate = mix(0.75, 1.0, 1.0 - vRear);
+  float toneGate = mix(1.0, smoothstep(0.35, 0.9, appear), vTone * 0.65);
+  alpha *= smoothstep(0.0, 0.7, appear * depthGate) * toneGate;
 
-  alpha *= 1.0 - uScroll * mix(0.55, 1.0, vRear);
+  alpha *= 1.0 - uScroll * mix(0.4, 0.85, vRear);
 
   color = mix(color, uGold, uCta * vEdge * 0.55 * (1.0 - vRear));
-  alpha *= mix(1.0, 1.08, uCta * vEdge);
+  alpha *= mix(1.0, 1.1, uCta * vEdge);
 
-  alpha *= mix(0.96, 1.0, vTwinkle);
-  alpha = clamp(alpha, 0.0, 0.78);
+  alpha *= mix(0.97, 1.0, vTwinkle);
+  alpha = clamp(alpha, 0.0, 0.94);
 
   if (alpha < 0.02) discard;
   gl_FragColor = vec4(color, alpha);
@@ -223,7 +224,7 @@ function useHorseLayout() {
   const offsetY = viewport.height * 0.04;
   const scale = Math.min(
     HORSE_SCALE,
-    (viewport.height * 0.56) / (HORSE_HALF * 2),
+    (viewport.height * 0.62) / (HORSE_HALF * 2),
   );
   return { offsetX, offsetY, scale };
 }

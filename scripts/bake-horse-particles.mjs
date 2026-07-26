@@ -15,7 +15,7 @@ const source = path.join(root, "public/images/horse-head.png");
 
 const size = 960;
 /** High-tier count; client subsamples for standard/static tiers. */
-const TARGET = 9000;
+const TARGET = 12000;
 
 const { data, info } = await sharp(source)
   .resize(size, size, {
@@ -176,7 +176,7 @@ fs.writeFileSync(
     count: picked.length,
     width: w,
     height: h,
-    tiers: { high: picked.length, standard: 6000, constrained: 0 },
+    tiers: { high: picked.length, standard: 8000, constrained: 0 },
     tones: { stone, bronze, gold },
   }),
 );

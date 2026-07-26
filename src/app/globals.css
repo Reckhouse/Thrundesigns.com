@@ -138,16 +138,22 @@
   }
 }
 
-/* Living Engraving — fade horse into mountain haze at bottom / outer edge */
+/* Living Engraving — soft fade into mountain haze (keep silhouette readable) */
 .horse-engraving {
-  -webkit-mask-image:
-    radial-gradient(ellipse 72% 78% at 74% 40%, #000 32%, transparent 80%),
-    linear-gradient(to top, transparent 0%, #000 18%, #000 100%);
-  mask-image:
-    radial-gradient(ellipse 72% 78% at 74% 40%, #000 32%, transparent 80%),
-    linear-gradient(to top, transparent 0%, #000 18%, #000 100%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  -webkit-mask-image: linear-gradient(
+    to top,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to top,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    #000 100%
+  );
 }
 
 @layer utilities {
