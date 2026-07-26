@@ -41,8 +41,22 @@ Required production env vars (see `.env.example`):
 - `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY`
 - `QUOTE_FORM_SECRET` (min 16 characters)
 - `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`
+  (or Marketplace `KV_REST_API_URL` / `KV_REST_API_TOKEN`)
 
 Also enable a Vercel Firewall rule for `POST /api/quote` (start in log mode).
+
+### One-shot provision (CLI)
+
+After `npx vercel login` and `npx wrangler login`:
+
+```bash
+chmod +x scripts/configure-quote-security.sh
+./scripts/configure-quote-security.sh
+npx vercel --prod --yes
+```
+
+This creates the Turnstile widget, sets env vars, installs Upstash when possible,
+and stages a log-mode Firewall rate limit on `POST /api/quote`.
 
 Studio (local package or hosted):
 
