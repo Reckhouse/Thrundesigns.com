@@ -241,23 +241,36 @@ fi
 log "Publishing staged firewall changes"
 npx vercel firewall publish --yes || log "Firewall publish skipped — publish from dashboard if needed"
 
-log "Installing Resend (resend/resend-email) via Vercel Marketplace (P2 notify)"
-resend_out="$(
-  npx vercel integration add resend/resend-email \
-    --name thrundesigns-quote-mail \
-    -e production -e preview -e development \
-    --format=json 2>&1 || true
-)"
-if printf '%s' "$resend_out" | jq -e '.status == "action_required"' >/dev/null 2>&1; then
-  terms_uri="$(printf '%s' "$resend_out" | jq -r '.verification_uri // empty')"
-  log "Resend needs marketplace terms acceptance (human, interactive):"
-  printf '  1) Open: %s\n' "${terms_uri:-https://vercel.com/reckhouses-projects/~/integrations/accept-terms/resend?source=cli}"
-  printf '  2) Retry:  npx vercel integration add resend/resend-email --name thrundesigns-quote-mail\n'
-elif printf '%s' "$resend_out" | jq -e '.status == "error"' >/dev/null 2>&1; then
-  log "Resend install reported an error — set RESEND_API_KEY manually if needed"
-  printf '%s\n' "$resend_out" >&2
+log "Resend Marketplace (optional P2) — requires owned domain + paid plan"
+if [[ -n "${QUOTE_RESEND_DOMAIN:-}" ]]; then
+  resend_out="$(
+    npx vercel integration add resend/resend-email \
+      --name thrundesigns-quote-mail \
+      --plan "${QUOTE_RESEND_PLAN:-pro}" \
+      -m "domain=${QUOTE_RESEND_DOMAIN}" \
+      -m "region=${QUOTE_RESEND_REGION:-us-east-1}" \
+      -e production -e preview -e development \
+      --format=json 2>&1 || true
+  )"
+  if printf '%s' "$resend_out" | jq -e '.status == "action_required"' >/dev/null 2>&1; then
+    terms_uri="$(printf '%s' "$resend_out" | jq -r '.verification_uri // empty')"
+    log "Resend needs marketplace terms acceptance (human, interactive):"
+    printf '  1) Open: %s\n' "${terms_uri:-https://vercel.com/reckhouses-projects/~/integrations/accept-terms/resend?source=cli}"
+    printf '  2) Retry with: QUOTE_RESEND_DOMAIN=%s ./scripts/configure-quote-security.sh\n' "$QUOTE_RESEND_DOMAIN"
+  elif printf '%s' "$resend_out" | jq -e '.status == "error"' >/dev/null 2>&1; then
+    log "Resend Marketplace install reported an error — set RESEND_API_KEY manually if needed"
+    printf '%s\n' "$resend_out" >&2
+  else
+    log "Resend integration add completed"
+  fi
 else
-  log "Resend integration add completed"
+  log "Skipping Marketplace Resend (set QUOTE_RESEND_DOMAIN=your.domain to provision)."
+  printf '  Free tier: paste RESEND_API_KEY from https://resend.com/api-keys\n'
+  printf '  Paid Marketplace example:\n'
+  printf '    QUOTE_RESEND_DOMAIN=thrundesign.com QUOTE_RESEND_PLAN=pro \\\n'
+  printf '      npx vercel integration add resend/resend-email --name thrundesigns-quote-mail \\\n'
+  printf '      --plan pro -m domain=thrundesign.com -m region=us-east-1 \\\n'
+  printf '      -e production -e preview -e development\n'
 fi
 
 if [[ -z "${QUOTE_NOTIFY_TO:-}" ]]; then

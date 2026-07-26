@@ -100,18 +100,34 @@ public media token.
 
 ## Resend (quote notify)
 
+Marketplace Resend requires a **domain you own** plus a paid plan (`pro` /
+`scale`). There is no free Marketplace SKU. Metadata is required in non-interactive CLI:
+
 ```bash
-# Accept Marketplace terms in the browser if prompted, then:
+# Example once you own/verify a sending domain (e.g. thrundesign.com):
 npx vercel integration add resend/resend-email \
   --name thrundesigns-quote-mail \
+  --plan pro \
+  -m domain=thrundesign.com \
+  -m region=us-east-1 \
   -e production -e preview -e development
-npx vercel env add QUOTE_NOTIFY_TO production preview development
-# optional verified sender (defaults to onboarding@resend.dev in code):
-# npx vercel env add QUOTE_NOTIFY_FROM ...
 ```
 
-Notify runs only after Sanity stores the submission. Missing Resend config logs
-`quote.email_skipped` and still returns success to the client.
+**Free-tier alternative (recommended until a custom domain is ready):** create an
+API key at https://resend.com/api-keys and set it on the project:
+
+```bash
+printf '%s' '<your-resend-api-key>' | npx vercel env add RESEND_API_KEY production,preview --force --yes --sensitive
+printf '%s' '<your-resend-api-key>' | npx vercel env add RESEND_API_KEY development --force --yes --no-sensitive
+```
+
+With the free key, keep `QUOTE_NOTIFY_FROM` as
+`Thrun Design Co <onboarding@resend.dev>` (already set). Resend only delivers
+test mail to the account owner until a domain is verified.
+
+`QUOTE_NOTIFY_TO` is already set. Notify runs only after Sanity stores the
+submission. Missing Resend config logs `quote.email_skipped` and still returns
+success to the client.
 
 ## Production URL
 
