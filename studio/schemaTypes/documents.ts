@@ -95,8 +95,11 @@ export const quoteSubmission = defineType({
     defineField({ name: "message", type: "text" }),
     defineField({
       name: "attachments",
+      title: "Attachment pathnames",
+      description:
+        "Private Vercel Blob pathnames (not public URLs). Download with QUOTE_READ_WRITE_TOKEN.",
       type: "array",
-      of: [{ type: "url" }],
+      of: [{ type: "string" }],
     }),
     defineField({ name: "submittedAt", type: "datetime" }),
   ],

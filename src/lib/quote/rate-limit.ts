@@ -5,6 +5,13 @@ import { createHash } from "node:crypto";
 type LimitResult = {
   success: boolean;
   retryAfterSec?: number;
+  /** Which bucket rejected the request (for abuse logs). */
+  limiter?:
+    | "ip_10m"
+    | "ip_1d"
+    | "email_1h"
+    | "email_1d"
+    | "global_1h";
 };
 
 type MemoryBucket = { count: number; resetAt: number };
@@ -103,6 +110,14 @@ export async function enforceQuoteRateLimits(options: {
   const emailKey = fingerprintEmail(options.email);
   const redis = getRedis();
 
+  const labels = [
+    "ip_10m",
+    "ip_1d",
+    "email_1h",
+    "email_1d",
+    "global_1h",
+  ] as const;
+
   if (!redis) {
     // Dev / misconfigured production still gets process-local protection.
     const checks = [
@@ -112,8 +127,9 @@ export async function enforceQuoteRateLimits(options: {
       memoryLimit(`email:1d:${emailKey}`, 5, 24 * 60 * 60 * 1000),
       memoryLimit("global:1h", 150, 60 * 60 * 1000),
     ];
-    const failed = checks.find((check) => !check.success);
-    return failed || { success: true };
+    const index = checks.findIndex((check) => !check.success);
+    if (index < 0) return { success: true };
+    return { ...checks[index], limiter: labels[index] };
   }
 
   ensureLimiters(redis);
@@ -126,8 +142,9 @@ export async function enforceQuoteRateLimits(options: {
     checkUpstash(globalHour!, "global"),
   ]);
 
-  const failed = results.find((result) => !result.success);
-  return failed || { success: true };
+  const index = results.findIndex((result) => !result.success);
+  if (index < 0) return { success: true };
+  return { ...results[index], limiter: labels[index] };
 }
 
 export async function isDuplicateSubmission(options: {

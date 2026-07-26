@@ -214,20 +214,80 @@ if ! grep -q '^UPSTASH_REDIS_REST_URL=' .env.local 2>/dev/null; then
   fi
 fi
 
-log "Staging Vercel Firewall rate-limit rule for POST /api/quote"
-npx vercel firewall rules add "Quote API rate limit" \
-  --condition '{"type":"path","op":"eq","value":"/api/quote"}' \
-  --condition '{"type":"method","op":"eq","value":"POST"}' \
-  --action rate_limit \
-  --rate-limit-window 600 \
-  --rate-limit-requests 3 \
-  --rate-limit-keys ip \
-  --rate-limit-action log \
-  --yes || log "Firewall rule add skipped (may already exist or plan-limited)"
+log "Ensuring Vercel Firewall rate-limit rule for POST /api/quote (P1 challenge enforce)"
+if npx vercel firewall rules inspect "Quote API rate limit" >/dev/null 2>&1; then
+  npx vercel firewall rules edit "Quote API rate limit" \
+    --action rate_limit \
+    --rate-limit-window 600 \
+    --rate-limit-requests 3 \
+    --rate-limit-keys ip \
+    --rate-limit-algo fixed_window \
+    --rate-limit-action challenge \
+    --description "P1 enforce: challenge when POST /api/quote exceeds 3/10m by IP" \
+    --yes || log "Firewall rule edit skipped"
+else
+  npx vercel firewall rules add "Quote API rate limit" \
+    --condition '{"type":"path","op":"eq","value":"/api/quote"}' \
+    --condition '{"type":"method","op":"eq","value":"POST"}' \
+    --action rate_limit \
+    --rate-limit-window 600 \
+    --rate-limit-requests 3 \
+    --rate-limit-keys ip \
+    --rate-limit-action challenge \
+    --description "P1 enforce: challenge when POST /api/quote exceeds 3/10m by IP" \
+    --yes || log "Firewall rule add skipped (may already exist or plan-limited)"
+fi
 
 log "Publishing staged firewall changes"
 npx vercel firewall publish --yes || log "Firewall publish skipped — publish from dashboard if needed"
 
+log "Resend Marketplace (optional P2) — requires owned domain + paid plan"
+if [[ -n "${QUOTE_RESEND_DOMAIN:-}" ]]; then
+  resend_out="$(
+    npx vercel integration add resend/resend-email \
+      --name thrundesigns-quote-mail \
+      --plan "${QUOTE_RESEND_PLAN:-pro}" \
+      -m "domain=${QUOTE_RESEND_DOMAIN}" \
+      -m "region=${QUOTE_RESEND_REGION:-us-east-1}" \
+      -e production -e preview -e development \
+      --format=json 2>&1 || true
+  )"
+  if printf '%s' "$resend_out" | jq -e '.status == "action_required"' >/dev/null 2>&1; then
+    terms_uri="$(printf '%s' "$resend_out" | jq -r '.verification_uri // empty')"
+    log "Resend needs marketplace terms acceptance (human, interactive):"
+    printf '  1) Open: %s\n' "${terms_uri:-https://vercel.com/reckhouses-projects/~/integrations/accept-terms/resend?source=cli}"
+    printf '  2) Retry with: QUOTE_RESEND_DOMAIN=%s ./scripts/configure-quote-security.sh\n' "$QUOTE_RESEND_DOMAIN"
+  elif printf '%s' "$resend_out" | jq -e '.status == "error"' >/dev/null 2>&1; then
+    log "Resend Marketplace install reported an error — set RESEND_API_KEY manually if needed"
+    printf '%s\n' "$resend_out" >&2
+  else
+    log "Resend integration add completed"
+  fi
+else
+  log "Skipping Marketplace Resend (set QUOTE_RESEND_DOMAIN=your.domain to provision)."
+  printf '  Free tier: paste RESEND_API_KEY from https://resend.com/api-keys\n'
+  printf '  Paid Marketplace example:\n'
+  printf '    QUOTE_RESEND_DOMAIN=thrundesign.com QUOTE_RESEND_PLAN=pro \\\n'
+  printf '      npx vercel integration add resend/resend-email --name thrundesigns-quote-mail \\\n'
+  printf '      --plan pro -m domain=thrundesign.com -m region=us-east-1 \\\n'
+  printf '      -e production -e preview -e development\n'
+fi
+
+if [[ -z "${QUOTE_NOTIFY_TO:-}" ]]; then
+  log "QUOTE_NOTIFY_TO not set in this shell — add manually:"
+  printf '  printf \"you@example.com\" | npx vercel env add QUOTE_NOTIFY_TO production,preview,development --force --yes\n'
+else
+  add_env "QUOTE_NOTIFY_TO" "$QUOTE_NOTIFY_TO" sensitive
+fi
+
+if [[ -n "${QUOTE_NOTIFY_FROM:-}" ]]; then
+  add_env "QUOTE_NOTIFY_FROM" "$QUOTE_NOTIFY_FROM" sensitive
+fi
+
+log "Pulling env to .env.local (post-Resend)"
+npx vercel env pull .env.local --yes >/dev/null
+
 log "Done. Redeploy production so new env vars take effect:"
 printf '  npx vercel --prod --yes\n'
 printf '  # or merge PR / redeploy from the Vercel dashboard\n'
+printf '  # Ensure private Blob QUOTE_READ_WRITE_TOKEN is connected for attachments\n'

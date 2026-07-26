@@ -3,6 +3,7 @@ import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { validateAttachments } from "@/lib/quote/attachments";
 import { verifyFormToken } from "@/lib/quote/form-token";
+import { notifyQuoteStored } from "@/lib/quote/notify";
 import {
   enforceQuoteRateLimits,
   isDuplicateSubmission,
@@ -20,6 +21,7 @@ import {
   logQuoteSecurity,
 } from "@/lib/quote/security-log";
 import { verifyTurnstileToken } from "@/lib/quote/turnstile";
+import { trackAcceptedQuoteVolume } from "@/lib/quote/volume-alert";
 import { apiVersion, dataset, projectId } from "@/sanity/env";
 
 export async function POST(request: Request) {
@@ -79,6 +81,7 @@ export async function POST(request: Request) {
     logQuoteSecurity("quote.rate_limited", {
       ipHash: hashIdentifier(ip),
       emailHash: hashIdentifier(parsed.data.email),
+      limiter: rate.limiter,
     });
     return genericError(429, rate.retryAfterSec);
   }
@@ -135,7 +138,8 @@ export async function POST(request: Request) {
     return genericError(400);
   }
 
-  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  // Prefer private quote store token; never fall back to the public media store.
+  const blobToken = process.env.QUOTE_READ_WRITE_TOKEN;
   const attachments: string[] = [];
 
   if (attachmentCheck.files.length > 0) {
@@ -150,12 +154,12 @@ export async function POST(request: Request) {
     for (const file of attachmentCheck.files) {
       const safeName = file.name.replace(/[^\w.\-]+/g, "_").slice(0, 80);
       const blob = await put(`quotes/${Date.now()}-${safeName}`, file, {
-        access: "public",
+        access: "private",
         token: blobToken,
         addRandomSuffix: true,
         contentType: file.type || undefined,
       });
-      attachments.push(blob.url);
+      attachments.push(blob.pathname);
     }
   }
 
@@ -197,6 +201,15 @@ export async function POST(request: Request) {
     projectType: parsed.data.projectType,
     attachmentCount: attachments.length,
   });
+
+  // Notify after store — failures are logged only; client still gets success.
+  await notifyQuoteStored({
+    ...parsed.data,
+    attachmentPathnames: attachments,
+    studioUrl: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL,
+  });
+
+  await trackAcceptedQuoteVolume();
 
   return genericSuccess();
 }
