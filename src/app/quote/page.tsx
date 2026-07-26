@@ -10,9 +10,14 @@ import {
 import { sanityFetch } from "@/sanity/lib/live";
 import { quoteFormQuery } from "@/sanity/lib/queries";
 
-async function loadQuoteFormConfig(): Promise<QuoteFormConfig> {
+async function loadQuoteFormConfig(options?: {
+  stega?: boolean;
+}): Promise<QuoteFormConfig> {
   try {
-    const { data } = await sanityFetch({ query: quoteFormQuery });
+    const { data } = await sanityFetch({
+      query: quoteFormQuery,
+      stega: options?.stega,
+    });
     return resolveQuoteFormConfig(data as Partial<QuoteFormConfig> | null);
   } catch {
     return defaultQuoteFormConfig;
@@ -20,7 +25,7 @@ async function loadQuoteFormConfig(): Promise<QuoteFormConfig> {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const config = await loadQuoteFormConfig();
+  const config = await loadQuoteFormConfig({ stega: false });
   return {
     title: config.seo?.title || "Request a quote | Thrun Design Co.",
     description:

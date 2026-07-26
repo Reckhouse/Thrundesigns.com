@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { stegaClean } from "@sanity/client/stega";
 import { TextLink } from "@/components/site/primitives";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 import { ClipHeading } from "@/components/site/clip-heading";
@@ -69,9 +70,10 @@ export function WorkSection({
           stagger={0.12}
         >
           {projects.map((project, index) => {
-            const href = project.slug?.current
-              ? `/work/${project.slug.current}`
-              : "/work";
+            const slug = project.slug?.current
+              ? stegaClean(project.slug.current)
+              : "";
+            const href = slug ? `/work/${slug}` : "/work";
             const src = project.imageSrc || project.cover?.blobUrl || null;
 
             return (

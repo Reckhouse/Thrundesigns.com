@@ -32,12 +32,22 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const project =
+  const { data } = await sanityFetch({
+    query: projectBySlugQuery,
+    params: { slug },
+    stega: false,
+  }).catch(() => ({ data: null }));
+  const cms = data as ProjectDoc | null;
+  const fallback =
     defaultHomeContent.projects.find((item) => item.slug.current === slug) ||
     null;
   return {
-    title: project?.title || "Project",
-    description: project?.services || "Case study from Thrun Design Co.",
+    title: cms?.title || fallback?.title || "Project",
+    description:
+      cms?.summary ||
+      cms?.services ||
+      fallback?.services ||
+      "Case study from Thrun Design Co.",
   };
 }
 
