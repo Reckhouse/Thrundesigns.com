@@ -18,12 +18,16 @@ import {
   ShaderMaterial,
 } from "three";
 
-/** Brand gold — high contrast on charcoal / mountain. */
-const GOLD = "#d4af6a";
-/** Bright cream accent while exploding. */
-const CONTRAST = "#f4f1e9";
+/**
+ * Editorial cream (same family as --fg / --contrast).
+ * Reads as brand ink on the mountain — high contrast without the orange
+ * cast solid --gold picks up as translucent particles.
+ */
+const PARTICLE = "#f4f1e9";
+/** Soft champagne accent on explode — cooler than button gold. */
+const PARTICLE_HOT = "#e6d9b8";
 
-const HORSE_SCALE = 1.18;
+const HORSE_SCALE = 1.3;
 const HORSE_HALF = 1.35;
 /** ~6 inches at CSS 96px/in from the silhouette edge. */
 const NO_SHAKE_PX = 6 * 96;
@@ -111,7 +115,7 @@ function useHorseLayout() {
   const offsetY = viewport.height * 0.02;
   const scale = Math.min(
     HORSE_SCALE,
-    (viewport.height * 0.42) / (HORSE_HALF * 2),
+    (viewport.height * 0.48) / (HORSE_HALF * 2),
   );
   return { offsetX, offsetY, scale };
 }
@@ -124,8 +128,8 @@ function HorseParticleField() {
   const hovering = useRef(false);
   const distPxRef = useRef(NO_SHAKE_PX);
   const horseAnchorRef = useRef({ x: 0.72, y: 0.5, halfW: 0.14, halfH: 0.22 });
-  const gold = useMemo(() => new Color(GOLD), []);
-  const contrast = useMemo(() => new Color(CONTRAST), []);
+  const particle = useMemo(() => new Color(PARTICLE), []);
+  const particleHot = useMemo(() => new Color(PARTICLE_HOT), []);
   const [buffers, setBuffers] = useState<ParticleBuffers | null>(null);
   const { gl, size, viewport } = useThree();
   const { offsetX, offsetY, scale } = useHorseLayout();
@@ -222,7 +226,7 @@ function HorseParticleField() {
         uShake: { value: 0 },
         uExplode: { value: 0 },
         uPixelRatio: { value: 1 },
-        uColor: { value: new Color(GOLD) },
+        uColor: { value: new Color(PARTICLE) },
       },
     });
     materialRef.current = mat;
@@ -258,7 +262,7 @@ function HorseParticleField() {
     mat.uniforms.uPixelRatio.value = Math.min(gl.getPixelRatio(), 1.75);
 
     const color = mat.uniforms.uColor.value as Color;
-    color.copy(gold).lerp(contrast, mat.uniforms.uExplode.value * 0.35);
+    color.copy(particle).lerp(particleHot, mat.uniforms.uExplode.value * 0.4);
 
     const distPx = distPxRef.current;
     let targetShake = 0;
