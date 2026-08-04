@@ -428,9 +428,9 @@ Follow the brainstorm phases, adjusted for existing scaffolding:
 | Creations API + rate limit + Blob store | Present |
 | Persistence / analytics adapters | Present |
 | Sanity `projectThreeExperience` | Present |
-| Real WebGL systems | **Missing** |
-| Editor UI / export / SVG / audio | **Missing** |
-| `docs/controlled-chaos/*` reports | Audit + architecture only (this phase) |
+| Real WebGL systems | **Phase 1 shell** (test composition); systems Phase 3+ |
+| Editor UI / export / SVG / audio | **Phase 1 chrome**; remainder missing |
+| `docs/controlled-chaos/*` reports | Audit + architecture (Phase 0) |
 
 ---
 

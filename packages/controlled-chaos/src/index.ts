@@ -22,3 +22,8 @@ export {
   type ControlledChaosCreation,
   type ControlledChaosEmbedConfig,
 } from "./schemas";
+export type {
+  ControlledChaosAnalyticsAdapter,
+  ControlledChaosAnalyticsEvent,
+  ControlledChaosPersistenceAdapter,
+} from "./adapters.types";

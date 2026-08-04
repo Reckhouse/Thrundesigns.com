@@ -128,9 +128,9 @@ try {
     "utf8",
   );
   if (!chaosManifest.includes('experienceKey: "controlled-chaos-poster-lab"')) {
-    fail("Controlled Chaos stub manifest experienceKey mismatch");
+    fail("Controlled Chaos manifest experienceKey mismatch");
   } else {
-    ok("Controlled Chaos stub manifest experienceKey matches registry");
+    ok("Controlled Chaos manifest experienceKey matches registry");
   }
 
   const livingManifest = readFileSync(

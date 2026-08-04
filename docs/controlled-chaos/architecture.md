@@ -378,19 +378,13 @@ Update root README when Poster Lab becomes runnable beyond the stub (env, migrat
 
 ## 18. Phase 1 entry criteria (next implementation phase)
 
-After audit review, Phase 1 should:
+Phase 1 shell is implemented inside `packages/controlled-chaos` (R3F test composition, editor chrome, WebGL/error fallbacks). Remaining polish before Phase 2:
 
-1. Bump package off `0.0.0-stub` and declare Three/R3F peers  
-2. Replace `StubShell` with a Client-only R3F canvas showing a basic vertical composition  
-3. Add editor shell layout (desktop + mobile) using portfolio tokens  
-4. Keep `manifest` / `schemas` / registry / API contracts working  
-5. Add loading + error boundaries so renderer failure cannot crash the whole site  
-6. Confirm homepage / work index bundles do not pull Controlled Chaos WebGL  
-7. Pass lint + typecheck; update this doc if export map changes (should not)
+1. Confirm homepage / work index bundles stay free of Controlled Chaos WebGL (validate:experiences + manual check)
+2. Manual smoke of `/lab/controlled-chaos` on desktop and narrow viewports
+3. Proceed to Phase 2 (Zustand + typography + `PosterCreationV1`) after smoke checks
 
-**Exit:** Lab route shows a real WebGL test composition; stub messaging removed from full lab entry; no production portfolio regressions.
-
-**Do not start Phase 1 until Phase 0 docs are reviewed.**
+**Exit (Phase 1):** Lab route shows a real WebGL test composition; stub messaging removed from full lab entry; export map unchanged; no production portfolio regressions.
 
 ---
 

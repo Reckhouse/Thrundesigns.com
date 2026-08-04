@@ -1,34 +1,39 @@
 "use client";
 
-import { StubShell } from "./stub-shell";
+import { PosterLabShell } from "./shell/PosterLabShell";
 import type {
   ControlledChaosCreation,
   ControlledChaosEmbedConfig,
 } from "./schemas";
+import type {
+  ControlledChaosAnalyticsAdapter,
+  ControlledChaosPersistenceAdapter,
+} from "./adapters.types";
 
 export type ControlledChaosReplayProps = {
   configuration?: ControlledChaosEmbedConfig;
   creation?: ControlledChaosCreation;
   creationId?: string;
+  persistence?: ControlledChaosPersistenceAdapter;
+  analytics?: ControlledChaosAnalyticsAdapter;
 };
 
 export function ControlledChaosReplay({
   configuration,
   creation,
   creationId,
+  persistence,
+  analytics,
 }: ControlledChaosReplayProps) {
   return (
-    <StubShell
-      label="Controlled Chaos — Replay"
+    <PosterLabShell
+      variant="replay"
       configuration={configuration}
-      creationId={creationId ?? creation?.title}
-    >
-      {creation?.title ? (
-        <p style={{ margin: 0, color: "#c7c2b8", fontSize: "0.875rem" }}>
-          Saved title: {creation.title}
-        </p>
-      ) : null}
-    </StubShell>
+      persistence={persistence}
+      analytics={analytics}
+      creationId={creationId}
+      creationTitle={creation?.title}
+    />
   );
 }
 
