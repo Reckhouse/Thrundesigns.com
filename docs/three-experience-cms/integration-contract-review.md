@@ -389,6 +389,15 @@ Completed:
 - `/creation/[creationId]` replay route (noindex) with edit + duplicate actions
 - Featured creations gallery on project pages (Sanity IDs → store fetch)
 
+## Phase 9–10 status
+
+Completed:
+
+- CSP + security headers (`src/lib/security-headers.ts` via `next.config.ts`)
+- Safe metadata helpers for creation titles/thumbnails
+- Authoring, upgrade, performance, accessibility, browser, CSP, and launch docs
+- Expanded `validate:experiences` (docs, CSP wiring, marketing route boundaries, assets)
+
 
 ---
 

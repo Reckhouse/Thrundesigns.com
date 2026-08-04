@@ -163,7 +163,7 @@ Experience UI should reuse `ModuleShell`, site primitives, and zero-radius edito
 | Auth | Draft Mode + quote HMAC/Turnstile/attachment secret — no end-user accounts |
 | Testing | **No** Vitest/Playwright/Jest; no `.github/workflows` |
 | CI | **None** in-repo |
-| CSP | **None** — no `headers()`, no middleware CSP |
+| CSP | Implemented in Phase 9 — `src/lib/security-headers.ts` via `next.config.ts` `headers()` (see [csp.md](./csp.md)) |
 | Env template | [`.env.example`](../../.env.example) |
 
 ### Existing Three.js

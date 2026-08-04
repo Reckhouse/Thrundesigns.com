@@ -3,12 +3,13 @@
  * validate-experience-compatibility
  *
  * Checks that every registered experience key has a matching manifest,
- * that server-safe modules do not import Three.js, and that stub package
- * exports resolve.
+ * that server-safe modules do not import Three.js, package exports resolve,
+ * marketing routes do not import experience loaders, CSP helpers exist,
+ * and required docs are present.
  */
 
 import { createRequire } from "node:module";
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -42,6 +43,9 @@ function walkTsFiles(dir, acc = []) {
 const FORBIDDEN_SERVER_IMPORT =
   /from\s+["'](three|@react-three\/fiber|@react-three\/drei)["']|require\(["'](three|@react-three\/fiber|@react-three\/drei)["']\)/;
 
+const EXPERIENCE_REACT_IMPORT =
+  /@thrun-design\/controlled-chaos\/react(?:-preview|-replay)?/;
+
 const serverSafePaths = [
   join(root, "src/experiences/registry.server.ts"),
   join(root, "src/experiences/compatibility.ts"),
@@ -57,9 +61,15 @@ const serverSafePaths = [
   join(root, "studio/lib/experienceValidation.ts"),
   join(root, "studio/schemaTypes/blocks/projectThreeExperience.ts"),
   join(root, "studio/components/ThreeExperiencePreview.tsx"),
+  join(root, "src/lib/security-headers.ts"),
+  join(root, "src/lib/safe-meta.ts"),
 ];
 
 for (const file of serverSafePaths) {
+  if (!existsSync(file)) {
+    fail(`Missing server-safe file: ${relative(root, file)}`);
+    continue;
+  }
   const source = readFileSync(file, "utf8");
   if (FORBIDDEN_SERVER_IMPORT.test(source)) {
     fail(`Server-safe module imports Three.js/R3F: ${relative(root, file)}`);
@@ -68,7 +78,6 @@ for (const file of serverSafePaths) {
   }
 }
 
-// Resolve package exports via Node resolution
 const pkgName = "@thrun-design/controlled-chaos";
 try {
   const pkgJsonPath = require.resolve(`${pkgName}/package.json`);
@@ -93,14 +102,11 @@ try {
   fail(`Cannot resolve ${pkgName}: ${error.message}`);
 }
 
-// Dynamic-import server registry and assert Controlled Chaos is registered
 const registryUrl = pathToFileURL(
   join(root, "src/experiences/registry.server.ts"),
 ).href;
 
 try {
-  // Prefer compiled/bundler resolution through tsx if available; otherwise
-  // import via a small Node-check of the source registration string.
   const registrySource = readFileSync(
     join(root, "src/experiences/registry.server.ts"),
     "utf8",
@@ -132,7 +138,6 @@ try {
   fail(`Registry inspection failed: ${error.message}`);
 }
 
-// Client registry should be the only place with experience dynamic imports
 const clientRegistry = readFileSync(
   join(root, "src/experiences/registry.client.ts"),
   "utf8",
@@ -147,13 +152,71 @@ const experienceDir = join(root, "src/experiences");
 for (const file of walkTsFiles(experienceDir)) {
   if (file.endsWith("registry.client.ts")) continue;
   const source = readFileSync(file, "utf8");
-  if (
-    source.includes("@thrun-design/controlled-chaos/react") &&
-    !file.endsWith("registry.client.ts")
-  ) {
+  if (EXPERIENCE_REACT_IMPORT.test(source)) {
     fail(
       `Experience dynamic import leaked outside client registry: ${relative(root, file)}`,
     );
+  }
+}
+
+const marketingBoundaries = [
+  join(root, "src/app/page.tsx"),
+  join(root, "src/app/work/page.tsx"),
+];
+
+for (const file of marketingBoundaries) {
+  const source = readFileSync(file, "utf8");
+  if (EXPERIENCE_REACT_IMPORT.test(source) || source.includes("registry.client")) {
+    fail(
+      `Marketing route imports experience loaders: ${relative(root, file)}`,
+    );
+  } else {
+    ok(`Marketing route stays free of experience loaders: ${relative(root, file)}`);
+  }
+}
+
+const assetDir = join(root, "public/experiences/controlled-chaos");
+if (!existsSync(assetDir)) {
+  fail("Missing asset base directory public/experiences/controlled-chaos");
+} else {
+  ok("Asset base directory exists");
+}
+
+const cspSource = readFileSync(join(root, "src/lib/security-headers.ts"), "utf8");
+if (
+  !cspSource.includes("Content-Security-Policy") &&
+  !cspSource.includes("buildContentSecurityPolicy")
+) {
+  fail("CSP helper missing buildContentSecurityPolicy");
+} else {
+  ok("CSP helper present");
+}
+
+const nextConfig = readFileSync(join(root, "next.config.ts"), "utf8");
+if (!nextConfig.includes("securityHeaders")) {
+  fail("next.config.ts does not apply securityHeaders");
+} else {
+  ok("next.config.ts applies security headers");
+}
+
+const requiredDocs = [
+  "docs/three-experience-cms/repository-audit.md",
+  "docs/three-experience-cms/architecture.md",
+  "docs/three-experience-cms/integration-contract-review.md",
+  "docs/three-experience-cms/authoring-guide.md",
+  "docs/three-experience-cms/package-upgrade-guide.md",
+  "docs/three-experience-cms/performance-report.md",
+  "docs/three-experience-cms/accessibility-report.md",
+  "docs/three-experience-cms/browser-report.md",
+  "docs/three-experience-cms/csp.md",
+  "docs/three-experience-cms/launch-checklist.md",
+];
+
+for (const doc of requiredDocs) {
+  if (!existsSync(join(root, doc))) {
+    fail(`Missing doc: ${doc}`);
+  } else {
+    ok(`Doc present: ${doc}`);
   }
 }
 

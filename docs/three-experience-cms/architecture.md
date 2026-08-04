@@ -243,7 +243,7 @@ CMS must not store: arbitrary JS, shaders, HTML, import paths, API URLs, credent
 
 Frontend always re-validates with package schemas after GROQ.
 
-Content Security Policy is currently absent; when lab/replay need workers / `blob:` URLs, add narrow directives and document them (Phase 9).
+Content Security Policy is implemented in `src/lib/security-headers.ts` (via `next.config.ts`) with `worker-src` / `blob:` support for lab/replay. See [csp.md](./csp.md).
 
 ---
 

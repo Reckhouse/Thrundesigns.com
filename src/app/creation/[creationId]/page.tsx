@@ -10,6 +10,7 @@ import { validateExperienceEmbedConfig } from "@/experiences/compatibility";
 import { controlledChaosManifest } from "@thrun-design/controlled-chaos/manifest";
 import type { ControlledChaosEmbedConfig } from "@thrun-design/controlled-chaos/schemas";
 import { loadCreation } from "@/lib/creations/store";
+import { isSafeHttpUrl, safeMetaText } from "@/lib/safe-meta";
 import { getSiteUrl } from "@/lib/site-url";
 
 type PageProps = {
@@ -33,10 +34,12 @@ export async function generateMetadata({
     };
   }
 
-  const title =
-    loaded.value.meta.title?.trim() ||
-    `${controlledChaosManifest.title} creation`;
+  const title = safeMetaText(
+    loaded.value.meta.title,
+    `${controlledChaosManifest.title} creation`,
+  );
   const description = `A saved ${controlledChaosManifest.title} outcome from Thrun Design Co.`;
+  const thumb = loaded.value.meta.thumbnailUrl;
 
   return {
     title,
@@ -45,9 +48,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      ...(loaded.value.meta.thumbnailUrl
-        ? { images: [{ url: loaded.value.meta.thumbnailUrl }] }
-        : {}),
+      ...(isSafeHttpUrl(thumb) ? { images: [{ url: thumb! }] } : {}),
     },
   };
 }
@@ -102,8 +103,10 @@ export default async function CreationPage({
     },
   );
 
-  const title =
-    loaded.value.meta.title?.trim() || controlledChaosManifest.title;
+  const title = safeMetaText(
+    loaded.value.meta.title,
+    controlledChaosManifest.title,
+  );
   const editHref = withLabReturnPath(
     `/lab/controlled-chaos?mode=inline&creation=${encodeURIComponent(creationId)}${
       loaded.value.payload.presetKey
