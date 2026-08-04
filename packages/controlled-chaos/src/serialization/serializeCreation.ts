@@ -4,6 +4,7 @@ import {
   type PosterCreationV1,
 } from "./posterCreation.schema";
 import { canonicalizeCreation, creationHash } from "./canonicalizeCreation";
+import { hardenPosterCreationForPersist } from "../persistence/hardenCreation";
 
 export type SerializedControlledChaosCreation = {
   stateSchemaVersion: number;
@@ -24,7 +25,11 @@ export function serializePosterCreation(
     createdAt?: string;
   },
 ): SerializedControlledChaosCreation {
-  const state = posterCreationV1Schema.parse(document);
+  const hardened = hardenPosterCreationForPersist(document);
+  if (!hardened.ok) {
+    throw new Error(hardened.message);
+  }
+  const state = hardened.state;
   return {
     stateSchemaVersion: controlledChaosManifest.stateSchemaVersion,
     experienceKey: controlledChaosManifest.experienceKey,

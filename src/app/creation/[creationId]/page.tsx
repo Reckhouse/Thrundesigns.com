@@ -10,7 +10,8 @@ import { validateExperienceEmbedConfig } from "@/experiences/compatibility";
 import { controlledChaosManifest } from "@thrun-design/controlled-chaos/manifest";
 import type { ControlledChaosEmbedConfig } from "@thrun-design/controlled-chaos/schemas";
 import { loadCreation } from "@/lib/creations/store";
-import { isSafeHttpUrl, safeMetaText } from "@/lib/safe-meta";
+import { isAllowedCreationThumbnailUrl } from "@/lib/creations/thumbnail-policy";
+import { safeMetaText } from "@/lib/safe-meta";
 import { getSiteUrl } from "@/lib/site-url";
 
 type PageProps = {
@@ -40,6 +41,8 @@ export async function generateMetadata({
   );
   const description = `A saved ${controlledChaosManifest.title} outcome from Thrun Design Co.`;
   const thumb = loaded.value.meta.thumbnailUrl;
+  const safeThumb =
+    thumb && isAllowedCreationThumbnailUrl(thumb) ? thumb : undefined;
 
   return {
     title,
@@ -48,7 +51,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      ...(isSafeHttpUrl(thumb) ? { images: [{ url: thumb! }] } : {}),
+      ...(safeThumb ? { images: [{ url: safeThumb }] } : {}),
     },
   };
 }

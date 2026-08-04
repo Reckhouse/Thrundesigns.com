@@ -76,6 +76,7 @@ const serverSafePaths = [
   join(root, "packages/controlled-chaos/src/systems/types.ts"),
   join(root, "packages/controlled-chaos/src/systems/registry.ts"),
   join(root, "packages/controlled-chaos/src/audio/audio.schema.ts"),
+  join(root, "packages/controlled-chaos/src/persistence/hardenCreation.ts"),
   join(root, "packages/controlled-chaos/src/quality/quality-presets.ts"),
   join(root, "packages/living-engraving/src/manifest.ts"),
   join(root, "packages/living-engraving/src/schemas.ts"),
@@ -110,6 +111,9 @@ for (const pkgName of [
     ok(`Resolved ${pkgName}@${pkg.version}`);
 
     const requiredExports = ["./manifest", "./schemas", "./react-preview", "./react"];
+    if (pkgName === "@thrun-design/controlled-chaos") {
+      requiredExports.push("./persistence");
+    }
     for (const entry of requiredExports) {
       if (!pkg.exports?.[entry]) {
         fail(`Missing package export ${entry} on ${pkgName}`);

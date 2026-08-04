@@ -5,8 +5,13 @@ import {
   type ControlledChaosCreation,
 } from "@thrun-design/controlled-chaos/schemas";
 import { controlledChaosManifest } from "@thrun-design/controlled-chaos/manifest";
+import { hardenPosterCreationForPersist } from "@thrun-design/controlled-chaos/persistence";
 import { assertStateVersionSupported } from "@/experiences/compatibility";
 import { createCreationId, isValidCreationId } from "@/lib/creations/id";
+import {
+  isAllowedCreationThumbnailUrl,
+  isPlausibleCreatedAt,
+} from "@/lib/creations/thumbnail-policy";
 import type { PortfolioExperienceManifest } from "@/experiences/types";
 
 export type CreationMetadata = {
@@ -42,7 +47,7 @@ const controlledChaosManifestForCompat: PortfolioExperienceManifest = {
   labPath: controlledChaosManifest.labPath,
 };
 
-function maxBytes(): number {
+export function maxCreationBytes(): number {
   const raw = Number(process.env.CREATIONS_MAX_BYTES || 262144);
   return Number.isFinite(raw) && raw > 1024 ? raw : 262144;
 }
@@ -71,6 +76,17 @@ function blobPath(id: string): string {
   return `creations/${id}.json`;
 }
 
+function scrubEnvelopeTitle(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  const cleaned = value
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 120);
+  return cleaned || undefined;
+}
+
 export function parseCreationPayload(
   input: unknown,
 ):
@@ -84,6 +100,10 @@ export function parseCreationPayload(
     };
   }
 
+  if (parsed.data.experienceKey !== controlledChaosManifest.experienceKey) {
+    return { ok: false, message: "Unsupported experience key" };
+  }
+
   const versionCheck = assertStateVersionSupported(
     controlledChaosManifestForCompat,
     parsed.data.stateSchemaVersion,
@@ -93,20 +113,66 @@ export function parseCreationPayload(
     return { ok: false, message: versionCheck.message };
   }
 
-  return { ok: true, value: parsed.data };
+  if (!isPlausibleCreatedAt(parsed.data.createdAt)) {
+    return { ok: false, message: "createdAt is out of acceptable range" };
+  }
+
+  if (
+    parsed.data.thumbnailUrl &&
+    !isAllowedCreationThumbnailUrl(parsed.data.thumbnailUrl)
+  ) {
+    return {
+      ok: false,
+      message: "thumbnailUrl must be an https Vercel Blob URL",
+    };
+  }
+
+  const hardened = hardenPosterCreationForPersist(parsed.data.state);
+  if (!hardened.ok) {
+    return { ok: false, message: hardened.message };
+  }
+
+  const value: ControlledChaosCreation = {
+    ...parsed.data,
+    experienceKey: controlledChaosManifest.experienceKey,
+    stateSchemaVersion: controlledChaosManifest.stateSchemaVersion,
+    title: scrubEnvelopeTitle(parsed.data.title ?? hardened.state.title),
+    state: hardened.state,
+    thumbnailUrl: parsed.data.thumbnailUrl,
+  };
+
+  return { ok: true, value };
 }
 
 export function assertPayloadSize(
   payload: unknown,
 ): { ok: true; bytes: number } | { ok: false; message: string } {
   const bytes = Buffer.byteLength(JSON.stringify(payload), "utf8");
-  if (bytes > maxBytes()) {
+  const max = maxCreationBytes();
+  if (bytes > max) {
     return {
       ok: false,
-      message: `Creation payload exceeds ${maxBytes()} byte limit`,
+      message: `Creation payload exceeds ${max} byte limit`,
     };
   }
   return { ok: true, bytes };
+}
+
+/** Reject obviously oversized request bodies before JSON parse when possible. */
+export function assertContentLengthBudget(
+  request: Request,
+  maxBytes: number,
+): { ok: true } | { ok: false; message: string } {
+  const header = request.headers.get("content-length");
+  if (!header) return { ok: true };
+  const length = Number(header);
+  if (!Number.isFinite(length) || length < 0) {
+    return { ok: false, message: "Invalid Content-Length" };
+  }
+  if (length > maxBytes) {
+    return { ok: false, message: "Request body too large" };
+  }
+  return { ok: true };
 }
 
 export async function saveCreation(
@@ -179,6 +245,7 @@ async function readPayloadJson(
   const token = blobToken();
 
   if (meta?.blobUrl) {
+    if (!isBlobStorageUrl(meta.blobUrl)) return null;
     const res = await fetch(meta.blobUrl, { cache: "no-store" }).catch(
       () => null,
     );
@@ -191,11 +258,24 @@ async function readPayloadJson(
 
   try {
     const headed = await head(blobPath(id), { token });
+    if (!isBlobStorageUrl(headed.url)) return null;
     const res = await fetch(headed.url, { cache: "no-store" });
     if (!res.ok) return null;
     return { json: await res.text(), blobUrl: headed.url };
   } catch {
     return null;
+  }
+}
+
+function isBlobStorageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.protocol === "https:" &&
+      /^[a-z0-9.-]+\.public\.blob\.vercel-storage\.com$/i.test(parsed.hostname)
+    );
+  } catch {
+    return false;
   }
 }
 
@@ -238,6 +318,14 @@ export async function loadCreation(
     blobUrl: file.blobUrl,
   };
 
+  // Drop non-allowlisted thumbnail URLs from public meta (defense in depth).
+  if (
+    resolvedMeta.thumbnailUrl &&
+    !isAllowedCreationThumbnailUrl(resolvedMeta.thumbnailUrl)
+  ) {
+    resolvedMeta.thumbnailUrl = undefined;
+  }
+
   return { ok: true, value: { meta: resolvedMeta, payload: parsed.value } };
 }
 
@@ -265,7 +353,7 @@ export async function duplicateCreation(
 export async function loadCreationsByIds(
   ids: string[],
 ): Promise<StoredCreation[]> {
-  const unique = [...new Set(ids.filter(isValidCreationId))];
+  const unique = [...new Set(ids.filter(isValidCreationId))].slice(0, 24);
   const results = await Promise.all(unique.map((id) => loadCreation(id)));
   return results
     .filter(
