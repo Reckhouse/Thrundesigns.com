@@ -49,3 +49,4 @@ Re-verified conceptually for Phase 12: export still uses canvas `toBlob` / data 
 
 - Safari video codec support may force still fallback more often than Chromium.
 - Low-power / thermal throttling may drop to demand frameloop feel under pause + quality low.
+- React 19 + `@react-three/postprocessing@3.0.4`: object refs on wrapEffect components throw on re-render; CRT stack uses callback refs (`0.12.1`).

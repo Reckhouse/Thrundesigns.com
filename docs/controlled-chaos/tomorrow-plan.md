@@ -2,18 +2,14 @@
 
 ## Goal
 
-**No next roadmap phase.** Phases 0–12 are complete (`0.12.0`).
+Ship CRT hotfix (`0.12.1`), re-smoke CRT on production, then optional Safari/mobile + Save & share confirmation.
 
-## Remaining work (ops / deploy only)
+## Remaining work
 
-Complete **needs deploy** items on `docs/controlled-chaos/launch-checklist.md`:
-
-- Production build with `SANITY_API_READ_TOKEN`
-- Blob + Upstash env on Vercel
-- Manual browser smoke (desktop + mobile)
-- Save & share round-trip
-
-Code-side launch wiring (launch `from=`, noindex, rate limits, reduced-motion load gate, retry UIs) is already verified in-repo.
+1. Merge `cursor/controlled-chaos-crt-fix-4f75` (callback refs in `CrtPostStack`)
+2. Re-test CRT / Photocopy on https://thrundesigns-com.vercel.app/lab/controlled-chaos
+3. Confirm Save & share shows dock status + round-trips `/creation/{id}`
+4. Safari / mobile smoke if available
 
 ## Known good commands
 
@@ -26,16 +22,6 @@ npx tsc --noEmit -p packages/controlled-chaos/tsconfig.json
 
 ## Things to avoid
 
-- Do not invent a Phase 13 without an explicit v1.1 scope
-- Do not move the experience out of `packages/controlled-chaos`
-- Do not add database dependencies for creations
+- Do not reintroduce object `ref`s on `@react-three/postprocessing` wrapEffect components under React 19
 - Do not persist local audio bytes
 - Do not put Three/R3F/Rapier imports in server-safe files
-- Do not claim true soft-body for inflatable/elastic
-- Do not silently weaken security checks added in Phase 7
-
-## Quick context summary
-
-- Phases 0–12 complete; package `0.12.0`
-- PR: https://github.com/Reckhouse/Thrundesigns.com/pull/26
-- Next human step: ship + post-deploy smoke
