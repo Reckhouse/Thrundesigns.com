@@ -2,14 +2,13 @@
 
 ## Goal
 
-Ship CRT hotfix (`0.12.1`), re-smoke CRT on production, then optional Safari/mobile + Save & share confirmation.
+Optional residual launch checks only. CRT hotfix re-smoke is done.
 
-## Remaining work
+## Remaining (optional)
 
-1. Merge `cursor/controlled-chaos-crt-fix-4f75` (callback refs in `CrtPostStack`)
-2. Re-test CRT / Photocopy on https://thrundesigns-com.vercel.app/lab/controlled-chaos
-3. Confirm Save & share shows dock status + round-trips `/creation/{id}`
-4. Safari / mobile smoke if available
+1. Confirm Save & share dock status + `/creation/{id}` round-trip
+2. Safari / mobile smoke if available
+3. Optional: investigate occasional CRT blank frame until first slider/preset nudge (non-crash)
 
 ## Known good commands
 
