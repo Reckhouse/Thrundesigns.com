@@ -2,18 +2,14 @@
 
 ## Goal
 
-Resume at **Phase 12**.
+Roadmap complete through **Phase 12**. No further planned phases for v1.
 
-## Remaining roadmap
+## Remaining work (ops / deploy)
 
-### Phase 12 — Hardening
-
-- accessibility report (`docs/controlled-chaos/accessibility-report.md`)
-- browser report
-- performance report
-- launch checklist (Controlled Chaos–specific)
-- final security polish
-- smoke `/work/controlled-chaos-poster-lab` + lab launch
+- Complete unchecked items on `docs/controlled-chaos/launch-checklist.md`
+- Production build with Sanity token
+- Manual browser smoke (desktop + mobile)
+- Confirm Blob + Upstash env on Vercel
 
 ## Known good commands
 
@@ -35,7 +31,7 @@ npx tsc --noEmit -p packages/controlled-chaos/tsconfig.json
 
 ## Quick context summary
 
-- Phases 0–11 complete; package `0.11.0`
+- Phases 0–12 complete; package `0.12.0`
 - Sanity case study published: slug `controlled-chaos-poster-lab`
 - Cover: `/images/controlled-chaos-cover.jpg`
-- Next: launch hardening reports + checklist
+- Hardening reports + launch checklist landed in Phase 12

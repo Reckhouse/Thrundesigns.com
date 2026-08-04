@@ -16,10 +16,23 @@ export const tokens = {
   line: "rgba(255, 255, 255, 0.18)",
   gold: "#d4af6a",
   bronze: "#8a6a38",
+  focusRing: "#d4af6a",
   fontDisplay: '"Libre Baskerville", Georgia, "Times New Roman", serif',
   fontSans: '"IBM Plex Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
   fontMono: '"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
 } as const;
+
+/** Injected once on the lab root for keyboard `:focus-visible` rings. */
+export const focusVisibleCss = `
+[data-cc-lab] button:focus-visible,
+[data-cc-lab] select:focus-visible,
+[data-cc-lab] textarea:focus-visible,
+[data-cc-lab] input:focus-visible,
+[data-cc-lab] a:focus-visible {
+  outline: 2px solid ${tokens.focusRing};
+  outline-offset: 2px;
+}
+`;
 
 export const defaultPhrase = "CHANGE ME";
 export const posterAspect = 9 / 16;

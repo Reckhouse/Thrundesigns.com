@@ -69,4 +69,16 @@ Never log phrase text, SVG markup, audio bytes, or full creation JSON.
 
 ## CSP
 
-Portfolio CSP already allows `worker-src` / `blob:` for experience workers. Re-test headers when dedicated export workers land (Phase 12).
+Portfolio CSP already allows `worker-src` / `blob:` for experience workers and `blob:` for media/img used by recordings and thumbnails. Phase 12 re-checked headers in `src/lib/security-headers.ts` against still export, MediaRecorder video fallback, and Rapier WASM lazy load — no CSP expansion required for v1.
+
+## Phase 12 appendix — final polish
+
+| Item | Change |
+|------|--------|
+| Error UI | Renderer boundary and context-lost screens expose Retry; raw `error.message` is not shown to visitors |
+| Thumbnail alt | Creation pages use a title-derived `alt` (still `noindex`) |
+| Server import gate | `validate-experience-compatibility` forbids `@react-three/rapier` on server-safe paths |
+| Audio idle | Analyser RAF does not run when `audio.mode === "off"` |
+| Trust boundary | Persist harden + analytics redaction from Phase 7 unchanged |
+
+Non-goals remain: accounts, private creations, signed JSON blob URLs.

@@ -41,7 +41,7 @@ function walkTsFiles(dir, acc = []) {
 }
 
 const FORBIDDEN_SERVER_IMPORT =
-  /from\s+["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|postprocessing)["']|require\(["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|postprocessing)["']\)/;
+  /from\s+["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|@react-three\/rapier|postprocessing)["']|require\(["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|@react-three\/rapier|postprocessing)["']\)/;
 
 const EXPERIENCE_REACT_IMPORT =
   /@thrun-design\/(?:controlled-chaos|living-engraving)\/react(?:-preview|-replay)?/;

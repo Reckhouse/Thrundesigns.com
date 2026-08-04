@@ -147,7 +147,7 @@ export default async function CreationPage({
           <div className="relative aspect-[9/16] max-w-sm overflow-hidden bg-bg-raised">
             <Image
               src={loaded.value.meta.thumbnailUrl}
-              alt=""
+              alt={`Saved poster thumbnail: ${title}`}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 384px"

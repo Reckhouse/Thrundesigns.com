@@ -3,10 +3,14 @@
 import type { CSSProperties, ReactNode } from "react";
 import { tokens } from "./tokens";
 
+/** Stable id for canvas `aria-describedby` pairing. */
+export const POSTER_CANVAS_DESC_ID = "cc-poster-canvas-description";
+
 type PosterViewportProps = {
   children: ReactNode;
   phraseHint?: string;
   description: string;
+  descriptionId?: string;
 };
 
 /**
@@ -17,6 +21,7 @@ export function PosterViewport({
   children,
   phraseHint,
   description,
+  descriptionId = POSTER_CANVAS_DESC_ID,
 }: PosterViewportProps) {
   return (
     <div
@@ -45,6 +50,7 @@ export function PosterViewport({
       >
         {children}
         <span
+          id={descriptionId}
           style={{
             position: "absolute",
             width: 1,

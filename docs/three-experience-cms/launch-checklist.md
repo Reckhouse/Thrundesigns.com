@@ -30,8 +30,9 @@
 
 ## After real Controlled Chaos package
 
-- [x] Package shipped through Phase 10 (systems + audio)
+- [x] Package shipped through Phase 12 (hardening)
 - [x] Sanity case-study seed + authoring docs (Phase 11)
-- [ ] Re-measure bundle / LCP / lab first frame
-- [ ] Browser matrix smoke test
-- [ ] Accessibility pass on package controls
+- [x] Controlled Chaos accessibility / performance / browser reports + launch checklist
+- [ ] Re-measure bundle / LCP / lab first frame on deploy
+- [ ] Browser matrix smoke test on deploy
+- [x] Accessibility pass on package controls (Phase 12 code polish)

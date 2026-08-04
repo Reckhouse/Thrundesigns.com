@@ -77,10 +77,11 @@ import {
 import { PosterToolbar } from "./PosterToolbar";
 import {
   PosterViewport,
+  POSTER_CANVAS_DESC_ID,
   dockStyle,
   inspectorPanelStyle,
 } from "./PosterViewport";
-import { tokens } from "./tokens";
+import { focusVisibleCss, tokens } from "./tokens";
 
 /**
  * Prefer same-origin asset paths so local/dev hosts do not fetch typefaces
@@ -464,7 +465,11 @@ function PosterLabShellInner({
             autoComplete="off"
           />
           {phraseError ? (
-            <p style={{ ...muted, color: "#e2b4a2", marginTop: "0.4rem" }}>
+            <p
+              role="alert"
+              aria-live="assertive"
+              style={{ ...muted, color: "#e2b4a2", marginTop: "0.4rem" }}
+            >
               {phraseError}
             </p>
           ) : null}
@@ -570,10 +575,11 @@ function PosterLabShellInner({
       </div>
 
       <div style={{ marginTop: "1.25rem" }}>
-        <p style={labelStyle}>Visual system</p>
+        <label style={labelStyle} htmlFor="cc-visual-system">
+          Visual system
+        </label>
         <select
           id="cc-visual-system"
-          aria-label="Visual system"
           value={systemKey}
           onChange={(event) =>
             setVisualSystem(event.target.value as ActiveVisualSystemKey)
@@ -1233,7 +1239,11 @@ function PosterLabShellInner({
           </button>
         ) : null}
         {svgError ? (
-          <p style={{ ...muted, color: "#e2b4a2", marginTop: "0.4rem" }}>
+          <p
+            role="alert"
+            aria-live="assertive"
+            style={{ ...muted, color: "#e2b4a2", marginTop: "0.4rem" }}
+          >
             {svgError}
           </p>
         ) : null}
@@ -1541,10 +1551,18 @@ function PosterLabShellInner({
                   Stop
                 </button>
               </div>
-              <p style={{ ...muted, marginTop: "0.45rem" }}>
+              <p style={{ ...muted, marginTop: "0.45rem" }} aria-live="polite">
                 Status · {audio.status}
-                {audio.error ? ` · ${audio.error}` : ""}
               </p>
+              {audio.error ? (
+                <p
+                  role="alert"
+                  aria-live="assertive"
+                  style={{ ...muted, color: "#e2b4a2", marginTop: "0.35rem" }}
+                >
+                  {audio.error}
+                </p>
+              ) : null}
             </>
           ) : null}
         </div>
@@ -1573,6 +1591,7 @@ function PosterLabShellInner({
         forceMode={forceMode}
         canvasRef={canvasRef}
         exporting={exporting}
+        canvasDescribedBy={POSTER_CANVAS_DESC_ID}
       />
     </PosterErrorBoundary>
   );
@@ -1699,7 +1718,7 @@ function PosterLabShellInner({
               opacity: exporting ? 0.5 : 1,
             }}
           >
-            PNG
+            Export PNG
           </button>
           <button
             type="button"
@@ -1719,7 +1738,7 @@ function PosterLabShellInner({
               opacity: exporting ? 0.5 : 1,
             }}
           >
-            Video
+            Export video
           </button>
         </>
       ) : null}
@@ -1750,6 +1769,7 @@ function PosterLabShellInner({
 
   return (
     <div
+      data-cc-lab=""
       data-experience={controlledChaosManifest.experienceKey}
       data-mode={configuration?.mode ?? variant}
       data-variant={variant}
@@ -1764,6 +1784,7 @@ function PosterLabShellInner({
         fontFamily: tokens.fontSans,
       }}
     >
+      <style dangerouslySetInnerHTML={{ __html: focusVisibleCss }} />
       <PosterToolbar
         title={title}
         modeLabel={modeLabel}
@@ -1830,7 +1851,11 @@ function PosterLabShellInner({
               </>
             ) : null}
             {loadError ? (
-              <p style={{ ...muted, color: "#e2b4a2", marginTop: "0.75rem" }}>
+              <p
+                role="alert"
+                aria-live="assertive"
+                style={{ ...muted, color: "#e2b4a2", marginTop: "0.75rem" }}
+              >
                 {loadError}
               </p>
             ) : null}
@@ -1851,7 +1876,16 @@ function PosterLabShellInner({
           <p style={{ ...labelStyle, marginBottom: 0 }}>
             Loop · {documentState.document.loopDurationSeconds}s
           </p>
-          <p style={muted}>
+          {loadError ? (
+            <p
+              role="alert"
+              aria-live="assertive"
+              style={{ ...muted, color: "#e2b4a2" }}
+            >
+              {loadError}
+            </p>
+          ) : null}
+          <p style={muted} aria-live="polite" role="status">
             {exportMessage
               ? exportMessage
               : allowSave

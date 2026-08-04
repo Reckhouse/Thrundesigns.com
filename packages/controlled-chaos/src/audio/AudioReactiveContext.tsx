@@ -81,7 +81,10 @@ export function AudioReactiveProvider({
   }, [config.gain]);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || config.mode === "off") {
+      bandsRef.current = emptyAudioBands();
+      return;
+    }
     let frame = 0;
     let lastStatus = engineRef.current?.getStatus() ?? "idle";
     const tick = () => {
@@ -101,7 +104,7 @@ export function AudioReactiveProvider({
     };
     frame = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(frame);
-  }, [enabled, reducedMotion]);
+  }, [config.mode, enabled, reducedMotion]);
 
   const value = useMemo<AudioReactiveContextValue>(
     () => ({

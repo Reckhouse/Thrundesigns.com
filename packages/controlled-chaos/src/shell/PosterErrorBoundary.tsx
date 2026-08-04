@@ -43,6 +43,19 @@ const eyebrow: CSSProperties = {
   color: tokens.gold,
 };
 
+const retryButton: CSSProperties = {
+  appearance: "none",
+  border: `1px solid ${tokens.line}`,
+  background: tokens.gold,
+  color: tokens.ink,
+  fontFamily: tokens.fontMono,
+  fontSize: "0.6875rem",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  padding: "0.65rem 1rem",
+  cursor: "pointer",
+};
+
 /**
  * Isolates renderer failures so a WebGL crash cannot take down the host page.
  */
@@ -63,6 +76,10 @@ export class PosterErrorBoundary extends Component<
     }
   }
 
+  handleRetry = () => {
+    this.setState({ error: null });
+  };
+
   render() {
     if (this.state.error) {
       return (
@@ -71,19 +88,12 @@ export class PosterErrorBoundary extends Component<
             {this.props.fallbackLabel ?? "Poster Lab error"}
           </p>
           <p style={{ margin: 0, fontSize: "0.9375rem", lineHeight: 1.6 }}>
-            The graphics experience stopped unexpectedly. Reload the page to
-            continue, or return to the case study for the static preview.
+            The graphics experience stopped unexpectedly. Retry the renderer, or
+            return to the case study for the static preview.
           </p>
-          <p
-            style={{
-              margin: 0,
-              fontSize: "0.8125rem",
-              lineHeight: 1.5,
-              color: tokens.fgMuted,
-            }}
-          >
-            {this.state.error.message}
-          </p>
+          <button type="button" onClick={this.handleRetry} style={retryButton}>
+            Retry renderer
+          </button>
         </div>
       );
     }

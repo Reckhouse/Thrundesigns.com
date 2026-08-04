@@ -2,7 +2,7 @@
 
 Interactive Three.js poster generator package for the Thrundesign portfolio.
 
-**Phase 11.** Sanity case-study seed + content authoring docs. Package `0.11.0`.
+**Phase 12.** Hardening reports, launch checklist, a11y/perf polish. Package `0.12.0`.
 
 ## Exports
 

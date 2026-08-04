@@ -366,11 +366,11 @@ Progressive onboarding (phrase → system → drag → save/export) — no block
 | `visual-systems.md` | As systems land |
 | `export-pipeline.md` | Phase 6 |
 | `security.md` | Phase 7 / 12 |
-| `performance-report.md` | Phase 12 |
-| `accessibility-report.md` | Phase 12 |
-| `browser-test-report.md` | Phase 12 |
+| `performance-report.md` | Phase 12 (done) |
+| `accessibility-report.md` | Phase 12 (done) |
+| `browser-report.md` | Phase 12 (done) |
 | `content-authoring-guide.md` | Phase 11 |
-| `launch-checklist.md` | Phase 12 |
+| `launch-checklist.md` | Phase 12 (done) |
 
 Update root README when Poster Lab becomes runnable beyond the stub (env, migrate/test commands, font/system/preset contribution).
 
@@ -386,7 +386,7 @@ Particle disintegration is the active default system:
 - Quality budgets and curated presets
 - Docs: `visual-systems.md`
 
-**Next (Phase 12):** Accessibility, performance, browser matrix, security hardening, launch checklist.
+**Next:** Roadmap complete through Phase 12 (hardening). See `launch-checklist.md` for post-deploy smoke.
 
 ---
 
