@@ -193,16 +193,19 @@ export class AudioAnalyserEngine {
       config.trebleWeight *
       config.sensitivity;
 
-    const energy = Math.min(1.5, (bass * 0.5 + mid * 0.35 + treble * 0.15));
-    const delta = Math.max(0, energy - this.lastEnergy);
-    this.lastEnergy = energy * 0.85 + this.lastEnergy * 0.15;
-    this.beatEnvelope = Math.max(this.beatEnvelope * 0.88, delta * 4);
+    const rawEnergy = Math.min(1.5, bass * 0.5 + mid * 0.35 + treble * 0.15);
+    const energy = Math.min(1.5, rawEnergy * config.energyWeight);
+    const delta = Math.max(0, rawEnergy - this.lastEnergy);
+    this.lastEnergy = rawEnergy * 0.82 + this.lastEnergy * 0.18;
+    const attack = 5.2 + config.beatBoost * 4.5;
+    const decay = 0.78 - Math.min(0.12, config.beatBoost * 0.04);
+    this.beatEnvelope = Math.max(this.beatEnvelope * decay, delta * attack);
 
     out.bass = Math.min(1.5, bass);
     out.mid = Math.min(1.5, mid);
     out.treble = Math.min(1.5, treble);
     out.energy = energy;
-    out.beat = Math.min(1.5, this.beatEnvelope);
+    out.beat = Math.min(1.5, this.beatEnvelope * config.beatWeight);
   }
 
   dispose() {

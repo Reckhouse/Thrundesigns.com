@@ -14,6 +14,11 @@ import {
 import { qualityBudget, type QualityTier } from "../../quality/quality-presets";
 import { createSeededRandom } from "../../seed/createSeededRandom";
 import { useAudioBandsRef } from "../../audio/AudioReactiveContext";
+import {
+  AUDIO_MIX_PROFILES,
+  audioDriveGain,
+  audioMul,
+} from "../../audio/audioMapping";
 import { parseTypeArchitectureConfig } from "./typeArchitecture.schema";
 
 type TypeArchitectureSystemProps = {
@@ -79,14 +84,8 @@ export function TypeArchitectureSystem({
   const structureRef = useRef<Group>(null);
   const configRef = useRef(config);
   const audioRef = useAudioBandsRef();
-
-  const audioEnabled =
-    document.audio.mode !== "off" &&
-    document.audio.reactive &&
-    !reducedMotion;
-  const audioGain = audioEnabled
-    ? document.audio.gain * document.audio.sensitivity
-    : 0;
+  const audioGain = audioDriveGain(document.audio, reducedMotion);
+  const beatBoost = document.audio.beatBoost;
 
   useEffect(() => {
     configRef.current = config;
@@ -268,11 +267,13 @@ export function TypeArchitectureSystem({
     const phase = (t % loopSeconds) / loopSeconds;
     const angle = phase * Math.PI * 2;
     const bands = audioRef.current;
-    const audioMul =
-      1 +
-      audioGain *
-        (bands.bass * 0.4 + bands.energy * 0.3 + bands.beat * 0.45);
-    const rhythm = cfg.rhythm * 0.02 * audioMul;
+    const drive = audioMul(
+      bands,
+      audioGain,
+      AUDIO_MIX_PROFILES.spring,
+      beatBoost,
+    );
+    const rhythm = cfg.rhythm * 0.02 * drive;
 
     let index = 0;
     group.children.forEach((child) => {
@@ -282,7 +283,7 @@ export function TypeArchitectureSystem({
       const local = angle * (0.6 + cfg.rhythm * 0.5) + slab.floor * 0.4;
       mesh.position.x = slab.rest[0] + Math.sin(local) * rhythm * 0.6;
       mesh.position.y =
-        slab.rest[1] + Math.cos(local * 0.8) * rhythm * 0.35 * audioMul;
+        slab.rest[1] + Math.cos(local * 0.8) * rhythm * 0.35 * drive;
       mesh.position.z =
         slab.rest[2] + Math.sin(local * 0.5) * cfg.elevation * 0.012;
       mesh.rotation.y = Math.sin(local * 0.35) * cfg.cantilever * 0.04;

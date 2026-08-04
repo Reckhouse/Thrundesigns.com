@@ -17,6 +17,7 @@ import { ParticleField } from "./ParticleField";
 import { sampleTextPoints } from "./textPointSampler";
 import type { SampledPoint } from "./pointSampling";
 import { useAudioBandsRef } from "../../audio/AudioReactiveContext";
+import { audioDriveGain } from "../../audio/audioMapping";
 
 type ParticleDisintegrationSystemProps = {
   document: PosterCreationV1;
@@ -40,10 +41,8 @@ export function ParticleDisintegrationSystem({
     [document.visualSystem.config],
   );
   const audioRef = useAudioBandsRef();
-  const audioGain =
-    document.audio.mode !== "off" && document.audio.reactive
-      ? document.audio.gain * document.audio.sensitivity
-      : 0;
+  const audioGain = audioDriveGain(document.audio, reducedMotion);
+  const beatBoost = document.audio.beatBoost;
 
   const budget = useMemo(
     () =>
@@ -146,6 +145,7 @@ export function ParticleDisintegrationSystem({
           pointerRef={forceRef}
           audioRef={audioRef}
           audioGain={audioGain}
+          beatBoost={beatBoost}
           paused={paused}
           reducedMotion={reducedMotion}
         />

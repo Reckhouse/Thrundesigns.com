@@ -1,13 +1,22 @@
 # Controlled Chaos — Audio + Export
 
-**Phase:** 5–6
+**Phase:** 5–6, 10
 
 ## Audio
 
 - **Curated tracks** are procedural Web Audio loops (no binary assets required).
 - **Local uploads** decode in memory only; never sent to analytics or auto-uploaded.
-- Serializable `document.audio` stores mode, trackKey, gain, sensitivity, band weights, and `reactive`.
-- Displacement applied to **particle disintegration** and **chrome liquid**; frozen when `prefers-reduced-motion`.
+- Serializable `document.audio` stores mode, trackKey, gain, sensitivity, band weights (`bass` / `mid` / `treble` / `energy` / `beat`), `displacementAmount`, `beatBoost`, and `reactive`.
+- Shared helpers in `audio/audioMapping.ts` (`audioDriveGain`, `audioMul`, `audioInfluence`, mix profiles).
+- **Routing presets** (Bass Led, Balanced, Treble Spark, Beat Punch) apply weight/boost patches from the inspector.
+- Displacement / modulation applied across **all active systems**:
+  - Particle disintegration (shader uniforms + beat boost)
+  - Chrome liquid
+  - CRT / photocopy post stack (scan / grain / chroma / bloom / vignette via effect refs)
+  - Inflatable + elastic (physics impulses)
+  - Torn paper + type architecture
+- Frozen when `prefers-reduced-motion`.
+- Analyser uses stronger beat attack/decay scaled by `beatBoost`.
 
 ## Export
 

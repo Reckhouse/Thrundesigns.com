@@ -23,6 +23,12 @@ export const audioReactiveConfigSchema = z.object({
   bassWeight: z.number().min(0).max(2).default(1.1),
   midWeight: z.number().min(0).max(2).default(0.85),
   trebleWeight: z.number().min(0).max(2).default(0.55),
+  energyWeight: z.number().min(0).max(2).default(1),
+  beatWeight: z.number().min(0).max(2).default(1.25),
+  /** Global scale for visual displacement / post modulation. */
+  displacementAmount: z.number().min(0).max(2).default(1),
+  /** How hard beat envelopes punch reactive motion. */
+  beatBoost: z.number().min(0).max(2).default(0.7),
   reactive: z.boolean().default(true),
 });
 
@@ -48,6 +54,68 @@ export const CURATED_AUDIO_TRACKS = [
     description: "Sustained hum with soft treble shimmer.",
   },
 ] as const;
+
+/** Curated routing presets — applied via setAudioConfig, not a separate key. */
+export const AUDIO_ROUTING_PRESETS = [
+  {
+    key: "bass-led",
+    title: "Bass Led",
+    description: "Heavy lows with punchy beat envelopes.",
+    config: {
+      bassWeight: 1.45,
+      midWeight: 0.55,
+      trebleWeight: 0.35,
+      energyWeight: 1.1,
+      beatWeight: 1.4,
+      beatBoost: 0.95,
+      displacementAmount: 1.15,
+    },
+  },
+  {
+    key: "balanced",
+    title: "Balanced",
+    description: "Even band routing for general composition.",
+    config: {
+      bassWeight: 1.05,
+      midWeight: 0.95,
+      trebleWeight: 0.7,
+      energyWeight: 1,
+      beatWeight: 1.15,
+      beatBoost: 0.65,
+      displacementAmount: 1,
+    },
+  },
+  {
+    key: "treble-spark",
+    title: "Treble Spark",
+    description: "Bright highs with lighter body motion.",
+    config: {
+      bassWeight: 0.55,
+      midWeight: 0.85,
+      trebleWeight: 1.45,
+      energyWeight: 0.9,
+      beatWeight: 1.05,
+      beatBoost: 0.5,
+      displacementAmount: 0.95,
+    },
+  },
+  {
+    key: "beat-punch",
+    title: "Beat Punch",
+    description: "Aggressive beat envelopes for rhythmic posters.",
+    config: {
+      bassWeight: 1.15,
+      midWeight: 0.75,
+      trebleWeight: 0.45,
+      energyWeight: 1.2,
+      beatWeight: 1.75,
+      beatBoost: 1.35,
+      displacementAmount: 1.25,
+    },
+  },
+] as const;
+
+export type AudioRoutingPresetKey = (typeof AUDIO_ROUTING_PRESETS)[number]["key"];
 
 export function parseAudioConfig(value: unknown): AudioReactiveConfig {
   const parsed = audioReactiveConfigSchema.safeParse(value ?? {});

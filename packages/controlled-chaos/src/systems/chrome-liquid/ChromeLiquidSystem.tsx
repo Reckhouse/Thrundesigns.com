@@ -12,11 +12,16 @@ import {
   sharedTextGeometryCache,
 } from "../../typography/TextGeometryCache";
 import { qualityBudget, type QualityTier } from "../../quality/quality-presets";
+import { useAudioBandsRef } from "../../audio/AudioReactiveContext";
+import {
+  AUDIO_MIX_PROFILES,
+  audioDriveGain,
+  audioMul,
+} from "../../audio/audioMapping";
 import {
   CHROME_LIGHTING,
   parseChromeConfig,
 } from "./chromeLiquid.schema";
-import { useAudioBandsRef } from "../../audio/AudioReactiveContext";
 
 type ChromeLiquidSystemProps = {
   document: PosterCreationV1;
@@ -84,11 +89,8 @@ export function ChromeLiquidSystem({
   const groupRef = useRef<Group>(null);
   const configRef = useRef(config);
   const audioRef = useAudioBandsRef();
-  const audioEnabled =
-    document.audio.mode !== "off" && document.audio.reactive && !reducedMotion;
-  const audioGain = audioEnabled
-    ? document.audio.gain * document.audio.sensitivity
-    : 0;
+  const audioGain = audioDriveGain(document.audio, reducedMotion);
+  const beatBoost = document.audio.beatBoost;
 
   useEffect(() => {
     configRef.current = config;
@@ -217,11 +219,13 @@ export function ChromeLiquidSystem({
     const phase = (t % loopSeconds) / loopSeconds;
     const angle = phase * Math.PI * 2;
     const bands = audioRef.current;
-    const audioMul =
-      1 +
-      audioGain *
-        (bands.bass * 0.55 + bands.energy * 0.35 + bands.beat * 0.7);
-    const amp = cfg.liquidAmplitude * 0.045 * audioMul;
+    const drive = audioMul(
+      bands,
+      audioGain,
+      AUDIO_MIX_PROFILES.liquid,
+      beatBoost,
+    );
+    const amp = cfg.liquidAmplitude * 0.045 * drive;
     const freq = cfg.liquidFrequency;
     const speed = cfg.liquidSpeed;
 
@@ -246,9 +250,13 @@ export function ChromeLiquidSystem({
       cfg.fresnel *
         (0.06 +
           0.1 * (0.5 + 0.5 * Math.sin(angle * 2)) +
-          audioGain * bands.treble * 0.12),
+          audioGain * bands.treble * 0.12 +
+          audioGain * bands.beat * beatBoost * 0.08),
       cfg.envIntensity *
-        (0.92 + 0.08 * Math.sin(angle) + audioGain * bands.mid * 0.15),
+        (0.92 +
+          0.08 * Math.sin(angle) +
+          audioGain * bands.mid * 0.15 +
+          audioGain * bands.energy * 0.08),
     );
   });
 

@@ -84,6 +84,7 @@ const serverSafePaths = [
   join(root, "packages/controlled-chaos/src/systems/types.ts"),
   join(root, "packages/controlled-chaos/src/systems/registry.ts"),
   join(root, "packages/controlled-chaos/src/audio/audio.schema.ts"),
+  join(root, "packages/controlled-chaos/src/audio/audioMapping.ts"),
   join(root, "packages/controlled-chaos/src/persistence/hardenCreation.ts"),
   join(root, "packages/controlled-chaos/src/quality/quality-presets.ts"),
   join(root, "packages/living-engraving/src/manifest.ts"),

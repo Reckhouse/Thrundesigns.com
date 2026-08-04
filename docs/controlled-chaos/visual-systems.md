@@ -1,8 +1,8 @@
 # Controlled Chaos — Visual Systems
 
-**Phase:** 9  
+**Phase:** 10  
 **Active systems:** Particle Disintegration · Chrome Liquid · CRT / Photocopy · Inflatable Type · Elastic Type · Torn Paper · Type Architecture  
-**Cross-cutting:** Audio-reactive displacement · Hardened still/video export · Save & share · Rapier physics (code-split)
+**Cross-cutting:** Full audio-reactive displacement · Hardened still/video export · Save & share · Rapier physics (code-split)
 
 ## Plugin contract
 
@@ -36,7 +36,7 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 |---------|----------------|
 | Type | Shallower extrusion + high-contrast ink bias |
 | Stack | EffectComposer (scanlines, grain, threshold, chromatic, vignette, bloom) |
-| Audio | Not mapped in Phase 5 (supportsAudio: false) |
+| Audio | Scan/grain/chroma/bloom/vignette modulated via effect refs |
 | Presets | Static Channel, Xerox Draft, Broadcast Bleed |
 
 ## Inflatable Type
@@ -83,7 +83,9 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 |---------|----------------|
 | Curated | Procedural looped buffers: Pulse Drone, Grid Click, Signal Hum |
 | Local | File decode in memory only — never analytics / auto-upload |
-| Persisted | `document.audio` mode/trackKey/gain/sensitivity/weights (no local bytes) |
+| Persisted | `document.audio` mode/trackKey/gain/sensitivity/weights/displacement/beatBoost (no local bytes) |
+| Routing | Shared `audioMapping` helpers + inspector routing presets |
+| Coverage | All seven active systems including CRT post stack |
 | Reduced motion | Displacement disabled; playback still optional |
 
 ## Export
@@ -97,4 +99,4 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 
 ## Next
 
-Fuller audio mappings across systems; Sanity case-study polish; a11y/perf/launch hardening.
+Sanity case-study polish; a11y/perf/browser/launch hardening.

@@ -62,6 +62,7 @@ import {
 } from "../audio/AudioReactiveContext";
 import {
   CURATED_AUDIO_TRACKS,
+  AUDIO_ROUTING_PRESETS,
   type AudioTrackKey,
 } from "../audio/audio.schema";
 import { captureStill, captureThumbnail, blobToDataUrl, recordPosterLoop, resolveVideoFpsLadder } from "../export/exportPoster";
@@ -1351,6 +1352,165 @@ function PosterLabShellInner({
                 }
                 style={{ width: "100%" }}
               />
+              <label
+                style={{ ...labelStyle, marginTop: "0.75rem" }}
+                htmlFor="cc-audio-displace"
+              >
+                Displacement · {documentState.audio.displacementAmount.toFixed(2)}
+              </label>
+              <input
+                id="cc-audio-displace"
+                type="range"
+                min={0}
+                max={2}
+                step={0.01}
+                value={documentState.audio.displacementAmount}
+                onChange={(event) =>
+                  setAudioConfig({
+                    displacementAmount: Number(event.target.value),
+                  })
+                }
+                style={{ width: "100%" }}
+              />
+              <label
+                style={{ ...labelStyle, marginTop: "0.75rem" }}
+                htmlFor="cc-audio-beat-boost"
+              >
+                Beat boost · {documentState.audio.beatBoost.toFixed(2)}
+              </label>
+              <input
+                id="cc-audio-beat-boost"
+                type="range"
+                min={0}
+                max={2}
+                step={0.01}
+                value={documentState.audio.beatBoost}
+                onChange={(event) =>
+                  setAudioConfig({ beatBoost: Number(event.target.value) })
+                }
+                style={{ width: "100%" }}
+              />
+
+              <p style={{ ...labelStyle, marginTop: "0.9rem" }}>Routing</p>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.35rem",
+                  marginTop: "0.35rem",
+                }}
+              >
+                {AUDIO_ROUTING_PRESETS.map((preset) => (
+                  <button
+                    key={preset.key}
+                    type="button"
+                    onClick={() => setAudioConfig(preset.config)}
+                    style={{
+                      ...inputStyle,
+                      cursor: "pointer",
+                      textAlign: "left",
+                      fontFamily: tokens.fontMono,
+                      fontSize: "0.6875rem",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {preset.title}
+                  </button>
+                ))}
+              </div>
+
+              <label
+                style={{ ...labelStyle, marginTop: "0.75rem" }}
+                htmlFor="cc-bass-weight"
+              >
+                Bass · {documentState.audio.bassWeight.toFixed(2)}
+              </label>
+              <input
+                id="cc-bass-weight"
+                type="range"
+                min={0}
+                max={2}
+                step={0.01}
+                value={documentState.audio.bassWeight}
+                onChange={(event) =>
+                  setAudioConfig({ bassWeight: Number(event.target.value) })
+                }
+                style={{ width: "100%" }}
+              />
+              <label
+                style={{ ...labelStyle, marginTop: "0.75rem" }}
+                htmlFor="cc-mid-weight"
+              >
+                Mid · {documentState.audio.midWeight.toFixed(2)}
+              </label>
+              <input
+                id="cc-mid-weight"
+                type="range"
+                min={0}
+                max={2}
+                step={0.01}
+                value={documentState.audio.midWeight}
+                onChange={(event) =>
+                  setAudioConfig({ midWeight: Number(event.target.value) })
+                }
+                style={{ width: "100%" }}
+              />
+              <label
+                style={{ ...labelStyle, marginTop: "0.75rem" }}
+                htmlFor="cc-treble-weight"
+              >
+                Treble · {documentState.audio.trebleWeight.toFixed(2)}
+              </label>
+              <input
+                id="cc-treble-weight"
+                type="range"
+                min={0}
+                max={2}
+                step={0.01}
+                value={documentState.audio.trebleWeight}
+                onChange={(event) =>
+                  setAudioConfig({ trebleWeight: Number(event.target.value) })
+                }
+                style={{ width: "100%" }}
+              />
+              <label
+                style={{ ...labelStyle, marginTop: "0.75rem" }}
+                htmlFor="cc-energy-weight"
+              >
+                Energy · {documentState.audio.energyWeight.toFixed(2)}
+              </label>
+              <input
+                id="cc-energy-weight"
+                type="range"
+                min={0}
+                max={2}
+                step={0.01}
+                value={documentState.audio.energyWeight}
+                onChange={(event) =>
+                  setAudioConfig({ energyWeight: Number(event.target.value) })
+                }
+                style={{ width: "100%" }}
+              />
+              <label
+                style={{ ...labelStyle, marginTop: "0.75rem" }}
+                htmlFor="cc-beat-weight"
+              >
+                Beat · {documentState.audio.beatWeight.toFixed(2)}
+              </label>
+              <input
+                id="cc-beat-weight"
+                type="range"
+                min={0}
+                max={2}
+                step={0.01}
+                value={documentState.audio.beatWeight}
+                onChange={(event) =>
+                  setAudioConfig({ beatWeight: Number(event.target.value) })
+                }
+                style={{ width: "100%" }}
+              />
+
               <div
                 style={{
                   display: "flex",

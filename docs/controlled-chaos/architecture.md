@@ -386,7 +386,7 @@ Particle disintegration is the active default system:
 - Quality budgets and curated presets
 - Docs: `visual-systems.md`
 
-**Next (Phase 10):** Fuller audio-displacement mappings across active systems.
+**Next (Phase 11):** Sanity case-study content polish.
 
 ---
 

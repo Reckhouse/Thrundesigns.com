@@ -25,6 +25,11 @@ import { qualityBudget, type QualityTier } from "../../quality/quality-presets";
 import { createSeededRandom } from "../../seed/createSeededRandom";
 import { useAudioBandsRef } from "../../audio/AudioReactiveContext";
 import {
+  AUDIO_MIX_PROFILES,
+  audioDriveGain,
+  audioMul,
+} from "../../audio/audioMapping";
+import {
   buildPhysicsLetterMeshes,
   releasePhysicsLetterMeshes,
   type PhysicsLetterMesh,
@@ -95,6 +100,7 @@ function ElasticForces({
   paused,
   reducedMotion,
   audioGain,
+  beatBoost,
   seed,
 }: {
   bodyRefs: RefObject<Array<RapierRigidBody | null>>;
@@ -106,6 +112,7 @@ function ElasticForces({
   paused: boolean;
   reducedMotion: boolean;
   audioGain: number;
+  beatBoost: number;
   seed: string;
 }) {
   const audioRef = useAudioBandsRef();
@@ -121,10 +128,12 @@ function ElasticForces({
     const phase = (t % loopSeconds) / loopSeconds;
     const angle = phase * Math.PI * 2;
     const bands = audioRef.current;
-    const audioMul =
-      1 +
-      audioGain *
-        (bands.mid * 0.4 + bands.energy * 0.3 + bands.beat * 0.5);
+    const drive = audioMul(
+      bands,
+      audioGain,
+      AUDIO_MIX_PROFILES.spring,
+      beatBoost,
+    );
     const stiffness = 2.4 + cfg.stiffness * 6.5;
     const damping = 0.8 + cfg.damping * 3.2;
     const maxTravel = 0.08 + cfg.stretch * 0.32;
@@ -144,7 +153,7 @@ function ElasticForces({
       const targetZ = rest[2];
 
       // Seeded oscillation of rest pose
-      const osc = cfg.oscillation * audioMul;
+      const osc = cfg.oscillation * drive;
       targetX += Math.sin(angle * 1.1 + (phaseOffsets[i] ?? 0)) * osc * 0.035;
       targetY += Math.cos(angle * 0.9 + (phaseOffsets[i] ?? 0)) * osc * 0.028;
 
@@ -347,6 +356,7 @@ function ElasticSimulation({
   reducedMotion,
   shadows,
   audioGain,
+  beatBoost,
   forceMode,
 }: {
   document: PosterCreationV1;
@@ -356,6 +366,7 @@ function ElasticSimulation({
   reducedMotion: boolean;
   shadows: boolean;
   audioGain: number;
+  beatBoost: number;
   forceMode: ForceMode;
 }) {
   const bodyRefs = useRef<Array<RapierRigidBody | null>>([]);
@@ -443,6 +454,7 @@ function ElasticSimulation({
           paused={paused}
           reducedMotion={reducedMotion}
           audioGain={audioGain}
+          beatBoost={beatBoost}
           seed={document.seed}
         />
       </Physics>
@@ -485,13 +497,8 @@ export function ElasticTypeSystem({
   const [letters, setLetters] = useState<PhysicsLetterMesh[]>([]);
   const lettersRef = useRef<PhysicsLetterMesh[]>([]);
 
-  const audioEnabled =
-    document.audio.mode !== "off" &&
-    document.audio.reactive &&
-    !reducedMotion;
-  const audioGain = audioEnabled
-    ? document.audio.gain * document.audio.sensitivity
-    : 0;
+  const audioGain = audioDriveGain(document.audio, reducedMotion);
+  const beatBoost = document.audio.beatBoost;
 
   useEffect(() => {
     let cancelled = false;
@@ -588,6 +595,7 @@ export function ElasticTypeSystem({
             reducedMotion={reducedMotion}
             shadows={budget.shadows}
             audioGain={audioGain}
+            beatBoost={beatBoost}
             forceMode={forceMode}
           />
         </Suspense>

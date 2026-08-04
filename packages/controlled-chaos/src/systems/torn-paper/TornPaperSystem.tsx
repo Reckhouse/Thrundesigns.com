@@ -20,6 +20,11 @@ import {
 import { qualityBudget, type QualityTier } from "../../quality/quality-presets";
 import { createSeededRandom } from "../../seed/createSeededRandom";
 import { useAudioBandsRef } from "../../audio/AudioReactiveContext";
+import {
+  AUDIO_MIX_PROFILES,
+  audioDriveGain,
+  audioMul,
+} from "../../audio/audioMapping";
 import { parseTornPaperConfig } from "./tornPaper.schema";
 
 type TornPaperSystemProps = {
@@ -145,14 +150,8 @@ export function TornPaperSystem({
   const shardGroupRef = useRef<Group>(null);
   const configRef = useRef(config);
   const audioRef = useAudioBandsRef();
-
-  const audioEnabled =
-    document.audio.mode !== "off" &&
-    document.audio.reactive &&
-    !reducedMotion;
-  const audioGain = audioEnabled
-    ? document.audio.gain * document.audio.sensitivity
-    : 0;
+  const audioGain = audioDriveGain(document.audio, reducedMotion);
+  const beatBoost = document.audio.beatBoost;
 
   useEffect(() => {
     configRef.current = config;
@@ -333,10 +332,12 @@ export function TornPaperSystem({
     const phase = (t % loopSeconds) / loopSeconds;
     const angle = phase * Math.PI * 2;
     const bands = audioRef.current;
-    const audioMul =
-      1 +
-      audioGain *
-        (bands.mid * 0.35 + bands.energy * 0.25 + bands.beat * 0.4);
+    const drive = audioMul(
+      bands,
+      audioGain,
+      AUDIO_MIX_PROFILES.paper,
+      beatBoost,
+    );
 
     let index = 0;
     group.children.forEach((child) => {
@@ -344,13 +345,13 @@ export function TornPaperSystem({
       const shard = shards[index];
       if (!shard || !mesh.isMesh) return;
       const local = angle + shard.phase;
-      const drift = cfg.drift * 0.028 * audioMul;
+      const drift = cfg.drift * 0.028 * drive;
       mesh.position.x = shard.position[0] + Math.sin(local * 0.7) * drift;
       mesh.position.y =
         shard.position[1] + Math.cos(local * 0.55) * drift * 1.1;
       mesh.position.z = shard.position[2];
       mesh.rotation.x =
-        shard.rotation[0] + Math.sin(local) * cfg.curl * 0.08 * audioMul;
+        shard.rotation[0] + Math.sin(local) * cfg.curl * 0.08 * drive;
       mesh.rotation.y =
         shard.rotation[1] + Math.cos(local * 0.8) * cfg.curl * 0.06;
       mesh.rotation.z =

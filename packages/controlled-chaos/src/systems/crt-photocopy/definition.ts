@@ -16,7 +16,7 @@ export const crtPhotocopyDefinition: VisualSystemDefinition<CrtPhotocopyConfig> 
     capabilities: {
       supportsText: true,
       supportsSvg: false,
-      supportsAudio: false,
+      supportsAudio: true,
       supportsPointerForces: false,
       supportsPhysics: false,
       supportsSeamlessLoop: true,

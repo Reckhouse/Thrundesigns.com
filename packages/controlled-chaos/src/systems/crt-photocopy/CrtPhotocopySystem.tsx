@@ -17,11 +17,12 @@ type CrtPhotocopySystemProps = {
 
 /**
  * Photocopy-styled extruded type + CRT post stack.
- * Type stays readable; postprocessing carries the channel/xerox look.
+ * Audio modulates scan/grain/chroma/bloom via post-stack refs.
  */
 export function CrtPhotocopySystem({
   document,
   quality = "auto",
+  paused = false,
   reducedMotion = false,
   assetBasePath,
 }: CrtPhotocopySystemProps) {
@@ -40,7 +41,6 @@ export function CrtPhotocopySystem({
 
   const inkPalette = useMemo(() => {
     const mix = config.photocopyMix;
-    // Bias toward high-contrast ink on paper as photocopyMix rises.
     return {
       ...document.palette,
       primary: mix > 0.55 ? "#ebe7df" : document.palette.primary,
@@ -65,6 +65,8 @@ export function CrtPhotocopySystem({
         config={config}
         quality={quality}
         reducedMotion={reducedMotion}
+        audio={document.audio}
+        paused={paused}
         enabled
       />
     </group>

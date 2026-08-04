@@ -2,7 +2,7 @@
 
 Interactive Three.js poster generator package for the Thrundesign portfolio.
 
-**Phase 9.** Torn paper collage + type-architecture massing systems. Package `0.9.0`.
+**Phase 10.** Full audio-displacement mappings across all active systems + CRT post modulation. Package `0.10.0`.
 
 ## Exports
 

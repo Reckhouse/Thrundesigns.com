@@ -2,22 +2,15 @@
 
 ## Goal
 
-Resume at **Phase 10**.
+Resume at **Phase 11**.
 
 ## Remaining roadmap
-
-### Phase 10 — Full audio mappings
-
-Expand audio beyond current particle/chrome/inflatable/elastic/torn/architecture mappings:
-
-- CRT/post stack modulation if tasteful
-- Weighted routing controls across all active systems
-- Stronger beat-reactive envelopes where they improve composition
 
 ### Phase 11 — Sanity case-study polish
 
 - authoring and presentation polish
 - experience metadata/content integration
+- case-study copy / modules for Controlled Chaos
 
 ### Phase 12 — Hardening
 
@@ -47,7 +40,7 @@ npx tsc --noEmit -p packages/controlled-chaos/tsconfig.json
 
 ## Quick context summary
 
-- Current branch contains Phases 0–9
-- All seven active visual systems are registered
-- Package version `0.9.0`
-- Next substantial work is fuller audio-displacement mappings
+- Current branch contains Phases 0–10
+- Package version `0.10.0`
+- Audio maps across all seven systems including CRT
+- Next work is Sanity case-study polish, then launch hardening

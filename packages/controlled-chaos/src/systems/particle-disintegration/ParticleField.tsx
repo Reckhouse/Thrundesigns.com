@@ -142,6 +142,7 @@ type ParticleFieldProps = {
   pointerRef: MutableRefObject<PointerForce>;
   audioRef?: MutableRefObject<AudioBands>;
   audioGain?: number;
+  beatBoost?: number;
   paused?: boolean;
   reducedMotion?: boolean;
 };
@@ -169,6 +170,7 @@ export function ParticleField({
   pointerRef,
   audioRef,
   audioGain = 0,
+  beatBoost = 0.7,
   paused = false,
   reducedMotion = false,
 }: ParticleFieldProps) {
@@ -322,7 +324,7 @@ export function ParticleField({
     mat.uniforms.uAudioMid.value = bands?.mid ?? 0;
     mat.uniforms.uAudioTreble.value = bands?.treble ?? 0;
     mat.uniforms.uAudioEnergy.value = bands?.energy ?? 0;
-    mat.uniforms.uAudioBeat.value = bands?.beat ?? 0;
+    mat.uniforms.uAudioBeat.value = (bands?.beat ?? 0) * beatBoost;
     mat.uniforms.uAudioGain.value = audioGain;
     (mat.uniforms.uPointer.value as Vector3).set(
       pointer.position[0],

@@ -24,6 +24,11 @@ import { qualityBudget, type QualityTier } from "../../quality/quality-presets";
 import { createSeededRandom } from "../../seed/createSeededRandom";
 import { useAudioBandsRef } from "../../audio/AudioReactiveContext";
 import {
+  AUDIO_MIX_PROFILES,
+  audioDriveGain,
+  audioMul,
+} from "../../audio/audioMapping";
+import {
   buildPhysicsLetterMeshes,
   releasePhysicsLetterMeshes,
   type PhysicsLetterMesh,
@@ -105,6 +110,7 @@ function InflateForces({
   paused,
   reducedMotion,
   audioGain,
+  beatBoost,
   seed,
 }: {
   bodyRefs: RefObject<Array<RapierRigidBody | null>>;
@@ -116,6 +122,7 @@ function InflateForces({
   paused: boolean;
   reducedMotion: boolean;
   audioGain: number;
+  beatBoost: number;
   seed: string;
 }) {
   const audioRef = useAudioBandsRef();
@@ -131,10 +138,12 @@ function InflateForces({
     const phase = (t % loopSeconds) / loopSeconds;
     const angle = phase * Math.PI * 2 * cfg.pulseSpeed;
     const bands = audioRef.current;
-    const audioMul =
-      1 +
-      audioGain *
-        (bands.bass * 0.5 + bands.energy * 0.25 + bands.beat * 0.55);
+    const drive = audioMul(
+      bands,
+      audioGain,
+      AUDIO_MIX_PROFILES.bodyBeat,
+      beatBoost,
+    );
 
     for (let i = 0; i < letters.length; i += 1) {
       const body = bodyRefs.current[i];
@@ -146,7 +155,7 @@ function InflateForces({
       const linvel = body.linvel();
       const inflate =
         0.5 + 0.5 * Math.sin(angle + (impulseScratch[i] ?? 0));
-      const pressure = cfg.inflatePressure * inflate * audioMul;
+      const pressure = cfg.inflatePressure * inflate * drive;
 
       // Restore toward rest pose (spring-like)
       const kx = (rest[0] - translation.x) * (1.8 + cfg.inflatePressure);
@@ -193,15 +202,19 @@ function InflateForces({
     const phase = (t % loopSeconds) / loopSeconds;
     const angle = phase * Math.PI * 2 * cfg.pulseSpeed;
     const bands = audioRef.current;
-    const audioMul =
-      1 + audioGain * (bands.bass * 0.35 + bands.beat * 0.4);
+    const drive = audioMul(
+      bands,
+      audioGain,
+      AUDIO_MIX_PROFILES.bodyBeat,
+      beatBoost,
+    );
 
     for (let i = 0; i < letters.length; i += 1) {
       const mesh = meshRefs.current[i];
       if (!mesh) continue;
       const inflate =
         0.5 + 0.5 * Math.sin(angle + (impulseScratch[i] ?? 0));
-      const puff = 1 + cfg.puffScale * inflate * 0.55 * audioMul;
+      const puff = 1 + cfg.puffScale * inflate * 0.55 * drive;
       mesh.scale.setScalar(puff);
     }
   });
@@ -257,6 +270,7 @@ function InflatableSimulation({
   reducedMotion,
   shadows,
   audioGain,
+  beatBoost,
 }: {
   document: PosterCreationV1;
   letters: PhysicsLetterMesh[];
@@ -265,6 +279,7 @@ function InflatableSimulation({
   reducedMotion: boolean;
   shadows: boolean;
   audioGain: number;
+  beatBoost: number;
 }) {
   const bodyRefs = useRef<Array<RapierRigidBody | null>>([]);
   const meshRefs = useRef<Array<Mesh | null>>([]);
@@ -362,6 +377,7 @@ function InflatableSimulation({
           paused={paused}
           reducedMotion={reducedMotion}
           audioGain={audioGain}
+          beatBoost={beatBoost}
           seed={document.seed}
         />
       </Physics>
@@ -404,13 +420,8 @@ export function InflatableTypeSystem({
   const [letters, setLetters] = useState<PhysicsLetterMesh[]>([]);
   const lettersRef = useRef<PhysicsLetterMesh[]>([]);
 
-  const audioEnabled =
-    document.audio.mode !== "off" &&
-    document.audio.reactive &&
-    !reducedMotion;
-  const audioGain = audioEnabled
-    ? document.audio.gain * document.audio.sensitivity
-    : 0;
+  const audioGain = audioDriveGain(document.audio, reducedMotion);
+  const beatBoost = document.audio.beatBoost;
 
   useEffect(() => {
     let cancelled = false;
@@ -516,6 +527,7 @@ export function InflatableTypeSystem({
             reducedMotion={reducedMotion}
             shadows={budget.shadows}
             audioGain={audioGain}
+            beatBoost={beatBoost}
           />
         </Suspense>
       )}
