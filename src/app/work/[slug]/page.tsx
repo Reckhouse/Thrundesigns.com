@@ -147,9 +147,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     slug,
     resolveMediaUrl(project.cover) || coverFallback(slug),
   );
-  const coverFitClass = isControlledChaosSlug(slug)
-    ? "object-contain object-center"
-    : "object-cover";
+  const isPosterCover = isControlledChaosSlug(slug);
   const primaryMapped = project.primaryExperience
     ? mapSanityExperienceConfig(project.primaryExperience)
     : null;
@@ -203,10 +201,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   ) : null}
                 </div>
               </div>
+              {/* Poster case studies use a 9:16 frame so the cover fills
+                  without pillarboxing. Other projects keep the wide hero box. */}
               <div
                 className={
-                  isControlledChaosSlug(slug)
-                    ? "relative flex min-h-[420px] items-center justify-center overflow-hidden bg-bg-raised lg:min-h-[620px]"
+                  isPosterCover
+                    ? "relative mx-auto aspect-[9/16] w-full max-w-[320px] overflow-hidden bg-bg-raised sm:max-w-[360px] lg:ml-auto lg:mr-0 lg:max-w-[400px]"
                     : "relative min-h-[420px] overflow-hidden bg-bg-raised lg:min-h-[620px]"
                 }
               >
@@ -214,8 +214,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   src={imageSrc}
                   alt={resolveMediaAlt(project.cover, project.title || "Project")}
                   fill
-                  className={`${coverFitClass} grayscale`}
-                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="object-cover object-center grayscale"
+                  sizes={
+                    isPosterCover
+                      ? "(max-width: 1024px) 360px, 400px"
+                      : "(max-width: 1024px) 100vw, 60vw"
+                  }
                   priority
                 />
               </div>
