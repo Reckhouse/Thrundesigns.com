@@ -9,6 +9,7 @@ import type {
   ControlledChaosAnalyticsAdapter,
   ControlledChaosPersistenceAdapter,
 } from "./adapters.types";
+import { deserializePosterCreation } from "./serialization/deserializeCreation";
 
 export type ControlledChaosReplayProps = {
   configuration?: ControlledChaosEmbedConfig;
@@ -25,6 +26,10 @@ export function ControlledChaosReplay({
   persistence,
   analytics,
 }: ControlledChaosReplayProps) {
+  const initialDocument = creation?.state
+    ? deserializePosterCreation(creation.state)
+    : undefined;
+
   return (
     <PosterLabShell
       variant="replay"
@@ -33,6 +38,7 @@ export function ControlledChaosReplay({
       analytics={analytics}
       creationId={creationId}
       creationTitle={creation?.title}
+      initialDocument={initialDocument}
     />
   );
 }

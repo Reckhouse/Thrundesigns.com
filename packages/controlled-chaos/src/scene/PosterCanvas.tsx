@@ -2,34 +2,46 @@
 
 import { Suspense, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { TestComposition } from "./TestComposition";
+import type { PosterCreationV1 } from "../serialization/posterCreation.schema";
+import { PosterSceneContent } from "./PosterSceneContent";
 import { PosterLoadingScreen } from "../shell/PosterLoadingScreen";
 import { tokens } from "../shell/tokens";
 
 type PosterSceneProps = {
-  phrase?: string;
+  document: PosterCreationV1;
   reducedMotion?: boolean;
   paused?: boolean;
   quality?: "auto" | "low" | "medium" | "high";
+  assetBasePath?: string;
 };
 
-function Lighting() {
+function Lighting({
+  lighting,
+  accent,
+}: {
+  lighting: PosterCreationV1["lighting"];
+  accent: string;
+}) {
   return (
     <>
-      <ambientLight intensity={0.35} />
+      <ambientLight intensity={0.28 * lighting.exposure} />
       <directionalLight
         position={[2.4, 3.2, 4]}
-        intensity={1.35}
+        intensity={lighting.keyIntensity * lighting.exposure}
         color="#fff6e8"
         castShadow
         shadow-mapSize={[1024, 1024]}
       />
       <directionalLight
         position={[-2.5, -1.2, 2]}
-        intensity={0.35}
-        color="#8a6a38"
+        intensity={lighting.fillIntensity * lighting.exposure}
+        color={accent}
       />
-      <pointLight position={[0, 0.6, 2.2]} intensity={0.45} color="#d4af6a" />
+      <pointLight
+        position={[0, 0.6, 2.2]}
+        intensity={lighting.rimIntensity * lighting.exposure}
+        color={accent}
+      />
     </>
   );
 }
@@ -42,17 +54,15 @@ function dprForQuality(
   return [1, 1.5];
 }
 
-/**
- * R3F canvas host for the vertical poster. Kept separate so entries can
- * swap systems later without remounting the shell chrome.
- */
 export function PosterCanvas({
-  phrase,
+  document,
   reducedMotion = false,
   paused = false,
   quality = "auto",
+  assetBasePath,
 }: PosterSceneProps) {
   const [contextLost, setContextLost] = useState(false);
+  const camera = document.camera;
 
   if (contextLost) {
     return (
@@ -92,26 +102,36 @@ export function PosterCanvas({
           powerPreference: "high-performance",
           preserveDrawingBuffer: true,
         }}
-        camera={{ position: [0, 0, 3.2], fov: 35, near: 0.1, far: 40 }}
+        camera={{
+          position: camera.position,
+          fov: camera.fieldOfView ?? 35,
+          near: 0.1,
+          far: 40,
+        }}
         dpr={dprForQuality(quality)}
         frameloop={paused || reducedMotion ? "demand" : "always"}
         shadows={quality !== "low"}
         onCreated={({ gl }) => {
-          gl.setClearColor(tokens.bgDeep, 1);
-          const canvas = gl.domElement;
+          gl.setClearColor(document.palette.background, 1);
+          const canvasEl = gl.domElement;
           const onLost = (event: Event) => {
             event.preventDefault();
             setContextLost(true);
           };
-          canvas.addEventListener("webglcontextlost", onLost, false);
+          canvasEl.addEventListener("webglcontextlost", onLost, false);
         }}
       >
         <Suspense fallback={null}>
-          <Lighting />
-          <TestComposition
-            phrase={phrase}
+          <Lighting
+            lighting={document.lighting}
+            accent={document.palette.accent}
+          />
+          <PosterSceneContent
+            document={document}
             reducedMotion={reducedMotion}
             paused={paused}
+            assetBasePath={assetBasePath}
+            quality={quality}
           />
         </Suspense>
       </Canvas>

@@ -5,6 +5,11 @@
 
 import { z } from "zod";
 import { controlledChaosManifest } from "./manifest";
+import {
+  posterCreationV1Schema,
+  type PosterCreationV1,
+} from "./serialization/posterCreation.schema";
+import { migratePosterCreation } from "./serialization/deserializeCreation";
 
 const presetKeys = controlledChaosManifest.presets.map((p) => p.key) as [
   string,
@@ -38,13 +43,6 @@ export const controlledChaosEmbedConfigSchema = z
         path: ["initialCreationId"],
         message: "Replay mode requires a creation ID",
       });
-    }
-
-    if (
-      (value.mode === "preview" || value.mode === "inline") &&
-      value.initialPresetKey === undefined
-    ) {
-      // Preset is recommended but not strictly required — allow defaults.
     }
 
     if (value.mode === "preview" && value.controls === "full") {
@@ -117,7 +115,10 @@ export const controlledChaosCreationSchema = z.object({
   experienceKey: z.literal(controlledChaosManifest.experienceKey),
   presetKey: z.enum(presetKeys).optional(),
   createdAt: z.string().datetime({ offset: true }).or(z.string().datetime()),
-  state: z.record(z.string(), z.unknown()),
+  state: z.preprocess(
+    (value) => migratePosterCreation(value),
+    posterCreationV1Schema,
+  ),
   thumbnailUrl: z.string().url().optional(),
   title: z.string().min(1).max(120).optional(),
 });
@@ -125,3 +126,6 @@ export const controlledChaosCreationSchema = z.object({
 export type ControlledChaosCreation = z.infer<
   typeof controlledChaosCreationSchema
 >;
+
+export type { PosterCreationV1 };
+export { posterCreationV1Schema };

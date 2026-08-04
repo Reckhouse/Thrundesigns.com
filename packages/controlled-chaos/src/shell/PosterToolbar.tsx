@@ -8,7 +8,12 @@ type PosterToolbarProps = {
   modeLabel: string;
   showFullControls: boolean;
   paused: boolean;
+  canUndo: boolean;
+  canRedo: boolean;
   onTogglePause: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  onRandomize: () => void;
   actions?: ReactNode;
 };
 
@@ -46,12 +51,23 @@ const button: CSSProperties = {
   cursor: "pointer",
 };
 
+const buttonDisabled: CSSProperties = {
+  ...button,
+  opacity: 0.4,
+  cursor: "not-allowed",
+};
+
 export function PosterToolbar({
   title,
   modeLabel,
   showFullControls,
   paused,
+  canUndo,
+  canRedo,
   onTogglePause,
+  onUndo,
+  onRedo,
+  onRandomize,
   actions,
 }: PosterToolbarProps) {
   return (
@@ -95,14 +111,35 @@ export function PosterToolbar({
         }}
       >
         {showFullControls ? (
-          <button
-            type="button"
-            style={button}
-            onClick={onTogglePause}
-            aria-pressed={paused}
-          >
-            {paused ? "Play" : "Pause"}
-          </button>
+          <>
+            <button
+              type="button"
+              style={canUndo ? button : buttonDisabled}
+              onClick={onUndo}
+              disabled={!canUndo}
+            >
+              Undo
+            </button>
+            <button
+              type="button"
+              style={canRedo ? button : buttonDisabled}
+              onClick={onRedo}
+              disabled={!canRedo}
+            >
+              Redo
+            </button>
+            <button type="button" style={button} onClick={onRandomize}>
+              Randomize
+            </button>
+            <button
+              type="button"
+              style={button}
+              onClick={onTogglePause}
+              aria-pressed={paused}
+            >
+              {paused ? "Play" : "Pause"}
+            </button>
+          </>
         ) : null}
         {actions}
       </div>

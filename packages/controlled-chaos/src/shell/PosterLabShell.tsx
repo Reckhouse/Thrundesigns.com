@@ -14,7 +14,13 @@ import type {
   ControlledChaosPersistenceAdapter,
 } from "../adapters.types";
 import { controlledChaosManifest } from "../manifest";
+import type { PosterCreationV1 } from "../serialization/posterCreation.schema";
 import { PosterCanvas } from "../scene/PosterCanvas";
+import {
+  PosterLabStoreProvider,
+  usePosterLabStore,
+} from "../state/usePosterLabStore";
+import { FONT_MANIFEST, type FontKey } from "../typography/font-manifest";
 import { PosterErrorBoundary } from "./PosterErrorBoundary";
 import {
   PosterFallback,
@@ -26,7 +32,25 @@ import {
   dockStyle,
   inspectorPanelStyle,
 } from "./PosterViewport";
-import { defaultPhrase, tokens } from "./tokens";
+import { tokens } from "./tokens";
+
+/**
+ * Prefer same-origin asset paths so local/dev hosts do not fetch typefaces
+ * from the production SITE_URL baked into lab search-param config.
+ */
+export function resolveAssetBasePath(configured?: string): string {
+  const fallback = "/experiences/controlled-chaos";
+  if (!configured) return fallback;
+  try {
+    const url = new URL(configured, "https://thrundesign.local");
+    const path = url.pathname.replace(/\/$/, "");
+    return path || fallback;
+  } catch {
+    return configured.startsWith("/")
+      ? configured.replace(/\/$/, "")
+      : fallback;
+  }
+}
 
 export type PosterLabShellProps = {
   configuration?: ControlledChaosEmbedConfig;
@@ -34,6 +58,7 @@ export type PosterLabShellProps = {
   analytics?: ControlledChaosAnalyticsAdapter;
   creationId?: string;
   creationTitle?: string;
+  initialDocument?: PosterCreationV1;
   variant?: "lab" | "preview" | "replay";
 };
 
@@ -94,23 +119,54 @@ const muted: CSSProperties = {
   color: tokens.fgMuted,
 };
 
-/**
- * Phase 1 application shell: responsive editor chrome + vertical canvas.
- * Visual systems, persistence UI, and export land in later phases.
- */
-export function PosterLabShell({
+const PALETTE_PRESETS = [
+  {
+    key: "editorial-gold",
+    label: "Editorial Gold",
+    palette: {
+      background: "#0c0d0c",
+      primary: "#ebe7df",
+      secondary: "#8a6a38",
+      accent: "#d4af6a",
+    },
+  },
+  {
+    key: "grid-moss",
+    label: "Grid Moss",
+    palette: {
+      background: "#121410",
+      primary: "#f4f1e9",
+      secondary: "#5c6b52",
+      accent: "#d4af6a",
+    },
+  },
+  {
+    key: "cold-steel",
+    label: "Cold Steel",
+    palette: {
+      background: "#0a0c10",
+      primary: "#d7dde8",
+      secondary: "#6a7385",
+      accent: "#9bb0c9",
+    },
+  },
+] as const;
+
+function PosterLabShellInner({
   configuration,
   persistence: _persistence,
   analytics,
   creationId,
   creationTitle,
   variant = "lab",
-}: PosterLabShellProps) {
+}: Omit<PosterLabShellProps, "initialDocument">) {
   const height = configuration?.height ?? controlledChaosManifest.defaultHeight;
   const controls = configuration?.controls ?? "minimal";
   const showFullControls =
     variant === "lab" && (controls === "full" || controls === "minimal");
   const showInspector = variant === "lab" && controls === "full";
+  const allowTextEditing =
+    configuration?.allowTextEditing !== false && showInspector;
 
   const narrow = useSyncExternalStore(
     subscribeNarrow,
@@ -126,12 +182,25 @@ export function PosterLabShell({
   const [webglOk] = useState(() =>
     typeof document === "undefined" ? true : detectWebGLSupport(),
   );
-  const [phrase, setPhrase] = useState(defaultPhrase);
-  const [draftPhrase, setDraftPhrase] = useState(defaultPhrase);
-  const [userPaused, setUserPaused] = useState<boolean | null>(null);
-  const [onboardingStep, setOnboardingStep] = useState(1);
+  const [phraseError, setPhraseError] = useState<string | null>(null);
+
+  const documentState = usePosterLabStore((state) => state.document);
+  const draftPhrase = usePosterLabStore((state) => state.draftPhrase);
+  const onboardingStep = usePosterLabStore((state) => state.onboardingStep);
+  const userPaused = usePosterLabStore((state) => state.userPaused);
+  const pastLength = usePosterLabStore((state) => state.past.length);
+  const futureLength = usePosterLabStore((state) => state.future.length);
+  const setDraftPhrase = usePosterLabStore((state) => state.setDraftPhrase);
+  const commitPhrase = usePosterLabStore((state) => state.commitPhrase);
+  const setFontKey = usePosterLabStore((state) => state.setFontKey);
+  const setPalette = usePosterLabStore((state) => state.setPalette);
+  const randomizeSeed = usePosterLabStore((state) => state.randomizeSeed);
+  const setUserPaused = usePosterLabStore((state) => state.setUserPaused);
+  const undo = usePosterLabStore((state) => state.undo);
+  const redo = usePosterLabStore((state) => state.redo);
 
   const paused = userPaused ?? reducedMotion;
+  const assetBasePath = resolveAssetBasePath(configuration?.assetBaseUrl);
 
   useEffect(() => {
     analytics?.track(variant === "replay" ? "replay_loaded" : "initialized");
@@ -144,16 +213,24 @@ export function PosterLabShell({
       String(mode),
       preset ? `preset ${preset}` : null,
       creationId ? `id ${creationId}` : null,
+      `seed ${documentState.seed}`,
     ].filter(Boolean);
     return parts.join(" · ");
-  }, [configuration?.mode, configuration?.initialPresetKey, creationId, variant]);
+  }, [
+    configuration?.mode,
+    configuration?.initialPresetKey,
+    creationId,
+    variant,
+    documentState.seed,
+  ]);
 
   const title =
     creationTitle?.trim() ||
+    documentState.title ||
     configuration?.initialPresetKey?.replace(/-/g, " ") ||
     controlledChaosManifest.title;
 
-  const description = `Vertical poster composition reading “${phrase}” in the Controlled Chaos Poster Lab.`;
+  const description = `Vertical poster composition reading “${documentState.typography.phrase}” with font ${documentState.typography.fontKey}.`;
 
   if (!webglOk) {
     return (
@@ -184,53 +261,141 @@ export function PosterLabShell({
       }}
       aria-label="Poster controls"
     >
-      <form
-        onSubmit={(event: FormEvent) => {
-          event.preventDefault();
-          const next = draftPhrase.trim() || defaultPhrase;
-          setPhrase(next.slice(0, 120));
-          if (onboardingStep === 1) setOnboardingStep(2);
-        }}
-      >
-        <label style={labelStyle} htmlFor="cc-phrase">
-          Phrase
+      {allowTextEditing ? (
+        <form
+          onSubmit={(event: FormEvent) => {
+            event.preventDefault();
+            const result = commitPhrase();
+            if (!result.ok) {
+              setPhraseError(result.message);
+              return;
+            }
+            setPhraseError(null);
+          }}
+        >
+          <label style={labelStyle} htmlFor="cc-phrase">
+            Phrase
+          </label>
+          <textarea
+            id="cc-phrase"
+            name="phrase"
+            value={draftPhrase}
+            maxLength={120}
+            rows={3}
+            onChange={(event) => setDraftPhrase(event.target.value)}
+            style={{ ...inputStyle, resize: "vertical", minHeight: 84 }}
+            autoComplete="off"
+          />
+          {phraseError ? (
+            <p style={{ ...muted, color: "#e2b4a2", marginTop: "0.4rem" }}>
+              {phraseError}
+            </p>
+          ) : null}
+          <button
+            type="submit"
+            style={{
+              ...inputStyle,
+              marginTop: "0.65rem",
+              width: "auto",
+              background: tokens.gold,
+              color: tokens.ink,
+              border: "none",
+              fontFamily: tokens.fontMono,
+              fontSize: "0.6875rem",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              cursor: "pointer",
+              padding: "0.7rem 1rem",
+            }}
+          >
+            Update phrase
+          </button>
+        </form>
+      ) : null}
+
+      <div style={{ marginTop: allowTextEditing ? "1.25rem" : 0 }}>
+        <label style={labelStyle} htmlFor="cc-font">
+          Font
         </label>
-        <input
-          id="cc-phrase"
-          name="phrase"
-          value={draftPhrase}
-          maxLength={120}
-          onChange={(event) => setDraftPhrase(event.target.value)}
+        <select
+          id="cc-font"
+          value={documentState.typography.fontKey}
+          onChange={(event) => setFontKey(event.target.value as FontKey)}
           style={inputStyle}
-          autoComplete="off"
-        />
+        >
+          {FONT_MANIFEST.map((font) => (
+            <option key={font.key} value={font.key}>
+              {font.displayName}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div style={{ marginTop: "1.25rem" }}>
+        <p style={labelStyle}>Palette</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+          {PALETTE_PRESETS.map((preset) => (
+            <button
+              key={preset.key}
+              type="button"
+              onClick={() => setPalette(preset.palette)}
+              style={{
+                ...inputStyle,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
+              <span>{preset.label}</span>
+              <span style={{ display: "flex", gap: 4 }}>
+                {[
+                  preset.palette.background,
+                  preset.palette.primary,
+                  preset.palette.accent,
+                ].map((color) => (
+                  <span
+                    key={color}
+                    style={{
+                      width: 12,
+                      height: 12,
+                      background: color,
+                      border: `1px solid ${tokens.line}`,
+                    }}
+                  />
+                ))}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginTop: "1.25rem" }}>
+        <p style={labelStyle}>Seed</p>
+        <p style={muted}>{documentState.seed}</p>
         <button
-          type="submit"
+          type="button"
+          onClick={() => randomizeSeed()}
           style={{
             ...inputStyle,
-            marginTop: "0.65rem",
+            marginTop: "0.5rem",
             width: "auto",
-            background: tokens.gold,
-            color: tokens.ink,
-            border: "none",
+            cursor: "pointer",
             fontFamily: tokens.fontMono,
             fontSize: "0.6875rem",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            cursor: "pointer",
-            padding: "0.7rem 1rem",
           }}
         >
-          Update phrase
+          New seed
         </button>
-      </form>
+      </div>
 
       <div style={{ marginTop: "1.25rem" }}>
         <p style={labelStyle}>Visual system</p>
         <p style={muted}>
-          Particle disintegration and additional systems arrive in later
-          phases. This shell proves canvas framing, loop motion, and editor
-          chrome.
+          {documentState.visualSystem.key} (systems land in Phase 3+)
         </p>
       </div>
 
@@ -249,10 +414,11 @@ export function PosterLabShell({
       onError={() => analytics?.track("failed", { reason: "render_boundary" })}
     >
       <PosterCanvas
-        phrase={phrase}
+        document={documentState}
         reducedMotion={reducedMotion}
         paused={paused}
         quality={configuration?.quality ?? "auto"}
+        assetBasePath={assetBasePath}
       />
     </PosterErrorBoundary>
   );
@@ -278,7 +444,12 @@ export function PosterLabShell({
         modeLabel={modeLabel}
         showFullControls={showFullControls}
         paused={paused}
+        canUndo={pastLength > 0}
+        canRedo={futureLength > 0}
         onTogglePause={() => setUserPaused(!paused)}
+        onUndo={undo}
+        onRedo={redo}
+        onRandomize={randomizeSeed}
       />
 
       <div
@@ -301,10 +472,14 @@ export function PosterLabShell({
             }}
             aria-label="Content"
           >
-            <p style={labelStyle}>Content</p>
+            <p style={labelStyle}>Typography</p>
             <p style={muted}>
-              Fonts, SVG import, and system picker land in Phase 2–3. Phrase
-              editing is available on the right.
+              Curated typefaces via typeface.json. Extruded geometry rebuilds
+              after a short debounce while you edit.
+            </p>
+            <p style={{ ...labelStyle, marginTop: "1.25rem" }}>Loop</p>
+            <p style={muted}>
+              {documentState.document.loopDurationSeconds}s · seed-stable accents
             </p>
           </aside>
         ) : null}
@@ -320,14 +495,35 @@ export function PosterLabShell({
 
       {showFullControls ? (
         <div style={dockStyle} aria-label="Timeline">
-          <p style={{ ...labelStyle, marginBottom: 0 }}>Loop · 8s</p>
+          <p style={{ ...labelStyle, marginBottom: 0 }}>
+            Loop · {documentState.document.loopDurationSeconds}s
+          </p>
           <p style={muted}>
-            Seamless timeline, gesture recording, and export controls arrive
-            with later phases. Persistence adapter
+            Timeline, gesture recording, and export arrive later. Persistence
+            adapter
             {_persistence ? " is connected." : " is not connected in this embed."}
           </p>
         </div>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * Phase 2 shell: Zustand document state, curated fonts, palette/seed controls,
+ * undo/redo, and extruded typography on the vertical canvas.
+ */
+export function PosterLabShell({
+  initialDocument,
+  configuration,
+  ...rest
+}: PosterLabShellProps) {
+  return (
+    <PosterLabStoreProvider
+      document={initialDocument}
+      presetKey={configuration?.initialPresetKey}
+    >
+      <PosterLabShellInner configuration={configuration} {...rest} />
+    </PosterLabStoreProvider>
   );
 }

@@ -376,15 +376,17 @@ Update root README when Poster Lab becomes runnable beyond the stub (env, migrat
 
 ---
 
-## 18. Phase 1 entry criteria (next implementation phase)
+## 18. Phase 2 status
 
-Phase 1 shell is implemented inside `packages/controlled-chaos` (R3F test composition, editor chrome, WebGL/error fallbacks). Remaining polish before Phase 2:
+Phase 2 foundation is implemented:
 
-1. Confirm homepage / work index bundles stay free of Controlled Chaos WebGL (validate:experiences + manual check)
-2. Manual smoke of `/lab/controlled-chaos` on desktop and narrow viewports
-3. Proceed to Phase 2 (Zustand + typography + `PosterCreationV1`) after smoke checks
+- Per-shell Zustand store with undo/redo
+- `PosterCreationV1` Zod schema + creation envelope migration
+- Seeded PRNG + seed-stable accent shards
+- Curated typeface.json fonts + debounced `TextGeometry` with ref-counted cache
+- Inspector: phrase, font, palette, seed
 
-**Exit (Phase 1):** Lab route shows a real WebGL test composition; stub messaging removed from full lab entry; export map unchanged; no production portfolio regressions.
+**Next (Phase 3):** Particle disintegration system on the typography/SVG sampling pipeline.
 
 ---
 

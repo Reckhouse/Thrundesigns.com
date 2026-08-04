@@ -1,6 +1,6 @@
 {
   "name": "@thrun-design/controlled-chaos",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Controlled Chaos Poster Lab — interactive Three.js poster generator for the Thrundesign portfolio.",
   "type": "module",
@@ -39,7 +39,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "three": "^0.185.0",
-    "zod": "^4.0.0"
+    "zod": "^4.0.0",
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@react-three/fiber": "^9.6.1",
@@ -49,6 +50,7 @@
     "react-dom": "^19.0.0",
     "three": "^0.185.1",
     "typescript": "^5.0.0",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
   }
 }
