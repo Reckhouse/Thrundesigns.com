@@ -2,7 +2,7 @@
 
 **Phase:** 10  
 **Active systems:** Particle Disintegration · Chrome Liquid · CRT / Photocopy · Inflatable Type · Elastic Type · Torn Paper · Type Architecture  
-**Cross-cutting:** Full audio-reactive displacement · Hardened still/video export · Save & share · Rapier physics (code-split)
+**Cross-cutting:** Full audio-reactive displacement · Hardened still/video export · Local save downloads · Rapier physics (code-split)
 
 ## Plugin contract
 

@@ -65,7 +65,7 @@ import {
   AUDIO_ROUTING_PRESETS,
   type AudioTrackKey,
 } from "../audio/audio.schema";
-import { captureStill, captureThumbnail, blobToDataUrl, recordPosterLoop, resolveVideoFpsLadder } from "../export/exportPoster";
+import { captureStill, downloadExportBlob, recordPosterLoop, resolveVideoFpsLadder } from "../export/exportPoster";
 import { serializePosterCreation } from "../serialization/serializeCreation";
 import { deserializePosterCreation } from "../serialization/deserializeCreation";
 import { controlledChaosCreationSchema } from "../schemas";
@@ -293,13 +293,13 @@ function PosterLabShellInner({
   const allowAudio = configuration?.allowAudio !== false && showInspector;
   const allowExport =
     configuration?.allowExport !== false && showFullControls;
-  const allowSave = Boolean(persistence) && showFullControls;
+  /** Local download of still + creation JSON — no remote Blob write. */
+  const allowSave = showFullControls;
 
   const audio = useAudioReactive();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const hydratedCreationRef = useRef<string | null>(null);
 
@@ -362,7 +362,6 @@ function PosterLabShellInner({
         hydrateFromDocument(deserializePosterCreation(parsed.data.state), {
           presetKey: parsed.data.presetKey,
         });
-        setShareUrl(`/creation/${record.id}`);
         setLoadError(null);
       })
       .catch(() => {
@@ -1651,11 +1650,8 @@ function PosterLabShellInner({
     if (result.ok) analytics?.track("export_completed");
   };
 
-  const handleSaveShare = async () => {
-    if (!persistence) {
-      setExportMessage("Persistence is not connected.");
-      return;
-    }
+  const handleSaveLocal = async () => {
+    if (!showFullControls || exporting) return;
     const canvasEl = canvasRef.current;
     if (!canvasEl) {
       setExportMessage("Canvas not ready.");
@@ -1663,36 +1659,33 @@ function PosterLabShellInner({
     }
 
     setExporting(true);
-    setExportMessage("Capturing thumbnail…");
+    setExportMessage("Saving to your device…");
     try {
-      let thumbnailUrl: string | undefined;
-      const thumb = await captureThumbnail({ canvas: canvasEl });
-      if (thumb.ok && persistence.uploadThumbnail) {
-        const dataUrl = await blobToDataUrl(thumb.blob);
-        const uploaded = await persistence.uploadThumbnail(dataUrl);
-        thumbnailUrl = uploaded.url;
+      analytics?.track("save_started");
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const still = await captureStill({
+        canvas: canvasEl,
+        download: false,
+      });
+      if (!still.ok) {
+        throw new Error(still.message || "Still capture failed.");
       }
+      downloadExportBlob(still.blob, `controlled-chaos-${stamp}.png`);
+      analytics?.track("export_still");
 
-      setExportMessage("Saving creation…");
       const payload = serializePosterCreation(documentState, {
         presetKey: presetKey ?? configuration?.initialPresetKey,
         title: documentState.title ?? title,
-        thumbnailUrl,
       });
-      const saved = await persistence.save(payload);
-      const absolute =
-        typeof window !== "undefined"
-          ? new URL(saved.url, window.location.origin).toString()
-          : saved.url;
-      setShareUrl(saved.url);
-      try {
-        await navigator.clipboard.writeText(absolute);
-        analytics?.track("share_link_copied");
-        setExportMessage(`Saved · link copied`);
-      } catch {
-        setExportMessage(`Saved · ${saved.url}`);
-      }
+      const json = new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json",
+      });
+      downloadExportBlob(json, `controlled-chaos-${stamp}.json`);
+
+      analytics?.track("save_succeeded");
+      setExportMessage("Saved to your device · PNG + JSON");
     } catch (error) {
+      analytics?.track("save_failed");
       setExportMessage(
         error instanceof Error ? error.message : "Save failed.",
       );
@@ -1751,7 +1744,7 @@ function PosterLabShellInner({
         <button
           type="button"
           disabled={exporting}
-          onClick={() => void handleSaveShare()}
+          onClick={() => void handleSaveLocal()}
           style={{
             appearance: "none",
             border: "none",
@@ -1766,7 +1759,7 @@ function PosterLabShellInner({
             opacity: exporting ? 0.5 : 1,
           }}
         >
-          Save & share
+          Save locally
         </button>
       ) : null}
     </>
@@ -1827,7 +1820,7 @@ function PosterLabShellInner({
             <p style={labelStyle}>How to explore</p>
             <p style={muted}>
               Edit the phrase, switch visual systems on the right, drag across
-              the poster to apply force, then export or save a share link.
+              the poster to apply force, then export or save files locally.
             </p>
             <p style={{ ...labelStyle, marginTop: "1.25rem" }}>Typography</p>
             <p style={muted}>
@@ -1840,24 +1833,11 @@ function PosterLabShellInner({
             </p>
             {allowSave ? (
               <>
-                <p style={{ ...labelStyle, marginTop: "1.25rem" }}>Share</p>
+                <p style={{ ...labelStyle, marginTop: "1.25rem" }}>Save</p>
                 <p style={muted}>
-                  Save & share captures a thumbnail and creates an immutable
-                  link.
+                  Save locally downloads a PNG still and a creation JSON file to
+                  your device. Nothing is uploaded.
                 </p>
-                {shareUrl ? (
-                  <a
-                    href={shareUrl}
-                    style={{
-                      ...muted,
-                      display: "inline-block",
-                      marginTop: "0.45rem",
-                      color: tokens.gold,
-                    }}
-                  >
-                    {shareUrl}
-                  </a>
-                ) : null}
               </>
             ) : null}
             {loadError ? (
@@ -1899,13 +1879,8 @@ function PosterLabShellInner({
             {exportMessage
               ? exportMessage
               : allowSave
-                ? "Tip: switch systems on the right · drag the poster · Export PNG/video or Save & share."
+                ? "Tip: switch systems on the right · drag the poster · Export PNG/video or Save locally."
                 : "Tip: switch systems on the right · drag the poster · Export PNG or one loop as video."}
-            {!exportMessage && !allowSave
-              ? persistence
-                ? " Persistence is connected."
-                : " Persistence is not connected in this embed."
-              : null}
           </p>
         </div>
       ) : null}
@@ -1939,7 +1914,7 @@ function PosterLabShellWithAudio({
 }
 
 /**
- * Phase 6 shell: save/share with thumbnails, hardened export, audio, systems.
+ * Phase 6 shell: local save downloads, hardened export, audio, systems.
  */
 export function PosterLabShell({
   initialDocument,
