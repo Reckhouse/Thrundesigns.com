@@ -21,6 +21,12 @@ import {
   usePosterLabStore,
 } from "../state/usePosterLabStore";
 import { FONT_MANIFEST, type FontKey } from "../typography/font-manifest";
+import {
+  parseParticleConfig,
+  particlePresets,
+} from "../systems/particle-disintegration/particleDisintegration.schema";
+import type { ForceMode } from "../systems/types";
+import { isSvgFileName } from "../svg/SvgSanitizer";
 import { PosterErrorBoundary } from "./PosterErrorBoundary";
 import {
   PosterFallback,
@@ -198,6 +204,20 @@ function PosterLabShellInner({
   const setUserPaused = usePosterLabStore((state) => state.setUserPaused);
   const undo = usePosterLabStore((state) => state.undo);
   const redo = usePosterLabStore((state) => state.redo);
+  const forceMode = usePosterLabStore((state) => state.forceMode);
+  const setForceMode = usePosterLabStore((state) => state.setForceMode);
+  const setParticleConfig = usePosterLabStore((state) => state.setParticleConfig);
+  const applyParticlePreset = usePosterLabStore(
+    (state) => state.applyParticlePreset,
+  );
+  const importSvgMarkup = usePosterLabStore((state) => state.importSvgMarkup);
+  const clearSvgAsset = usePosterLabStore((state) => state.clearSvgAsset);
+  const svgError = usePosterLabStore((state) => state.svgError);
+
+  const particleConfig = useMemo(
+    () => parseParticleConfig(documentState.visualSystem.config),
+    [documentState.visualSystem.config],
+  );
 
   const paused = userPaused ?? reducedMotion;
   const assetBasePath = resolveAssetBasePath(configuration?.assetBaseUrl);
@@ -245,7 +265,11 @@ function PosterLabShellInner({
   const phraseHint =
     onboardingStep === 1 && showFullControls
       ? "Change the phrase to begin."
-      : undefined;
+      : onboardingStep === 2 && showFullControls
+        ? "Choose how the type behaves."
+        : onboardingStep >= 3 && showFullControls
+          ? "Drag across the poster."
+          : undefined;
 
   const inspector = showInspector ? (
     <aside
@@ -394,9 +418,154 @@ function PosterLabShellInner({
 
       <div style={{ marginTop: "1.25rem" }}>
         <p style={labelStyle}>Visual system</p>
-        <p style={muted}>
-          {documentState.visualSystem.key} (systems land in Phase 3+)
+        <p style={muted}>Particle Disintegration</p>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.4rem",
+            marginTop: "0.55rem",
+          }}
+        >
+          {particlePresets.map((preset) => (
+            <button
+              key={preset.key}
+              type="button"
+              onClick={() => applyParticlePreset(preset.key)}
+              style={{
+                ...inputStyle,
+                cursor: "pointer",
+                textAlign: "left",
+                fontFamily: tokens.fontMono,
+                fontSize: "0.6875rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              {preset.title}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginTop: "1.25rem" }}>
+        <label style={labelStyle} htmlFor="cc-disintegration">
+          Disintegration · {particleConfig.disintegration.toFixed(2)}
+        </label>
+        <input
+          id="cc-disintegration"
+          type="range"
+          min={0}
+          max={1}
+          step={0.01}
+          value={particleConfig.disintegration}
+          onChange={(event) =>
+            setParticleConfig({
+              disintegration: Number(event.target.value),
+            })
+          }
+          style={{ width: "100%" }}
+        />
+        <label style={{ ...labelStyle, marginTop: "0.75rem" }} htmlFor="cc-motion">
+          Motion · {particleConfig.motion.toFixed(2)}
+        </label>
+        <input
+          id="cc-motion"
+          type="range"
+          min={0}
+          max={1}
+          step={0.01}
+          value={particleConfig.motion}
+          onChange={(event) =>
+            setParticleConfig({ motion: Number(event.target.value) })
+          }
+          style={{ width: "100%" }}
+        />
+        <label style={{ ...labelStyle, marginTop: "0.75rem" }} htmlFor="cc-density">
+          Density · {particleConfig.density.toFixed(2)}
+        </label>
+        <input
+          id="cc-density"
+          type="range"
+          min={0.15}
+          max={1}
+          step={0.01}
+          value={particleConfig.density}
+          onChange={(event) =>
+            setParticleConfig({ density: Number(event.target.value) })
+          }
+          style={{ width: "100%" }}
+        />
+      </div>
+
+      <div style={{ marginTop: "1.25rem" }}>
+        <label style={labelStyle} htmlFor="cc-force-mode">
+          Pointer force
+        </label>
+        <select
+          id="cc-force-mode"
+          value={forceMode}
+          onChange={(event) => setForceMode(event.target.value as ForceMode)}
+          style={inputStyle}
+        >
+          {(
+            [
+              "push",
+              "pull",
+              "explode",
+              "attract",
+              "tear",
+              "repel",
+            ] as ForceMode[]
+          ).map((mode) => (
+            <option key={mode} value={mode}>
+              {mode}
+            </option>
+          ))}
+        </select>
+        <p style={{ ...muted, marginTop: "0.45rem" }}>
+          Drag across the poster to apply force.
         </p>
+      </div>
+
+      <div style={{ marginTop: "1.25rem" }}>
+        <p style={labelStyle}>SVG import</p>
+        <input
+          type="file"
+          accept=".svg,image/svg+xml"
+          aria-label="Upload SVG"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (!file) return;
+            if (!isSvgFileName(file.name) && file.type !== "image/svg+xml") {
+              return;
+            }
+            void file.text().then((text) => {
+              importSvgMarkup(text);
+            });
+          }}
+          style={{ ...inputStyle, padding: "0.45rem" }}
+        />
+        {documentState.asset?.type === "svg" ? (
+          <button
+            type="button"
+            onClick={() => clearSvgAsset()}
+            style={{
+              ...inputStyle,
+              marginTop: "0.5rem",
+              width: "auto",
+              cursor: "pointer",
+            }}
+          >
+            Clear SVG
+          </button>
+        ) : null}
+        {svgError ? (
+          <p style={{ ...muted, color: "#e2b4a2", marginTop: "0.4rem" }}>
+            {svgError}
+          </p>
+        ) : null}
       </div>
 
       <div style={{ marginTop: "1.25rem" }}>
@@ -419,6 +588,7 @@ function PosterLabShellInner({
         paused={paused}
         quality={configuration?.quality ?? "auto"}
         assetBasePath={assetBasePath}
+        forceMode={forceMode}
       />
     </PosterErrorBoundary>
   );

@@ -376,17 +376,17 @@ Update root README when Poster Lab becomes runnable beyond the stub (env, migrat
 
 ---
 
-## 18. Phase 2 status
+## 18. Phase 3 status
 
-Phase 2 foundation is implemented:
+Particle disintegration is the active default system:
 
-- Per-shell Zustand store with undo/redo
-- `PosterCreationV1` Zod schema + creation envelope migration
-- Seeded PRNG + seed-stable accent shards
-- Curated typeface.json fonts + debounced `TextGeometry` with ref-counted cache
-- Inspector: phrase, font, palette, seed
+- Text + sanitized SVG point sampling
+- Instanced particle field with seeded seamless loop
+- Pointer force plane (push / pull / explode / …)
+- Quality budgets and curated presets
+- Docs: `visual-systems.md`
 
-**Next (Phase 3):** Particle disintegration system on the typography/SVG sampling pipeline.
+**Next (Phase 4):** Chrome liquid typography + CRT/photocopy postprocessing.
 
 ---
 

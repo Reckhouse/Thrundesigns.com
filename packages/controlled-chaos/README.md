@@ -4,7 +4,7 @@ Controlled Chaos Poster Lab — interactive Three.js poster generator package fo
 
 ## Status
 
-**Phase 2.** Zustand document store, `PosterCreationV1` schema, curated typeface fonts, extruded typography, palette/seed controls, undo/redo. Visual systems begin in Phase 3.
+**Phase 3.** Particle disintegration visual system with text/SVG sampling, pointer forces, quality tiers, and seamless loops. Chrome/CRT systems follow in Phase 4.
 
 ## Entries
 
@@ -27,5 +27,3 @@ Controlled Chaos Poster Lab — interactive Three.js poster generator package fo
 - `@react-three/fiber` `^9`
 - `zod` `^4`
 - `zustand` `^5`
-
-Keep export paths stable. Do not import Three.js from `./manifest` or `./schemas`.

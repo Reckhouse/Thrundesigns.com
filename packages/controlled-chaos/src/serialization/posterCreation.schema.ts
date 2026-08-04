@@ -6,6 +6,10 @@
 import { z } from "zod";
 import { DEFAULT_FONT_KEY, FONT_KEYS } from "../typography/font-manifest";
 import { createRandomSeed } from "../seed/createSeededRandom";
+import {
+  defaultParticleDisintegrationConfig,
+  particlePresets,
+} from "../systems/particle-disintegration/particleDisintegration.schema";
 
 export const VISUAL_SYSTEM_KEYS = [
   "particle-disintegration",
@@ -72,6 +76,15 @@ export const posterCreationV1Schema = z.object({
   }),
 
   typography: typographySchema,
+
+  asset: z
+    .object({
+      type: z.literal("svg"),
+      assetId: z.string().optional(),
+      normalizedSvg: z.string().max(180_000).optional(),
+      checksum: z.string().min(4).max(64),
+    })
+    .optional(),
 
   composition: z.object({
     position: vec3Schema.default([0, 0, 0.07]),
@@ -172,6 +185,10 @@ export function createDefaultPosterCreation(
     ? PRESET_DEFAULTS[options.presetKey]
     : undefined;
 
+  const particlePreset = options?.presetKey
+    ? particlePresets.find((entry) => entry.key === options.presetKey)
+    : undefined;
+
   const draft = {
     schemaVersion: 1 as const,
     seed: options?.seed ?? preset?.seed ?? createRandomSeed(),
@@ -203,7 +220,8 @@ export function createDefaultPosterCreation(
     visualSystem: {
       key: "particle-disintegration" as const,
       version: 1,
-      config: {},
+      config:
+        particlePreset?.config ?? defaultParticleDisintegrationConfig,
     },
     palette: preset?.palette ?? {
       background: "#0c0d0c",

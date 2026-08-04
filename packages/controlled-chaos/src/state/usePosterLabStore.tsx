@@ -15,6 +15,13 @@ import {
 } from "../serialization/posterCreation.schema";
 import { createRandomSeed } from "../seed/createSeededRandom";
 import type { FontKey } from "../typography/font-manifest";
+import {
+  parseParticleConfig,
+  particlePresets,
+  type ParticleDisintegrationConfig,
+} from "../systems/particle-disintegration/particleDisintegration.schema";
+import { sanitizeSvgMarkup } from "../svg/SvgSanitizer";
+import type { ForceMode } from "../systems/types";
 
 const HISTORY_LIMIT = 40;
 
@@ -25,7 +32,9 @@ export type PosterLabStoreState = {
   future: PosterCreationV1[];
   onboardingStep: number;
   userPaused: boolean | null;
+  forceMode: ForceMode;
   presetKey?: string;
+  svgError: string | null;
 
   hydrateFromPreset: (presetKey?: string) => void;
   hydrateFromDocument: (
@@ -41,6 +50,13 @@ export type PosterLabStoreState = {
   setSeed: (seed: string) => void;
   setUserPaused: (paused: boolean | null) => void;
   setOnboardingStep: (step: number) => void;
+  setForceMode: (mode: ForceMode) => void;
+  setParticleConfig: (patch: Partial<ParticleDisintegrationConfig>) => void;
+  applyParticlePreset: (presetKey: string) => void;
+  importSvgMarkup: (
+    markup: string,
+  ) => { ok: true } | { ok: false; message: string };
+  clearSvgAsset: () => void;
   undo: () => void;
   redo: () => void;
 };
@@ -86,7 +102,9 @@ export function createPosterLabStore(options?: {
       future: [],
       onboardingStep: 1,
       userPaused: null,
+      forceMode: "push",
       presetKey: options?.presetKey,
+      svgError: null,
 
       hydrateFromPreset(presetKey) {
         const document = createDefaultPosterCreation({ presetKey });
@@ -97,6 +115,7 @@ export function createPosterLabStore(options?: {
           future: [],
           onboardingStep: 1,
           presetKey,
+          svgError: null,
         });
       },
 
@@ -108,6 +127,7 @@ export function createPosterLabStore(options?: {
           future: [],
           onboardingStep: 1,
           presetKey: hydrateOptions?.presetKey,
+          svgError: null,
         });
       },
 
@@ -171,6 +191,64 @@ export function createPosterLabStore(options?: {
 
       setOnboardingStep(step) {
         set({ onboardingStep: step });
+      },
+
+      setForceMode(mode) {
+        set({ forceMode: mode });
+      },
+
+      setParticleConfig(patch) {
+        patchDocument((document) => {
+          const current = parseParticleConfig(document.visualSystem.config);
+          document.visualSystem = {
+            key: "particle-disintegration",
+            version: 1,
+            config: parseParticleConfig({ ...current, ...patch }),
+          };
+          return document;
+        });
+      },
+
+      applyParticlePreset(presetKey) {
+        const preset = particlePresets.find((entry) => entry.key === presetKey);
+        if (!preset) return;
+        patchDocument((document) => {
+          document.visualSystem = {
+            key: "particle-disintegration",
+            version: 1,
+            config: preset.config,
+          };
+          return document;
+        });
+        if (get().onboardingStep < 3) {
+          set({ onboardingStep: 3 });
+        }
+      },
+
+      importSvgMarkup(markup) {
+        const result = sanitizeSvgMarkup(markup);
+        if (!result.ok) {
+          set({ svgError: result.message });
+          return result;
+        }
+        patchDocument((document) => {
+          document.asset = {
+            type: "svg",
+            normalizedSvg: result.svg,
+            checksum: result.checksum,
+          };
+          return document;
+        });
+        set({ svgError: null });
+        return { ok: true as const };
+      },
+
+      clearSvgAsset() {
+        patchDocument((document) => {
+          delete document.asset;
+          return document;
+        });
+        set({ svgError: null });
       },
 
       undo() {

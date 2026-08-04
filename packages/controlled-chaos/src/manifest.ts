@@ -36,7 +36,7 @@ export type ControlledChaosManifest = {
 export const controlledChaosManifest = {
   experienceKey: "controlled-chaos-poster-lab",
   title: "Controlled Chaos Poster Lab",
-  packageVersion: "0.2.0",
+  packageVersion: "0.3.0",
   stateSchemaVersion: 1,
   embedConfigVersion: 1,
   assetBasePath: "/experiences/controlled-chaos",

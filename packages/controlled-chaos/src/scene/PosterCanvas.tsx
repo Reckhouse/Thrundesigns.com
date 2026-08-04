@@ -13,6 +13,7 @@ type PosterSceneProps = {
   paused?: boolean;
   quality?: "auto" | "low" | "medium" | "high";
   assetBasePath?: string;
+  forceMode?: import("../systems/types").ForceMode;
 };
 
 function Lighting({
@@ -60,6 +61,7 @@ export function PosterCanvas({
   paused = false,
   quality = "auto",
   assetBasePath,
+  forceMode = "push",
 }: PosterSceneProps) {
   const [contextLost, setContextLost] = useState(false);
   const camera = document.camera;
@@ -132,6 +134,7 @@ export function PosterCanvas({
             paused={paused}
             assetBasePath={assetBasePath}
             quality={quality}
+            forceMode={forceMode}
           />
         </Suspense>
       </Canvas>
