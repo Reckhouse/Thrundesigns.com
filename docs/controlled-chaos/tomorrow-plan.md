@@ -2,14 +2,18 @@
 
 ## Goal
 
-Roadmap complete through **Phase 12**. No further planned phases for v1.
+**No next roadmap phase.** Phases 0–12 are complete (`0.12.0`).
 
-## Remaining work (ops / deploy)
+## Remaining work (ops / deploy only)
 
-- Complete unchecked items on `docs/controlled-chaos/launch-checklist.md`
-- Production build with Sanity token
+Complete **needs deploy** items on `docs/controlled-chaos/launch-checklist.md`:
+
+- Production build with `SANITY_API_READ_TOKEN`
+- Blob + Upstash env on Vercel
 - Manual browser smoke (desktop + mobile)
-- Confirm Blob + Upstash env on Vercel
+- Save & share round-trip
+
+Code-side launch wiring (launch `from=`, noindex, rate limits, reduced-motion load gate, retry UIs) is already verified in-repo.
 
 ## Known good commands
 
@@ -22,6 +26,7 @@ npx tsc --noEmit -p packages/controlled-chaos/tsconfig.json
 
 ## Things to avoid
 
+- Do not invent a Phase 13 without an explicit v1.1 scope
 - Do not move the experience out of `packages/controlled-chaos`
 - Do not add database dependencies for creations
 - Do not persist local audio bytes
@@ -32,6 +37,5 @@ npx tsc --noEmit -p packages/controlled-chaos/tsconfig.json
 ## Quick context summary
 
 - Phases 0–12 complete; package `0.12.0`
-- Sanity case study published: slug `controlled-chaos-poster-lab`
-- Cover: `/images/controlled-chaos-cover.jpg`
-- Hardening reports + launch checklist landed in Phase 12
+- PR: https://github.com/Reckhouse/Thrundesigns.com/pull/26
+- Next human step: ship + post-deploy smoke
