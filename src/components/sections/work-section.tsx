@@ -111,7 +111,7 @@ export function WorkSection({
                                 src={src}
                                 alt={alt}
                                 fill
-                                className="object-cover grayscale transition duration-500 group-hover:grayscale-0"
+                                className="object-contain object-center grayscale transition duration-500 group-hover:grayscale-0"
                                 sizes="(max-width: 768px) 100vw, 286px"
                               />
                             </motion.div>
