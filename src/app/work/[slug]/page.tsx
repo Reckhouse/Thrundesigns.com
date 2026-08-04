@@ -193,12 +193,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   ) : null}
                 </div>
               </div>
-              <div className="relative min-h-[420px] overflow-hidden bg-bg-raised lg:min-h-[620px]">
+              <div className="relative flex min-h-[420px] items-center justify-center overflow-hidden bg-bg-raised lg:min-h-[620px]">
                 <Image
                   src={imageSrc}
                   alt={resolveMediaAlt(project.cover, project.title || "Project")}
                   fill
-                  className="object-cover grayscale"
+                  className="object-contain object-center grayscale"
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   priority
                 />

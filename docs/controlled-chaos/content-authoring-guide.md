@@ -11,7 +11,7 @@
 |---------|---------|
 | Project identity | Title, slug, summary, cover, industry/services, SEO |
 | Primary experience | Hero launch CTA + project-level experience metadata |
-| Page modules | Narrative blocks + optional interactive preview embed |
+| Page modules | Narrative blocks (systems, process, metrics, credits, CTA). Skip in-page experience embeds when lab CTAs already exist. |
 | Featured creations | Creation IDs only (`cc_…`) — never paste JSON |
 
 WebGL, audio bytes, and export stay in the package / lab — not in Sanity.
@@ -19,10 +19,11 @@ WebGL, audio bytes, and export stay in the package / lab — not in Sanity.
 ## Recommended case-study pattern
 
 1. Cover + summary introduce the instrument.
-2. Primary experience → Launch Poster Lab CTA. Case-study **embed** stays `preview` + minimal; the launch URL always opens the **full lab** (`mode=inline`).
-3. Module embed → lightweight preview with the same poster (not the full editor).
-4. Process / systems / metrics explain the architecture without a dashboard dump.
-5. CTA points at `/lab/controlled-chaos?mode=inline&from=/work/controlled-chaos-poster-lab`.
+2. Primary experience → Launch Poster Lab CTA (fullscreen launch always opens `mode=inline`).
+3. Narrative modules (systems / process / metrics / credits) — **no** in-page interactive embed when multiple lab CTAs already exist.
+4. CTA points at `/lab/controlled-chaos?mode=inline&from=/work/controlled-chaos-poster-lab`.
+
+Cover stills are **9:16**. Work cards and case-study frames use `object-contain` so the full poster fits without cropping.
 
 ## Presets by visual system
 

@@ -95,14 +95,14 @@ export async function FeaturedCreationsGallery({
           <li key={item.key} className="flex flex-col gap-4">
             <Link
               href={item.href}
-              className="group relative block aspect-[4/5] overflow-hidden bg-bg-raised"
+              className="group relative block aspect-[9/16] overflow-hidden bg-bg-raised"
             >
               {item.imageSrc ? (
                 <Image
                   src={item.imageSrc}
                   alt={item.imageAlt}
                   fill
-                  className="object-cover transition-opacity duration-500 group-hover:opacity-90"
+                  className="object-contain object-center transition-opacity duration-500 group-hover:opacity-90"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               ) : (
