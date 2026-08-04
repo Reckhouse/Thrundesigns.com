@@ -2,7 +2,7 @@
 
 Interactive Three.js poster generator package for the Thrundesign portfolio.
 
-**Phase 12.** Hardening complete. Full-lab launch CTAs + in-lab directions in `0.12.2`.
+**Phase 12.** Hardening complete. Local save downloads (no Blob writes) in `0.12.3`.
 
 ## Exports
 
