@@ -20,6 +20,14 @@ import {
   defaultCrtPhotocopyConfig,
 } from "../systems/crt-photocopy/crtPhotocopy.schema";
 import {
+  defaultInflatableTypeConfig,
+  inflatablePresets,
+} from "../systems/inflatable-type/inflatableType.schema";
+import {
+  defaultElasticTypeConfig,
+  elasticPresets,
+} from "../systems/elastic-type/elasticType.schema";
+import {
   audioReactiveConfigSchema,
   defaultAudioReactiveConfig,
 } from "../audio/audio.schema";
@@ -257,6 +265,72 @@ const PRESET_DEFAULTS: Record<
       accent: "#9bb0c9",
     },
   },
+  "helium-drop": {
+    phrase: "HELIUM",
+    fontKey: "helvetiker-bold",
+    seed: "helium01",
+    palette: {
+      background: "#0c0d0c",
+      primary: "#ebe7df",
+      secondary: "#8a6a38",
+      accent: "#d4af6a",
+    },
+  },
+  "balloon-grid": {
+    phrase: "BALLOON",
+    fontKey: "optimer-bold",
+    seed: "balloon1",
+    palette: {
+      background: "#121410",
+      primary: "#f4f1e9",
+      secondary: "#5c6b52",
+      accent: "#d4af6a",
+    },
+  },
+  "soft-pressure": {
+    phrase: "PRESSURE",
+    fontKey: "gentilis-regular",
+    seed: "softprs1",
+    palette: {
+      background: "#0a0c10",
+      primary: "#d7dde8",
+      secondary: "#6a7385",
+      accent: "#9bb0c9",
+    },
+  },
+  "rubber-band": {
+    phrase: "RUBBER",
+    fontKey: "helvetiker-bold",
+    seed: "rubber01",
+    palette: {
+      background: "#0c0d0c",
+      primary: "#ebe7df",
+      secondary: "#8a6a38",
+      accent: "#d4af6a",
+    },
+  },
+  "spring-lattice": {
+    phrase: "LATTICE",
+    fontKey: "optimer-bold",
+    seed: "lattice1",
+    palette: {
+      background: "#121410",
+      primary: "#f4f1e9",
+      secondary: "#5c6b52",
+      accent: "#d4af6a",
+    },
+  },
+  rebound: {
+    phrase: "REBOUND",
+    fontKey: "gentilis-regular",
+    seed: "rebound1",
+    palette: {
+      background: "#0a0c10",
+      primary: "#d7dde8",
+      secondary: "#6a7385",
+      accent: "#9bb0c9",
+    },
+  },
 };
 
 function resolveVisualSystemForPreset(presetKey?: string): {
@@ -294,6 +368,28 @@ function resolveVisualSystemForPreset(presetKey?: string): {
       key: "crt-photocopy",
       version: 1,
       config: crtPreset.config as unknown as Record<string, unknown>,
+    };
+  }
+
+  const inflatablePreset = presetKey
+    ? inflatablePresets.find((entry) => entry.key === presetKey)
+    : undefined;
+  if (inflatablePreset) {
+    return {
+      key: "inflatable-type",
+      version: 1,
+      config: inflatablePreset.config as unknown as Record<string, unknown>,
+    };
+  }
+
+  const elasticPreset = presetKey
+    ? elasticPresets.find((entry) => entry.key === presetKey)
+    : undefined;
+  if (elasticPreset) {
+    return {
+      key: "elastic-type",
+      version: 1,
+      config: elasticPreset.config as unknown as Record<string, unknown>,
     };
   }
 
@@ -414,5 +510,7 @@ export {
   defaultParticleDisintegrationConfig,
   defaultChromeLiquidConfig,
   defaultCrtPhotocopyConfig,
+  defaultInflatableTypeConfig,
+  defaultElasticTypeConfig,
   defaultAudioReactiveConfig,
 };

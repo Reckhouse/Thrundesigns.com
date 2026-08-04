@@ -34,6 +34,18 @@ import {
   defaultCrtPhotocopyConfig,
   type CrtPhotocopyConfig,
 } from "../systems/crt-photocopy/crtPhotocopy.schema";
+import {
+  parseInflatableConfig,
+  inflatablePresets,
+  defaultInflatableTypeConfig,
+  type InflatableTypeConfig,
+} from "../systems/inflatable-type/inflatableType.schema";
+import {
+  parseElasticConfig,
+  elasticPresets,
+  defaultElasticTypeConfig,
+  type ElasticTypeConfig,
+} from "../systems/elastic-type/elasticType.schema";
 import { defaultParticleDisintegrationConfig } from "../systems/particle-disintegration/particleDisintegration.schema";
 import { sanitizeSvgMarkup } from "../svg/SvgSanitizer";
 import type { ForceMode } from "../systems/types";
@@ -81,6 +93,10 @@ export type PosterLabStoreState = {
   applyChromePreset: (presetKey: string) => void;
   setCrtConfig: (patch: Partial<CrtPhotocopyConfig>) => void;
   applyCrtPreset: (presetKey: string) => void;
+  setInflatableConfig: (patch: Partial<InflatableTypeConfig>) => void;
+  applyInflatablePreset: (presetKey: string) => void;
+  setElasticConfig: (patch: Partial<ElasticTypeConfig>) => void;
+  applyElasticPreset: (presetKey: string) => void;
   setAudioConfig: (patch: Partial<AudioReactiveConfig>) => void;
   importSvgMarkup: (
     markup: string,
@@ -109,6 +125,12 @@ function defaultConfigForSystem(key: VisualSystemKey): Record<string, unknown> {
   }
   if (key === "crt-photocopy") {
     return defaultCrtPhotocopyConfig as unknown as Record<string, unknown>;
+  }
+  if (key === "inflatable-type") {
+    return defaultInflatableTypeConfig as unknown as Record<string, unknown>;
+  }
+  if (key === "elastic-type") {
+    return defaultElasticTypeConfig as unknown as Record<string, unknown>;
   }
   return defaultParticleDisintegrationConfig as unknown as Record<
     string,
@@ -388,6 +410,94 @@ export function createPosterLabStore(options?: {
           return document;
         });
         set({ presetKey });
+        if (get().onboardingStep < 3) {
+          set({ onboardingStep: 3 });
+        }
+      },
+
+      setInflatableConfig(patch) {
+        patchDocument((document) => {
+          const current = parseInflatableConfig(document.visualSystem.config);
+          document.visualSystem = {
+            key: "inflatable-type",
+            version: 1,
+            config: { ...current, ...patch },
+          };
+          return document;
+        });
+      },
+
+      applyInflatablePreset(presetKey) {
+        const preset = inflatablePresets.find(
+          (entry) => entry.key === presetKey,
+        );
+        if (!preset) return;
+        const next = createDefaultPosterCreation({
+          presetKey,
+          phrase: get().document.typography.phrase,
+          seed: get().document.seed,
+        });
+        patchDocument((document) => {
+          document.visualSystem = {
+            key: "inflatable-type",
+            version: 1,
+            config: preset.config,
+          };
+          document.palette = next.palette;
+          document.typography.phrase = next.typography.phrase;
+          document.postprocessing = {
+            ...document.postprocessing,
+            enabled: false,
+          };
+          return document;
+        });
+        set({
+          presetKey,
+          draftPhrase: next.typography.phrase,
+        });
+        if (get().onboardingStep < 3) {
+          set({ onboardingStep: 3 });
+        }
+      },
+
+      setElasticConfig(patch) {
+        patchDocument((document) => {
+          const current = parseElasticConfig(document.visualSystem.config);
+          document.visualSystem = {
+            key: "elastic-type",
+            version: 1,
+            config: { ...current, ...patch },
+          };
+          return document;
+        });
+      },
+
+      applyElasticPreset(presetKey) {
+        const preset = elasticPresets.find((entry) => entry.key === presetKey);
+        if (!preset) return;
+        const next = createDefaultPosterCreation({
+          presetKey,
+          phrase: get().document.typography.phrase,
+          seed: get().document.seed,
+        });
+        patchDocument((document) => {
+          document.visualSystem = {
+            key: "elastic-type",
+            version: 1,
+            config: preset.config,
+          };
+          document.palette = next.palette;
+          document.typography.phrase = next.typography.phrase;
+          document.postprocessing = {
+            ...document.postprocessing,
+            enabled: false,
+          };
+          return document;
+        });
+        set({
+          presetKey,
+          draftPhrase: next.typography.phrase,
+        });
         if (get().onboardingStep < 3) {
           set({ onboardingStep: 3 });
         }

@@ -2,7 +2,7 @@
 
 Interactive Three.js poster generator package for the Thrundesign portfolio.
 
-**Phase 7.** Persistence hardening (`hardenPosterCreationForPersist`) + security docs. Package `0.7.0`.
+**Phase 8.** Inflatable + elastic typography via `@react-three/rapier` (code-split). Package `0.8.0`.
 
 ## Exports
 

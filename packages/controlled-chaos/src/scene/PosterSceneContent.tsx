@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { lazy, Suspense, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { Mesh } from "three";
 import type { PosterCreationV1 } from "../serialization/posterCreation.schema";
@@ -10,6 +10,18 @@ import { ChromeLiquidSystem } from "../systems/chrome-liquid/ChromeLiquidSystem"
 import { CrtPhotocopySystem } from "../systems/crt-photocopy/CrtPhotocopySystem";
 import type { ForceMode } from "../systems/types";
 import { PosterText } from "../typography/PosterText";
+
+const InflatableTypeSystem = lazy(() =>
+  import("../systems/inflatable-type/InflatableTypeSystem").then((module) => ({
+    default: module.InflatableTypeSystem,
+  })),
+);
+
+const ElasticTypeSystem = lazy(() =>
+  import("../systems/elastic-type/ElasticTypeSystem").then((module) => ({
+    default: module.ElasticTypeSystem,
+  })),
+);
 
 type PosterSceneContentProps = {
   document: PosterCreationV1;
@@ -22,6 +34,8 @@ type PosterSceneContentProps = {
 
 /**
  * Poster scene host. Active visual systems replace solid type meshes.
+ * Physics systems (inflatable / elastic) are code-split so Rapier WASM
+ * loads only when those systems are selected.
  */
 export function PosterSceneContent({
   document,
@@ -39,7 +53,10 @@ export function PosterSceneContent({
   const useParticles = systemKey === "particle-disintegration";
   const useChrome = systemKey === "chrome-liquid";
   const useCrt = systemKey === "crt-photocopy";
-  const useFallbackType = !useParticles && !useChrome && !useCrt;
+  const useInflatable = systemKey === "inflatable-type";
+  const useElastic = systemKey === "elastic-type";
+  const useFallbackType =
+    !useParticles && !useChrome && !useCrt && !useInflatable && !useElastic;
 
   const shardSeeds = useMemo(() => {
     if (!useFallbackType) return [];
@@ -113,6 +130,31 @@ export function PosterSceneContent({
           reducedMotion={reducedMotion}
           assetBasePath={assetBasePath}
         />
+      ) : null}
+
+      {useInflatable ? (
+        <Suspense fallback={null}>
+          <InflatableTypeSystem
+            document={document}
+            quality={quality}
+            paused={paused}
+            reducedMotion={reducedMotion}
+            assetBasePath={assetBasePath}
+          />
+        </Suspense>
+      ) : null}
+
+      {useElastic ? (
+        <Suspense fallback={null}>
+          <ElasticTypeSystem
+            document={document}
+            quality={quality}
+            paused={paused}
+            reducedMotion={reducedMotion}
+            assetBasePath={assetBasePath}
+            forceMode={forceMode}
+          />
+        </Suspense>
       ) : null}
 
       {useFallbackType ? (

@@ -1,8 +1,8 @@
 # Controlled Chaos — Visual Systems
 
-**Phase:** 6  
-**Active systems:** Particle Disintegration · Chrome Liquid · CRT / Photocopy  
-**Cross-cutting:** Audio-reactive displacement · Hardened still/video export · Save & share
+**Phase:** 8  
+**Active systems:** Particle Disintegration · Chrome Liquid · CRT / Photocopy · Inflatable Type · Elastic Type  
+**Cross-cutting:** Audio-reactive displacement · Hardened still/video export · Save & share · Rapier physics (code-split)
 
 ## Plugin contract
 
@@ -39,6 +39,31 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 | Audio | Not mapped in Phase 5 (supportsAudio: false) |
 | Presets | Static Channel, Xerox Draft, Broadcast Bleed |
 
+## Inflatable Type
+
+| Concern | Implementation |
+|---------|----------------|
+| Geometry | Per-character extruded meshes (`buildPhysicsLetterMeshes`) |
+| Physics | `@react-three/rapier` rigid bodies + hull colliders; fixed 60 Hz timestep |
+| Motion | Cyclic inflate impulses + rest springs + visual puff scale; seeded phase offsets |
+| Audio | Bass/energy/beat scale inflate pressure |
+| Reduced motion | Static letter meshes; no Physics world |
+| Bundle | Lazy-loaded from scene host so Rapier WASM stays out of other systems |
+| Presets | Helium Drop, Balloon Grid, Soft Pressure |
+| Note | Rigid bodies + inflate-like forces — **not** true soft-body |
+
+## Elastic Type
+
+| Concern | Implementation |
+|---------|----------------|
+| Geometry | Same per-character extruded meshes |
+| Physics | Fixed-timestep Rapier cuboid bodies + spring forces toward rest |
+| Coupling | Neighbor pull + max stretch clamp + optional pointer forces |
+| Audio | Mid/energy/beat modulate oscillation |
+| Pointer | Raycast plane → push/pull/attract modes |
+| Reduced motion | Static letter meshes |
+| Presets | Rubber Band, Spring Lattice, Rebound |
+
 ## Audio engine
 
 | Concern | Implementation |
@@ -55,7 +80,8 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 | PNG | `canvas.toBlob` with `preserveDrawingBuffer` |
 | Video | One loop via `captureStream` + MediaRecorder MIME ladder |
 | Overlays | Hidden while `data-exporting` is set |
+| Physics | Fixed timestep + velocity clamps keep loops exportable |
 
 ## Next systems
 
-Inflatable type, torn paper, elastic type, type-architecture; fuller audio mappings; export hardening (FPS fallbacks, thumbnails).
+Torn paper, type-architecture; fuller audio mappings across physics systems; a11y/perf/launch hardening.

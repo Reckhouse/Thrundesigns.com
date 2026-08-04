@@ -35,6 +35,14 @@ import {
   crtPresets,
 } from "../systems/crt-photocopy/crtPhotocopy.schema";
 import {
+  parseInflatableConfig,
+  inflatablePresets,
+} from "../systems/inflatable-type/inflatableType.schema";
+import {
+  parseElasticConfig,
+  elasticPresets,
+} from "../systems/elastic-type/elasticType.schema";
+import {
   listRegisteredVisualSystems,
   type ActiveVisualSystemKey,
 } from "../systems/registry";
@@ -240,6 +248,16 @@ function PosterLabShellInner({
   const applyChromePreset = usePosterLabStore((state) => state.applyChromePreset);
   const setCrtConfig = usePosterLabStore((state) => state.setCrtConfig);
   const applyCrtPreset = usePosterLabStore((state) => state.applyCrtPreset);
+  const setInflatableConfig = usePosterLabStore(
+    (state) => state.setInflatableConfig,
+  );
+  const applyInflatablePreset = usePosterLabStore(
+    (state) => state.applyInflatablePreset,
+  );
+  const setElasticConfig = usePosterLabStore((state) => state.setElasticConfig);
+  const applyElasticPreset = usePosterLabStore(
+    (state) => state.applyElasticPreset,
+  );
   const setAudioConfig = usePosterLabStore((state) => state.setAudioConfig);
   const importSvgMarkup = usePosterLabStore((state) => state.importSvgMarkup);
   const clearSvgAsset = usePosterLabStore((state) => state.clearSvgAsset);
@@ -274,6 +292,14 @@ function PosterLabShellInner({
   );
   const crtConfig = useMemo(
     () => parseCrtConfig(documentState.visualSystem.config),
+    [documentState.visualSystem.config],
+  );
+  const inflatableConfig = useMemo(
+    () => parseInflatableConfig(documentState.visualSystem.config),
+    [documentState.visualSystem.config],
+  );
+  const elasticConfig = useMemo(
+    () => parseElasticConfig(documentState.visualSystem.config),
     [documentState.visualSystem.config],
   );
   const registeredSystems = useMemo(() => listRegisteredVisualSystems(), []);
@@ -519,11 +545,7 @@ function PosterLabShellInner({
         <select
           id="cc-visual-system"
           aria-label="Visual system"
-          value={
-            systemKey === "chrome-liquid" || systemKey === "crt-photocopy"
-              ? systemKey
-              : "particle-disintegration"
-          }
+          value={systemKey}
           onChange={(event) =>
             setVisualSystem(event.target.value as ActiveVisualSystemKey)
           }
@@ -582,24 +604,62 @@ function PosterLabShellInner({
                     {preset.title}
                   </button>
                 ))
-              : particlePresets.map((preset) => (
-                  <button
-                    key={preset.key}
-                    type="button"
-                    onClick={() => applyParticlePreset(preset.key)}
-                    style={{
-                      ...inputStyle,
-                      cursor: "pointer",
-                      textAlign: "left",
-                      fontFamily: tokens.fontMono,
-                      fontSize: "0.6875rem",
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {preset.title}
-                  </button>
-                ))}
+              : systemKey === "inflatable-type"
+                ? inflatablePresets.map((preset) => (
+                    <button
+                      key={preset.key}
+                      type="button"
+                      onClick={() => applyInflatablePreset(preset.key)}
+                      style={{
+                        ...inputStyle,
+                        cursor: "pointer",
+                        textAlign: "left",
+                        fontFamily: tokens.fontMono,
+                        fontSize: "0.6875rem",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {preset.title}
+                    </button>
+                  ))
+                : systemKey === "elastic-type"
+                  ? elasticPresets.map((preset) => (
+                      <button
+                        key={preset.key}
+                        type="button"
+                        onClick={() => applyElasticPreset(preset.key)}
+                        style={{
+                          ...inputStyle,
+                          cursor: "pointer",
+                          textAlign: "left",
+                          fontFamily: tokens.fontMono,
+                          fontSize: "0.6875rem",
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {preset.title}
+                      </button>
+                    ))
+                  : particlePresets.map((preset) => (
+                      <button
+                        key={preset.key}
+                        type="button"
+                        onClick={() => applyParticlePreset(preset.key)}
+                        style={{
+                          ...inputStyle,
+                          cursor: "pointer",
+                          textAlign: "left",
+                          fontFamily: tokens.fontMono,
+                          fontSize: "0.6875rem",
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {preset.title}
+                      </button>
+                    ))}
         </div>
       </div>
 
@@ -815,7 +875,160 @@ function PosterLabShellInner({
         </div>
       ) : null}
 
-      {systemKey === "particle-disintegration" ? (
+      {systemKey === "inflatable-type" ? (
+        <div style={{ marginTop: "1.25rem" }}>
+          <label style={labelStyle} htmlFor="cc-inflate">
+            Inflate · {inflatableConfig.inflatePressure.toFixed(2)}
+          </label>
+          <input
+            id="cc-inflate"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={inflatableConfig.inflatePressure}
+            onChange={(event) =>
+              setInflatableConfig({
+                inflatePressure: Number(event.target.value),
+              })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-bounce"
+          >
+            Bounce · {inflatableConfig.bounce.toFixed(2)}
+          </label>
+          <input
+            id="cc-bounce"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={inflatableConfig.bounce}
+            onChange={(event) =>
+              setInflatableConfig({ bounce: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-puff"
+          >
+            Puff · {inflatableConfig.puffScale.toFixed(2)}
+          </label>
+          <input
+            id="cc-puff"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={inflatableConfig.puffScale}
+            onChange={(event) =>
+              setInflatableConfig({ puffScale: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-pulse"
+          >
+            Pulse · {inflatableConfig.pulseSpeed.toFixed(2)}
+          </label>
+          <input
+            id="cc-pulse"
+            type="range"
+            min={0.1}
+            max={3}
+            step={0.05}
+            value={inflatableConfig.pulseSpeed}
+            onChange={(event) =>
+              setInflatableConfig({ pulseSpeed: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+        </div>
+      ) : null}
+
+      {systemKey === "elastic-type" ? (
+        <div style={{ marginTop: "1.25rem" }}>
+          <label style={labelStyle} htmlFor="cc-stiffness">
+            Stiffness · {elasticConfig.stiffness.toFixed(2)}
+          </label>
+          <input
+            id="cc-stiffness"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={elasticConfig.stiffness}
+            onChange={(event) =>
+              setElasticConfig({ stiffness: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-stretch"
+          >
+            Stretch · {elasticConfig.stretch.toFixed(2)}
+          </label>
+          <input
+            id="cc-stretch"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={elasticConfig.stretch}
+            onChange={(event) =>
+              setElasticConfig({ stretch: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-elastic-damp"
+          >
+            Damping · {elasticConfig.damping.toFixed(2)}
+          </label>
+          <input
+            id="cc-elastic-damp"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={elasticConfig.damping}
+            onChange={(event) =>
+              setElasticConfig({ damping: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-pointer-coupling"
+          >
+            Pointer · {elasticConfig.pointerCoupling.toFixed(2)}
+          </label>
+          <input
+            id="cc-pointer-coupling"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={elasticConfig.pointerCoupling}
+            onChange={(event) =>
+              setElasticConfig({
+                pointerCoupling: Number(event.target.value),
+              })
+            }
+            style={{ width: "100%" }}
+          />
+        </div>
+      ) : null}
+
+      {systemKey === "particle-disintegration" ||
+      systemKey === "elastic-type" ? (
       <div style={{ marginTop: "1.25rem" }}>
         <label style={labelStyle} htmlFor="cc-force-mode">
           Pointer force

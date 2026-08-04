@@ -386,7 +386,7 @@ Particle disintegration is the active default system:
 - Quality budgets and curated presets
 - Docs: `visual-systems.md`
 
-**Next (Phase 8):** Inflatable + elastic type (Rapier physics).
+**Next (Phase 9):** Torn paper + type-architecture systems.
 
 ---
 
