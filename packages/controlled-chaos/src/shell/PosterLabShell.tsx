@@ -439,6 +439,11 @@ function PosterLabShellInner({
       }}
       aria-label="Poster controls"
     >
+      <p style={labelStyle}>How to explore</p>
+      <p style={{ ...muted, marginBottom: "1.25rem" }}>
+        Edit the phrase, pick a visual system, drag to apply force, then export
+        PNG/video or save a share link.
+      </p>
       {allowTextEditing ? (
         <form
           onSubmit={(event: FormEvent) => {
@@ -1819,7 +1824,12 @@ function PosterLabShellInner({
             }}
             aria-label="Content"
           >
-            <p style={labelStyle}>Typography</p>
+            <p style={labelStyle}>How to explore</p>
+            <p style={muted}>
+              Edit the phrase, switch visual systems on the right, drag across
+              the poster to apply force, then export or save a share link.
+            </p>
+            <p style={{ ...labelStyle, marginTop: "1.25rem" }}>Typography</p>
             <p style={muted}>
               Curated typefaces via typeface.json. Extruded geometry rebuilds
               after a short debounce while you edit.
@@ -1889,8 +1899,8 @@ function PosterLabShellInner({
             {exportMessage
               ? exportMessage
               : allowSave
-                ? "Export PNG/video or Save & share from the toolbar."
-                : "Export PNG or one loop as video from the toolbar."}
+                ? "Tip: switch systems on the right · drag the poster · Export PNG/video or Save & share."
+                : "Tip: switch systems on the right · drag the poster · Export PNG or one loop as video."}
             {!exportMessage && !allowSave
               ? persistence
                 ? " Persistence is connected."

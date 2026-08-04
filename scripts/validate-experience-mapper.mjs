@@ -41,6 +41,14 @@ if (validPreview.ok) {
     "preview builds launch URL",
   );
   assert(
+    validPreview.value.launchUrl.includes("mode=inline"),
+    "preview fullscreen launch opens full lab (inline), not embed preview",
+  );
+  assert(
+    !validPreview.value.launchUrl.includes("mode=preview"),
+    "preview fullscreen launch does not leak mode=preview",
+  );
+  assert(
     validPreview.value.presentation.loadBehavior === "interaction",
     "preview keeps load behavior",
   );
