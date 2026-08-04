@@ -18,27 +18,32 @@ This document covers creation persistence, analytics redaction, and client/serve
 
 Non-goals: authenticated accounts, private creations, signed blob URLs for JSON (public immutable share links by design).
 
-## Persistence flow
+## Persistence flow (visitor)
 
 ```
-Lab Save & share
+Lab Save locally
   → harden + serialize (client)
-  → POST /api/creations/thumbnail (optional JPEG/PNG/WebP data URL)
-  → POST /api/creations (Zod + harden + size + thumbnail allowlist)
-  → Blob creations/{id}.json + Redis meta
-  → /creation/{id} (noindex; OG image only if allowlisted)
+  → download PNG still + creation JSON (browser only)
 ```
 
-Saves are **immutable**: each save allocates a new `cc_` id. Edits create a new link; old links remain valid.
+Public write APIs are disabled:
+
+```
+POST /api/creations → 403
+POST /api/creations/thumbnail → 403
+POST /api/creations/{id}/duplicate → 403
+```
+
+Existing creation IDs remain readable via `GET /api/creations/{id}` and `/creation/{id}` for curated / historical replays. Thumbnail URLs on those records still require HTTPS + Blob hostname allowlist for OG.
 
 ## API surfaces
 
 | Route | Guards |
 |-------|--------|
-| `POST /api/creations` | Rate limit, Content-Length budget, Zod, harden, `CREATIONS_MAX_BYTES`, experience key pin |
-| `POST /api/creations/thumbnail` | Separate rate limit, Content-Length, data-URL parse, magic bytes, 1.5 MB cap |
+| `POST /api/creations` | **403** — public uploads disabled |
+| `POST /api/creations/thumbnail` | **403** — public uploads disabled |
 | `GET /api/creations/{id}` | ID format check, `Cache-Control: private, no-store`, redacted security logs |
-| `POST /api/creations/{id}/duplicate` | Rate limit + load + new immutable save |
+| `POST /api/creations/{id}/duplicate` | **403** — public uploads disabled |
 
 ## Logging
 

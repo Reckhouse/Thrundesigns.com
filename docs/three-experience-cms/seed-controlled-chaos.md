@@ -37,7 +37,7 @@ Cover asset (repo): `/images/controlled-chaos-cover.jpg`
 2. **Rich text** — seven visual systems overview.
 3. **Process steps** — experience package → serializable creations → case-study launch.
 4. **Metrics** — 7 systems · 21 presets · 9:16 frame.
-5. **Credits** — Thrun Design Co. + stack line.
+5. **Credits** — Thrun Design Co. + stack line (`Next.js · Three.js · R3F · Rapier`).
 6. **CTA** — Launch Poster Lab → `/lab/controlled-chaos?mode=inline&from=/work/controlled-chaos-poster-lab`.
 
 Skip an in-page `projectThreeExperience` embed when the hero + CTA already open the lab.

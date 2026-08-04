@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CreationReplayClient } from "@/app/creation/[creationId]/creation-replay-client";
-import { DuplicateCreationButton } from "@/app/creation/[creationId]/duplicate-button";
 import { ExperienceLaunchLink } from "@/components/experiences/ExperienceLaunchLink";
 import { withLabReturnPath } from "@/experiences/controlled-chaos/parseLabSearchParams";
 import { validateExperienceEmbedConfig } from "@/experiences/compatibility";
@@ -185,7 +184,6 @@ export default async function CreationPage({
           >
             Edit this version
           </ExperienceLaunchLink>
-          <DuplicateCreationButton creationId={creationId} />
         </div>
       </main>
     </div>

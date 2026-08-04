@@ -51,6 +51,11 @@ function downloadBlob(blob: Blob, fileName: string) {
   window.setTimeout(() => URL.revokeObjectURL(url), 2_000);
 }
 
+/** Trigger a browser download for an arbitrary Blob. */
+export function downloadExportBlob(blob: Blob, fileName: string) {
+  downloadBlob(blob, fileName);
+}
+
 export function resolveVideoFpsLadder(
   preferred = 30,
   quality?: "auto" | "low" | "medium" | "high",

@@ -22,5 +22,5 @@
 
 - **PNG** via `captureStill` (optional scale).
 - **Video** via FPS + MIME ladders; falls back to still when recording fails.
-- **Thumbnail** JPEG on Save & share → Blob HTTPS URL.
+- **Save locally** downloads PNG + creation JSON to the visitor’s device (no Blob upload).
 - See `export-pipeline.md` for the full Phase 6 pipeline.
