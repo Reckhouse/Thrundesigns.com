@@ -368,6 +368,17 @@ Completed:
 - Wired into `ProjectModules` and hero launch CTA from `primaryExperience`
 - Privacy-safe `trackExperienceEvent` adapter (console for now)
 
+## Phase 6 status
+
+Completed:
+
+- `/lab/controlled-chaos` fullscreen route with minimal chrome + case-study return link
+- Lab search-param parser + validated embed config (asset base URL included)
+- Shared client loaders via experience registry
+- Persistence adapter stub (Phase 7 API) + analytics adapter
+- `ExperienceErrorBoundary` around the lab renderer
+- Sitemap entry for the lab route
+
 
 ---
 

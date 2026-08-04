@@ -6,6 +6,7 @@ import {
   SectionHeading,
 } from "@/components/site/primitives";
 import { formatCompatibilityWarning } from "@/experiences/compatibility";
+import { withLabReturnPath } from "@/experiences/controlled-chaos/parseLabSearchParams";
 import { mapSanityExperienceConfig } from "@/experiences/mapSanityExperienceConfig";
 import type { ExperienceMode } from "@/experiences/types";
 import { resolveFileLabel, resolveFileUrl } from "@/lib/file-asset";
@@ -18,6 +19,7 @@ type ThreeExperienceSectionProps = {
   value: ThreeExperienceBlockValue;
   /** When false, omit ModuleShell (e.g. nested usage). Default true. */
   shelled?: boolean;
+  caseStudyPath?: string;
 };
 
 function asMode(value: unknown): ExperienceMode {
@@ -72,6 +74,7 @@ function ExperienceFallbackVideo({
 export function ThreeExperienceSection({
   value,
   shelled = true,
+  caseStudyPath,
 }: ThreeExperienceSectionProps) {
   const mapped = mapSanityExperienceConfig(value);
   const posterSrc = resolveMediaUrl(value.posterImage, 1600);
@@ -95,7 +98,11 @@ export function ThreeExperienceSection({
   const description = mapped.ok
     ? mapped.value.presentation.description || value.description
     : value.description;
-  const launchUrl = mapped.ok ? mapped.value.launchUrl : null;
+  const launchUrl = mapped.ok
+    ? caseStudyPath
+      ? withLabReturnPath(mapped.value.launchUrl, caseStudyPath)
+      : mapped.value.launchUrl
+    : null;
   const showFullscreen = mapped.ok
     ? mapped.value.presentation.showFullscreenAction
     : Boolean(value.showFullscreenAction);
@@ -179,8 +186,12 @@ export function ThreeExperienceSection({
 
 export function ThreeExperienceModule({
   module,
+  caseStudyPath,
 }: {
   module: ProjectThreeExperienceModule;
+  caseStudyPath?: string;
 }) {
-  return <ThreeExperienceSection value={module} />;
+  return (
+    <ThreeExperienceSection value={module} caseStudyPath={caseStudyPath} />
+  );
 }

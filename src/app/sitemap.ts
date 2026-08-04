@@ -30,6 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/`, lastModified: now },
     { url: `${base}/work`, lastModified: now },
     { url: `${base}/quote`, lastModified: now },
+    { url: `${base}/lab/controlled-chaos`, lastModified: now },
   ];
 
   const projectRoutes: MetadataRoute.Sitemap = projects

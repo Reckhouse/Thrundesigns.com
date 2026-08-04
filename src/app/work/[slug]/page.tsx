@@ -12,6 +12,7 @@ import {
   SectionHeading,
 } from "@/components/site/primitives";
 import { mapSanityExperienceConfig } from "@/experiences/mapSanityExperienceConfig";
+import { withLabReturnPath } from "@/experiences/controlled-chaos/parseLabSearchParams";
 import { defaultHomeContent } from "@/lib/default-content";
 import {
   resolveMediaAlt,
@@ -140,7 +141,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const primaryLaunch =
     primaryMapped?.ok && primaryMapped.value.presentation.showFullscreenAction
       ? {
-          href: primaryMapped.value.launchUrl,
+          href: withLabReturnPath(
+            primaryMapped.value.launchUrl,
+            `/work/${slug}`,
+          ),
           label: primaryMapped.value.presentation.fullscreenLabel,
           experienceKey: primaryMapped.value.experienceKey,
         }
@@ -196,7 +200,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               </div>
             </div>
           </section>
-          <ProjectModules modules={project.modules} />
+          <ProjectModules
+            modules={project.modules}
+            caseStudyPath={`/work/${slug}`}
+          />
         </article>
       </main>
       <SiteFooter

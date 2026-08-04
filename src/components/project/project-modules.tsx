@@ -12,9 +12,14 @@ import type { ProjectModule } from "@/types/project-modules";
 
 type ProjectModulesProps = {
   modules?: ProjectModule[] | null;
+  /** Case study path used for lab "back" links, e.g. `/work/orbit-systems`. */
+  caseStudyPath?: string;
 };
 
-export function ProjectModules({ modules }: ProjectModulesProps) {
+export function ProjectModules({
+  modules,
+  caseStudyPath,
+}: ProjectModulesProps) {
   if (!modules?.length) return null;
 
   return (
@@ -37,7 +42,13 @@ export function ProjectModules({ modules }: ProjectModulesProps) {
           case "projectVideo":
             return <VideoModule key={module._key} module={module} />;
           case "projectThreeExperience":
-            return <ThreeExperienceModule key={module._key} module={module} />;
+            return (
+              <ThreeExperienceModule
+                key={module._key}
+                module={module}
+                caseStudyPath={caseStudyPath}
+              />
+            );
           case "projectCta":
             return <CtaModule key={module._key} module={module} />;
           case "projectCredits":

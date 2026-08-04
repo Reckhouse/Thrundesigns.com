@@ -120,12 +120,14 @@ export function validateExperienceEmbedConfig(
     };
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Invalid embed configuration";
+      error instanceof Error
+        ? error.message
+        : "Invalid embed configuration";
     return {
       ok: false,
       code: "invalid_configuration",
       experienceKey,
-      message,
+      message: typeof message === "string" ? message : "Invalid embed configuration",
       details: error,
     } satisfies ExperienceCompatibilityError;
   }

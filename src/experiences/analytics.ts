@@ -9,7 +9,10 @@ export type ExperienceAnalyticsEvent =
   | "experience_initialized"
   | "experience_failed"
   | "fullscreen_launch_selected"
-  | "replay_loaded";
+  | "replay_loaded"
+  | "export_completed"
+  | "share_link_copied"
+  | "creation_duplicated";
 
 type ExperienceAnalyticsPayload = {
   experienceKey?: string;
