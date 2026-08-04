@@ -110,6 +110,35 @@ export const projectBySlugQuery = defineQuery(`
       description,
       ogImage
     },
+    primaryExperience{
+      ...,
+      posterImage{
+        alt,
+        blobUrl,
+        image
+      },
+      fallbackVideo{
+        asset->{
+          url,
+          originalFilename,
+          mimeType,
+          size
+        }
+      }
+    },
+    featuredCreations[]{
+      _key,
+      creationId,
+      displayTitle,
+      shortDescription,
+      curatorNote,
+      order,
+      thumbnail{
+        alt,
+        blobUrl,
+        image
+      }
+    },
     modules[]{
       ...,
       _type == "projectGallery" => {
@@ -134,6 +163,22 @@ export const projectBySlugQuery = defineQuery(`
           alt,
           blobUrl,
           image
+        }
+      },
+      _type == "projectThreeExperience" => {
+        ...,
+        posterImage{
+          alt,
+          blobUrl,
+          image
+        },
+        fallbackVideo{
+          asset->{
+            url,
+            originalFilename,
+            mimeType,
+            size
+          }
         }
       }
     },

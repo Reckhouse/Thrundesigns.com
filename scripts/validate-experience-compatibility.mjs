@@ -47,6 +47,7 @@ const serverSafePaths = [
   join(root, "src/experiences/compatibility.ts"),
   join(root, "src/experiences/types.ts"),
   join(root, "src/experiences/manifest-options.ts"),
+  join(root, "src/experiences/mapSanityExperienceConfig.ts"),
   join(root, "packages/controlled-chaos/src/manifest.ts"),
   join(root, "packages/controlled-chaos/src/schemas.ts"),
   join(root, "studio/lib/experienceManifestOptions.ts"),

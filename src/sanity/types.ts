@@ -12,7 +12,16 @@
  * ---------------------------------------------------------------------------------
  */
 
+export declare const internalGroqTypeReferenceTo: unique symbol;
+
 // Source: schema.json
+export type ServiceReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "service";
+};
+
 export type QuoteSubmission = {
   _id: string;
   _type: "quoteSubmission";
@@ -24,12 +33,7 @@ export type QuoteSubmission = {
   email?: string;
   company?: string;
   projectType?: string;
-  service?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "service";
-  };
+  service?: ServiceReference;
   budget?: string;
   timeline?: string;
   message?: string;
@@ -58,16 +62,29 @@ export type QuoteForm = {
   timelineField?: QuoteFormField;
   messageField?: QuoteFormField;
   attachmentsField?: QuoteFormField;
-  projectTypes?: Array<{
-    _key: string;
-  } & QuoteFormProjectTypeOption>;
-  budgetRanges?: Array<{
-    _key: string;
-  } & QuoteFormOption>;
-  timelines?: Array<{
-    _key: string;
-  } & QuoteFormOption>;
+  projectTypes?: Array<
+    {
+      _key: string;
+    } & QuoteFormProjectTypeOption
+  >;
+  budgetRanges?: Array<
+    {
+      _key: string;
+    } & QuoteFormOption
+  >;
+  timelines?: Array<
+    {
+      _key: string;
+    } & QuoteFormOption
+  >;
   seo?: Seo;
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
 export type Seo = {
@@ -75,12 +92,7 @@ export type Seo = {
   title?: string;
   description?: string;
   ogImage?: {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
+    asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
@@ -109,28 +121,49 @@ export type Project = {
   cover?: MediaAsset;
   featured?: boolean;
   order?: number;
-  modules?: Array<{
-    _key: string;
-  } & ProjectRichText | {
-    _key: string;
-  } & ProjectGallery | {
-    _key: string;
-  } & ProjectSplit | {
-    _key: string;
-  } & ProjectMetrics | {
-    _key: string;
-  } & ProjectProcess | {
-    _key: string;
-  } & ProjectQuote | {
-    _key: string;
-  } & ProjectVideo | {
-    _key: string;
-  } & ProjectCta | {
-    _key: string;
-  } & ProjectCredits>;
-  gallery?: Array<{
-    _key: string;
-  } & MediaAsset>;
+  primaryExperience?: ProjectThreeExperience;
+  featuredCreations?: Array<
+    {
+      _key: string;
+    } & FeaturedCreation
+  >;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & ProjectRichText)
+    | ({
+        _key: string;
+      } & ProjectGallery)
+    | ({
+        _key: string;
+      } & ProjectSplit)
+    | ({
+        _key: string;
+      } & ProjectMetrics)
+    | ({
+        _key: string;
+      } & ProjectProcess)
+    | ({
+        _key: string;
+      } & ProjectQuote)
+    | ({
+        _key: string;
+      } & ProjectVideo)
+    | ({
+        _key: string;
+      } & ProjectThreeExperience)
+    | ({
+        _key: string;
+      } & ProjectCta)
+    | ({
+        _key: string;
+      } & ProjectCredits)
+  >;
+  gallery?: Array<
+    {
+      _key: string;
+    } & MediaAsset
+  >;
   body?: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -152,15 +185,45 @@ export type Project = {
   seo?: Seo;
 };
 
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
+};
+
+export type ProjectThreeExperience = {
+  _type: "projectThreeExperience";
+  experienceKey?: "controlled-chaos-poster-lab";
+  embedConfigVersion?: number;
+  mode?: "preview" | "inline" | "replay";
+  initialPresetKey?: "signal-failure" | "grid-bloom" | "cold-open";
+  initialCreationId?: string;
+  heading?: string;
+  description?: string;
+  posterImage?: MediaAsset;
+  fallbackVideo?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  quality?: "auto" | "low" | "medium" | "high";
+  controls?: "none" | "minimal" | "full";
+  autoplay?: boolean;
+  loadBehavior?: "interaction" | "viewport" | "immediate";
+  height?: number;
+  allowTextEditing?: boolean;
+  allowSvgUpload?: boolean;
+  allowAudio?: boolean;
+  allowExport?: boolean;
+  showFullscreenAction?: boolean;
+  fullscreenLabel?: string;
+};
+
 export type MediaAsset = {
   _type: "mediaAsset";
   image?: {
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-    };
+    asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
@@ -297,12 +360,7 @@ export type QuoteFormProjectTypeOption = {
   _type: "quoteFormProjectTypeOption";
   value?: string;
   label?: string;
-  service?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "service";
-  };
+  service?: ServiceReference;
   enabled?: boolean;
 };
 
@@ -408,9 +466,11 @@ export type ProjectSplit = {
 export type ProjectGallery = {
   _type: "projectGallery";
   layout?: "grid" | "fullBleed" | "masonry";
-  items?: Array<{
-    _key: string;
-  } & MediaAsset>;
+  items?: Array<
+    {
+      _key: string;
+    } & MediaAsset
+  >;
   caption?: string;
 };
 
@@ -435,6 +495,16 @@ export type ProjectRichText = {
     _type: "block";
     _key: string;
   }>;
+};
+
+export type FeaturedCreation = {
+  _type: "featuredCreation";
+  creationId?: string;
+  displayTitle?: string;
+  shortDescription?: string;
+  curatorNote?: string;
+  thumbnail?: MediaAsset;
+  order?: number;
 };
 
 export type SanityImageCrop = {
@@ -486,6 +556,7 @@ export type SanityImageMetadata = {
   palette?: SanityImagePalette;
   lqip?: string;
   blurHash?: string;
+  thumbHash?: string;
   hasAlpha?: boolean;
   isOpaque?: boolean;
 };
@@ -549,8 +620,46 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = QuoteSubmission | QuoteForm | Seo | QuoteFormField | Project | MediaAsset | Slug | ProcessStep | HomePage | Cta | SiteSettings | QuoteFormProjectTypeOption | Service | QuoteFormOption | ProjectCredits | ProjectCta | ProjectVideo | ProjectQuote | ProjectProcess | ProjectMetrics | ProjectSplit | ProjectGallery | ProjectRichText | SanityImageCrop | SanityImageHotspot | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
-export declare const internalGroqTypeReferenceTo: unique symbol;
+export type AllSanitySchemaTypes =
+  | ServiceReference
+  | QuoteSubmission
+  | QuoteForm
+  | SanityImageAssetReference
+  | Seo
+  | QuoteFormField
+  | Project
+  | SanityFileAssetReference
+  | ProjectThreeExperience
+  | MediaAsset
+  | Slug
+  | ProcessStep
+  | HomePage
+  | Cta
+  | SiteSettings
+  | QuoteFormProjectTypeOption
+  | Service
+  | QuoteFormOption
+  | ProjectCredits
+  | ProjectCta
+  | ProjectVideo
+  | ProjectQuote
+  | ProjectProcess
+  | ProjectMetrics
+  | ProjectSplit
+  | ProjectGallery
+  | ProjectRichText
+  | FeaturedCreation
+  | SanityImageCrop
+  | SanityImageHotspot
+  | SanityImagePaletteSwatch
+  | SanityImagePalette
+  | SanityImageDimensions
+  | SanityImageMetadata
+  | SanityFileAsset
+  | SanityAssetSourceData
+  | SanityImageAsset
+  | Geopoint;
+
 // Source: ../src/sanity/lib/queries.ts
 // Variable: siteSettingsQuery
 // Query: *[_type == "siteSettings"][0]{    title,    tagline,    nav[]{ label, href },    footerColumns[]{      heading,      links[]{ label, href }    },    seo  }
@@ -570,6 +679,8 @@ export type SiteSettingsQueryResult = {
   }> | null;
   seo: Seo | null;
 } | null;
+
+// Source: ../src/sanity/lib/queries.ts
 // Variable: homePageQuery
 // Query: *[_type == "homePage"][0]{    hero{      eyebrow,      headline,      support,      primaryCta,      secondaryCta,      servicesMeta,      image    },    servicesIntro,    processIntro,    workIntro,    artifact{      eyebrow,      heading,      intro,      items[]{ label, detail },      footnote,      ctaLabel,      ctaHref    },    engage{      heading,      steps[]{ title, copy },      replyHeading,      replyPoints    },    whyThrun,    finalCta,    seo  }
 export type HomePageQueryResult = {
@@ -638,6 +749,8 @@ export type HomePageQueryResult = {
   } | null;
   seo: Seo | null;
 } | null;
+
+// Source: ../src/sanity/lib/queries.ts
 // Variable: servicesQuery
 // Query: *[_type == "service"] | order(order asc){    _id,    title,    slug,    icon,    summary,    linkLabel  }
 export type ServicesQueryResult = Array<{
@@ -648,6 +761,8 @@ export type ServicesQueryResult = Array<{
   summary: string | null;
   linkLabel: string | null;
 }>;
+
+// Source: ../src/sanity/lib/queries.ts
 // Variable: processStepsQuery
 // Query: *[_type == "processStep"] | order(order asc){    _id,    number,    title,    copy  }
 export type ProcessStepsQueryResult = Array<{
@@ -656,6 +771,8 @@ export type ProcessStepsQueryResult = Array<{
   title: string | null;
   copy: string | null;
 }>;
+
+// Source: ../src/sanity/lib/queries.ts
 // Variable: featuredProjectsQuery
 // Query: *[_type == "project" && featured == true] | order(order asc)[0...6]{    _id,    title,    slug,    industry,    services,    summary,    cover  }
 export type FeaturedProjectsQueryResult = Array<{
@@ -667,6 +784,8 @@ export type FeaturedProjectsQueryResult = Array<{
   summary: string | null;
   cover: MediaAsset | null;
 }>;
+
+// Source: ../src/sanity/lib/queries.ts
 // Variable: projectsQuery
 // Query: *[_type == "project"] | order(order asc){    _id,    title,    slug,    industry,    services,    summary,    cover  }
 export type ProjectsQueryResult = Array<{
@@ -678,8 +797,10 @@ export type ProjectsQueryResult = Array<{
   summary: string | null;
   cover: MediaAsset | null;
 }>;
+
+// Source: ../src/sanity/lib/queries.ts
 // Variable: projectBySlugQuery
-// Query: *[_type == "project" && slug.current == $slug][0]{    _id,    title,    slug,    industry,    services,    summary,    cover{      alt,      blobUrl,      image    },    seo{      title,      description,      ogImage    },    modules[]{      ...,      _type == "projectGallery" => {        ...,        items[]{          alt,          blobUrl,          image        }      },      _type == "projectSplit" => {        ...,        media{          alt,          blobUrl,          image        }      },      _type == "projectVideo" => {        ...,        poster{          alt,          blobUrl,          image        }      }    },    // Legacy fields kept for one-time migration tooling    gallery,    body  }
+// Query: *[_type == "project" && slug.current == $slug][0]{    _id,    title,    slug,    industry,    services,    summary,    cover{      alt,      blobUrl,      image    },    seo{      title,      description,      ogImage    },    primaryExperience{      ...,      posterImage{        alt,        blobUrl,        image      },      fallbackVideo{        asset->{          url,          originalFilename,          mimeType,          size        }      }    },    featuredCreations[]{      _key,      creationId,      displayTitle,      shortDescription,      curatorNote,      order,      thumbnail{        alt,        blobUrl,        image      }    },    modules[]{      ...,      _type == "projectGallery" => {        ...,        items[]{          alt,          blobUrl,          image        }      },      _type == "projectSplit" => {        ...,        media{          alt,          blobUrl,          image        }      },      _type == "projectVideo" => {        ...,        poster{          alt,          blobUrl,          image        }      },      _type == "projectThreeExperience" => {        ...,        posterImage{          alt,          blobUrl,          image        },        fallbackVideo{          asset->{            url,            originalFilename,            mimeType,            size          }        }      }    },    // Legacy fields kept for one-time migration tooling    gallery,    body  }
 export type ProjectBySlugQueryResult = {
   _id: string;
   title: string | null;
@@ -691,12 +812,7 @@ export type ProjectBySlugQueryResult = {
     alt: string | null;
     blobUrl: string | null;
     image: {
-      asset?: {
-        _ref: string;
-        _type: "reference";
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-      };
+      asset?: SanityImageAssetReference;
       media?: unknown;
       hotspot?: SanityImageHotspot;
       crop?: SanityImageCrop;
@@ -707,166 +823,258 @@ export type ProjectBySlugQueryResult = {
     title: string | null;
     description: string | null;
     ogImage: {
-      asset?: {
-        _ref: string;
-        _type: "reference";
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-      };
+      asset?: SanityImageAssetReference;
       media?: unknown;
       hotspot?: SanityImageHotspot;
       crop?: SanityImageCrop;
       _type: "image";
     } | null;
   } | null;
-  modules: Array<{
-    _key: string;
-    _type: "projectCredits";
-    items?: Array<{
-      role?: string;
-      name?: string;
-      _type: "credit";
-      _key: string;
-    }>;
-  } | {
-    _key: string;
-    _type: "projectCta";
-    eyebrow?: string;
+  primaryExperience: {
+    _type: "projectThreeExperience";
+    experienceKey?: "controlled-chaos-poster-lab";
+    embedConfigVersion?: number;
+    mode?: "inline" | "preview" | "replay";
+    initialPresetKey?: "cold-open" | "grid-bloom" | "signal-failure";
+    initialCreationId?: string;
     heading?: string;
-    label?: string;
-    href?: string;
-  } | {
-    _key: string;
-    _type: "projectGallery";
-    layout?: "fullBleed" | "grid" | "masonry";
-    items: Array<{
+    description?: string;
+    posterImage: {
       alt: string | null;
       blobUrl: string | null;
       image: {
-        asset?: {
-          _ref: string;
-          _type: "reference";
-          _weak?: boolean;
-          [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-        };
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        _type: "image";
-      } | null;
-    }> | null;
-    caption?: string;
-  } | {
-    _key: string;
-    _type: "projectMetrics";
-    items?: Array<{
-      value?: string;
-      label?: string;
-      detail?: string;
-      _type: "metric";
-      _key: string;
-    }>;
-  } | {
-    _key: string;
-    _type: "projectProcess";
-    heading?: string;
-    steps?: Array<{
-      title?: string;
-      body?: string;
-      _type: "processStepItem";
-      _key: string;
-    }>;
-  } | {
-    _key: string;
-    _type: "projectQuote";
-    quote?: string;
-    attribution?: string;
-    role?: string;
-  } | {
-    _key: string;
-    _type: "projectRichText";
-    heading?: string;
-    body?: Array<{
-      children?: Array<{
-        marks?: Array<string>;
-        text?: string;
-        _type: "span";
-        _key: string;
-      }>;
-      style?: "blockquote" | "h3" | "h4" | "normal";
-      listItem?: "bullet" | "number";
-      markDefs?: Array<{
-        href?: string;
-        _type: "link";
-        _key: string;
-      }>;
-      level?: number;
-      _type: "block";
-      _key: string;
-    }>;
-  } | {
-    _key: string;
-    _type: "projectSplit";
-    mediaPosition?: "left" | "right";
-    media: {
-      alt: string | null;
-      blobUrl: string | null;
-      image: {
-        asset?: {
-          _ref: string;
-          _type: "reference";
-          _weak?: boolean;
-          [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-        };
+        asset?: SanityImageAssetReference;
         media?: unknown;
         hotspot?: SanityImageHotspot;
         crop?: SanityImageCrop;
         _type: "image";
       } | null;
     } | null;
-    body?: Array<{
-      children?: Array<{
-        marks?: Array<string>;
-        text?: string;
-        _type: "span";
-        _key: string;
-      }>;
-      style?: "h3" | "h4" | "normal";
-      listItem?: "bullet" | "number";
-      markDefs?: Array<{
-        href?: string;
-        _type: "link";
-        _key: string;
-      }>;
-      level?: number;
-      _type: "block";
-      _key: string;
-    }>;
-  } | {
+    fallbackVideo: {
+      asset: {
+        url: string | null;
+        originalFilename: string | null;
+        mimeType: string | null;
+        size: number | null;
+      } | null;
+    } | null;
+    quality?: "auto" | "high" | "low" | "medium";
+    controls?: "full" | "minimal" | "none";
+    autoplay?: boolean;
+    loadBehavior?: "immediate" | "interaction" | "viewport";
+    height?: number;
+    allowTextEditing?: boolean;
+    allowSvgUpload?: boolean;
+    allowAudio?: boolean;
+    allowExport?: boolean;
+    showFullscreenAction?: boolean;
+    fullscreenLabel?: string;
+  } | null;
+  featuredCreations: Array<{
     _key: string;
-    _type: "projectVideo";
-    url?: string;
-    poster: {
+    creationId: string | null;
+    displayTitle: string | null;
+    shortDescription: string | null;
+    curatorNote: string | null;
+    order: number | null;
+    thumbnail: {
       alt: string | null;
       blobUrl: string | null;
       image: {
-        asset?: {
-          _ref: string;
-          _type: "reference";
-          _weak?: boolean;
-          [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-        };
+        asset?: SanityImageAssetReference;
         media?: unknown;
         hotspot?: SanityImageHotspot;
         crop?: SanityImageCrop;
         _type: "image";
       } | null;
     } | null;
-    caption?: string;
   }> | null;
-  gallery: Array<{
-    _key: string;
-  } & MediaAsset> | null;
+  modules: Array<
+    | {
+        _key: string;
+        _type: "projectCredits";
+        items?: Array<{
+          role?: string;
+          name?: string;
+          _type: "credit";
+          _key: string;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "projectCta";
+        eyebrow?: string;
+        heading?: string;
+        label?: string;
+        href?: string;
+      }
+    | {
+        _key: string;
+        _type: "projectGallery";
+        layout?: "fullBleed" | "grid" | "masonry";
+        items: Array<{
+          alt: string | null;
+          blobUrl: string | null;
+          image: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+          } | null;
+        }> | null;
+        caption?: string;
+      }
+    | {
+        _key: string;
+        _type: "projectMetrics";
+        items?: Array<{
+          value?: string;
+          label?: string;
+          detail?: string;
+          _type: "metric";
+          _key: string;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "projectProcess";
+        heading?: string;
+        steps?: Array<{
+          title?: string;
+          body?: string;
+          _type: "processStepItem";
+          _key: string;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "projectQuote";
+        quote?: string;
+        attribution?: string;
+        role?: string;
+      }
+    | {
+        _key: string;
+        _type: "projectRichText";
+        heading?: string;
+        body?: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "blockquote" | "h3" | "h4" | "normal";
+          listItem?: "bullet" | "number";
+          markDefs?: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "projectSplit";
+        mediaPosition?: "left" | "right";
+        media: {
+          alt: string | null;
+          blobUrl: string | null;
+          image: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+          } | null;
+        } | null;
+        body?: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "h3" | "h4" | "normal";
+          listItem?: "bullet" | "number";
+          markDefs?: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+          }>;
+          level?: number;
+          _type: "block";
+          _key: string;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "projectThreeExperience";
+        experienceKey?: "controlled-chaos-poster-lab";
+        embedConfigVersion?: number;
+        mode?: "inline" | "preview" | "replay";
+        initialPresetKey?: "cold-open" | "grid-bloom" | "signal-failure";
+        initialCreationId?: string;
+        heading?: string;
+        description?: string;
+        posterImage: {
+          alt: string | null;
+          blobUrl: string | null;
+          image: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+          } | null;
+        } | null;
+        fallbackVideo: {
+          asset: {
+            url: string | null;
+            originalFilename: string | null;
+            mimeType: string | null;
+            size: number | null;
+          } | null;
+        } | null;
+        quality?: "auto" | "high" | "low" | "medium";
+        controls?: "full" | "minimal" | "none";
+        autoplay?: boolean;
+        loadBehavior?: "immediate" | "interaction" | "viewport";
+        height?: number;
+        allowTextEditing?: boolean;
+        allowSvgUpload?: boolean;
+        allowAudio?: boolean;
+        allowExport?: boolean;
+        showFullscreenAction?: boolean;
+        fullscreenLabel?: string;
+      }
+    | {
+        _key: string;
+        _type: "projectVideo";
+        url?: string;
+        poster: {
+          alt: string | null;
+          blobUrl: string | null;
+          image: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+          } | null;
+        } | null;
+        caption?: string;
+      }
+  > | null;
+  gallery: Array<
+    {
+      _key: string;
+    } & MediaAsset
+  > | null;
   body: Array<{
     children?: Array<{
       marks?: Array<string>;
@@ -886,6 +1094,8 @@ export type ProjectBySlugQueryResult = {
     _key: string;
   }> | null;
 } | null;
+
+// Source: ../src/sanity/lib/queries.ts
 // Variable: quoteFormQuery
 // Query: *[_type == "quoteForm" && _id == "quoteForm"][0]{    eyebrow,    headline,    support,    stepLabels,    successHeading,    successBody,    submitLabel,    nameField{ label, placeholder, helperText },    emailField{ label, placeholder, helperText },    companyField{ label, placeholder, helperText },    projectTypeField{ label, placeholder, helperText },    budgetField{ label, placeholder, helperText },    timelineField{ label, placeholder, helperText },    messageField{ label, placeholder, helperText },    attachmentsField{ label, placeholder, helperText },    projectTypes[]{      value,      label,      enabled,      service->{        _id,        title,        "slug": slug.current,        summary,        icon      }    },    budgetRanges[]{ value, label, enabled },    timelines[]{ value, label, enabled },    seo  }
 export type QuoteFormQueryResult = {
@@ -965,13 +1175,13 @@ export type QuoteFormQueryResult = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "\n  *[_type == \"siteSettings\"][0]{\n    title,\n    tagline,\n    nav[]{ label, href },\n    footerColumns[]{\n      heading,\n      links[]{ label, href }\n    },\n    seo\n  }\n": SiteSettingsQueryResult;
-    "\n  *[_type == \"homePage\"][0]{\n    hero{\n      eyebrow,\n      headline,\n      support,\n      primaryCta,\n      secondaryCta,\n      servicesMeta,\n      image\n    },\n    servicesIntro,\n    processIntro,\n    workIntro,\n    artifact{\n      eyebrow,\n      heading,\n      intro,\n      items[]{ label, detail },\n      footnote,\n      ctaLabel,\n      ctaHref\n    },\n    engage{\n      heading,\n      steps[]{ title, copy },\n      replyHeading,\n      replyPoints\n    },\n    whyThrun,\n    finalCta,\n    seo\n  }\n": HomePageQueryResult;
-    "\n  *[_type == \"service\"] | order(order asc){\n    _id,\n    title,\n    slug,\n    icon,\n    summary,\n    linkLabel\n  }\n": ServicesQueryResult;
-    "\n  *[_type == \"processStep\"] | order(order asc){\n    _id,\n    number,\n    title,\n    copy\n  }\n": ProcessStepsQueryResult;
-    "\n  *[_type == \"project\" && featured == true] | order(order asc)[0...6]{\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    summary,\n    cover\n  }\n": FeaturedProjectsQueryResult;
-    "\n  *[_type == \"project\"] | order(order asc){\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    summary,\n    cover\n  }\n": ProjectsQueryResult;
-    "\n  *[_type == \"project\" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    summary,\n    cover{\n      alt,\n      blobUrl,\n      image\n    },\n    seo{\n      title,\n      description,\n      ogImage\n    },\n    modules[]{\n      ...,\n      _type == \"projectGallery\" => {\n        ...,\n        items[]{\n          alt,\n          blobUrl,\n          image\n        }\n      },\n      _type == \"projectSplit\" => {\n        ...,\n        media{\n          alt,\n          blobUrl,\n          image\n        }\n      },\n      _type == \"projectVideo\" => {\n        ...,\n        poster{\n          alt,\n          blobUrl,\n          image\n        }\n      }\n    },\n    // Legacy fields kept for one-time migration tooling\n    gallery,\n    body\n  }\n": ProjectBySlugQueryResult;
-    "\n  *[_type == \"quoteForm\" && _id == \"quoteForm\"][0]{\n    eyebrow,\n    headline,\n    support,\n    stepLabels,\n    successHeading,\n    successBody,\n    submitLabel,\n    nameField{ label, placeholder, helperText },\n    emailField{ label, placeholder, helperText },\n    companyField{ label, placeholder, helperText },\n    projectTypeField{ label, placeholder, helperText },\n    budgetField{ label, placeholder, helperText },\n    timelineField{ label, placeholder, helperText },\n    messageField{ label, placeholder, helperText },\n    attachmentsField{ label, placeholder, helperText },\n    projectTypes[]{\n      value,\n      label,\n      enabled,\n      service->{\n        _id,\n        title,\n        \"slug\": slug.current,\n        summary,\n        icon\n      }\n    },\n    budgetRanges[]{ value, label, enabled },\n    timelines[]{ value, label, enabled },\n    seo\n  }\n": QuoteFormQueryResult;
+    '\n  *[_type == "siteSettings"][0]{\n    title,\n    tagline,\n    nav[]{ label, href },\n    footerColumns[]{\n      heading,\n      links[]{ label, href }\n    },\n    seo\n  }\n': SiteSettingsQueryResult;
+    '\n  *[_type == "homePage"][0]{\n    hero{\n      eyebrow,\n      headline,\n      support,\n      primaryCta,\n      secondaryCta,\n      servicesMeta,\n      image\n    },\n    servicesIntro,\n    processIntro,\n    workIntro,\n    artifact{\n      eyebrow,\n      heading,\n      intro,\n      items[]{ label, detail },\n      footnote,\n      ctaLabel,\n      ctaHref\n    },\n    engage{\n      heading,\n      steps[]{ title, copy },\n      replyHeading,\n      replyPoints\n    },\n    whyThrun,\n    finalCta,\n    seo\n  }\n': HomePageQueryResult;
+    '\n  *[_type == "service"] | order(order asc){\n    _id,\n    title,\n    slug,\n    icon,\n    summary,\n    linkLabel\n  }\n': ServicesQueryResult;
+    '\n  *[_type == "processStep"] | order(order asc){\n    _id,\n    number,\n    title,\n    copy\n  }\n': ProcessStepsQueryResult;
+    '\n  *[_type == "project" && featured == true] | order(order asc)[0...6]{\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    summary,\n    cover\n  }\n': FeaturedProjectsQueryResult;
+    '\n  *[_type == "project"] | order(order asc){\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    summary,\n    cover\n  }\n': ProjectsQueryResult;
+    '\n  *[_type == "project" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    summary,\n    cover{\n      alt,\n      blobUrl,\n      image\n    },\n    seo{\n      title,\n      description,\n      ogImage\n    },\n    primaryExperience{\n      ...,\n      posterImage{\n        alt,\n        blobUrl,\n        image\n      },\n      fallbackVideo{\n        asset->{\n          url,\n          originalFilename,\n          mimeType,\n          size\n        }\n      }\n    },\n    featuredCreations[]{\n      _key,\n      creationId,\n      displayTitle,\n      shortDescription,\n      curatorNote,\n      order,\n      thumbnail{\n        alt,\n        blobUrl,\n        image\n      }\n    },\n    modules[]{\n      ...,\n      _type == "projectGallery" => {\n        ...,\n        items[]{\n          alt,\n          blobUrl,\n          image\n        }\n      },\n      _type == "projectSplit" => {\n        ...,\n        media{\n          alt,\n          blobUrl,\n          image\n        }\n      },\n      _type == "projectVideo" => {\n        ...,\n        poster{\n          alt,\n          blobUrl,\n          image\n        }\n      },\n      _type == "projectThreeExperience" => {\n        ...,\n        posterImage{\n          alt,\n          blobUrl,\n          image\n        },\n        fallbackVideo{\n          asset->{\n            url,\n            originalFilename,\n            mimeType,\n            size\n          }\n        }\n      }\n    },\n    // Legacy fields kept for one-time migration tooling\n    gallery,\n    body\n  }\n': ProjectBySlugQueryResult;
+    '\n  *[_type == "quoteForm" && _id == "quoteForm"][0]{\n    eyebrow,\n    headline,\n    support,\n    stepLabels,\n    successHeading,\n    successBody,\n    submitLabel,\n    nameField{ label, placeholder, helperText },\n    emailField{ label, placeholder, helperText },\n    companyField{ label, placeholder, helperText },\n    projectTypeField{ label, placeholder, helperText },\n    budgetField{ label, placeholder, helperText },\n    timelineField{ label, placeholder, helperText },\n    messageField{ label, placeholder, helperText },\n    attachmentsField{ label, placeholder, helperText },\n    projectTypes[]{\n      value,\n      label,\n      enabled,\n      service->{\n        _id,\n        title,\n        "slug": slug.current,\n        summary,\n        icon\n      }\n    },\n    budgetRanges[]{ value, label, enabled },\n    timelines[]{ value, label, enabled },\n    seo\n  }\n': QuoteFormQueryResult;
   }
 }

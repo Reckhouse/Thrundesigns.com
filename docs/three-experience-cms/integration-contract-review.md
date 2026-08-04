@@ -350,6 +350,15 @@ Completed:
 - `studio/lib/experienceManifestOptions.ts` imports `@thrun-design/controlled-chaos/manifest` only
 - Studio depends on the stub package via `file:../packages/controlled-chaos`
 
+## Phase 3 status
+
+Completed:
+
+- Extended `projectBySlugQuery` for `primaryExperience`, `featuredCreations`, and experience module assets
+- Regenerated `src/sanity/types.ts` via Sanity TypeGen
+- Added `mapSanityExperienceConfig` + fixtures/`validate-experience-mapper`
+- Manual module union includes `projectThreeExperience`
+
 
 ---
 

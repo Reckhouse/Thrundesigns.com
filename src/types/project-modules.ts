@@ -1,5 +1,6 @@
 import type { PortableTextBlock } from "@portabletext/types";
 import type { MediaAssetValue } from "@/lib/media";
+import type { ThreeExperienceBlockValue } from "@/types/three-experience";
 
 type ModuleBase = {
   _key: string;
@@ -82,6 +83,11 @@ export type ProjectCreditsModule = ModuleBase & {
     | null;
 };
 
+export type ProjectThreeExperienceModule = ModuleBase &
+  Omit<ThreeExperienceBlockValue, "_type" | "_key"> & {
+    _type: "projectThreeExperience";
+  };
+
 export type ProjectModule =
   | ProjectRichTextModule
   | ProjectGalleryModule
@@ -90,5 +96,6 @@ export type ProjectModule =
   | ProjectProcessModule
   | ProjectQuoteModule
   | ProjectVideoModule
+  | ProjectThreeExperienceModule
   | ProjectCtaModule
   | ProjectCreditsModule;

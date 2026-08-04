@@ -12,7 +12,7 @@
     "typegen": "npm --prefix studio run typegen",
     "migrate:project-modules": "node --env-file=.env.local scripts/migrate-project-modules.mjs",
     "bake:horse": "node scripts/bake-horse-particles.mjs",
-    "validate:experiences": "node scripts/validate-experience-compatibility.mjs"
+    "validate:experiences": "node scripts/validate-experience-compatibility.mjs && node --import tsx scripts/validate-experience-mapper.mjs"
   },
   "dependencies": {
     "@thrun-design/controlled-chaos": "file:packages/controlled-chaos",

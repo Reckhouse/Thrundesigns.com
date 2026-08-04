@@ -10,7 +10,7 @@
     "build": "sanity build",
     "deploy": "sanity deploy",
     "deploy-schema": "sanity schema deploy",
-    "extract-schema": "sanity schema extract --path=./schema.json",
+    "extract-schema": "sanity schema extract --path=./schema.json --enforce-required-fields --force",
     "typegen": "npm run extract-schema && sanity typegen generate"
   },
   "dependencies": {
