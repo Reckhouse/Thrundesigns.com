@@ -10,11 +10,14 @@
     "build": "sanity build",
     "deploy": "sanity deploy",
     "deploy-schema": "sanity schema deploy",
-    "extract-schema": "sanity schema extract --path=./schema.json",
+    "extract-schema": "sanity schema extract --path=./schema.json --enforce-required-fields --force",
     "typegen": "npm run extract-schema && sanity typegen generate"
   },
   "dependencies": {
+    "@thrun-design/controlled-chaos": "file:../packages/controlled-chaos",
+    "@thrun-design/living-engraving": "file:../packages/living-engraving",
     "@sanity/icons": "^5.2.1",
+    "@sanity/ui": "^3.1.11",
     "@sanity/vision": "^6.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

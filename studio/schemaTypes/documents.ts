@@ -56,6 +56,7 @@ export const project = defineType({
   type: "document",
   groups: [
     { name: "identity", title: "Identity", default: true },
+    { name: "experience", title: "Experience" },
     { name: "modules", title: "Page modules" },
     { name: "seo", title: "SEO" },
   ],
@@ -90,6 +91,23 @@ export const project = defineType({
     }),
     defineField({ name: "order", type: "number", group: "identity" }),
     defineField({
+      name: "primaryExperience",
+      title: "Primary experience",
+      type: "projectThreeExperience",
+      group: "experience",
+      description:
+        "Optional project-level experience for hero preview, fullscreen launch, and metadata. Inline modules may still embed the same experience in preview mode.",
+    }),
+    defineField({
+      name: "featuredCreations",
+      title: "Featured creations",
+      type: "array",
+      group: "experience",
+      of: [{ type: "featuredCreation" }],
+      description:
+        "Curated creation IDs only. Full payloads live in the application creations store.",
+    }),
+    defineField({
       name: "modules",
       title: "Page modules",
       type: "array",
@@ -104,6 +122,7 @@ export const project = defineType({
         { type: "projectProcess" },
         { type: "projectQuote" },
         { type: "projectVideo" },
+        { type: "projectThreeExperience" },
         { type: "projectCta" },
         { type: "projectCredits" },
       ],

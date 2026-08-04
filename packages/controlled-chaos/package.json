@@ -1,0 +1,49 @@
+{
+  "name": "@thrun-design/controlled-chaos",
+  "version": "0.0.0-stub",
+  "private": true,
+  "description": "Stub Controlled Chaos experience package — replace with the real renderer when ready.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./package.json": "./package.json",
+    "./manifest": {
+      "types": "./src/manifest.ts",
+      "default": "./src/manifest.ts"
+    },
+    "./schemas": {
+      "types": "./src/schemas.ts",
+      "default": "./src/schemas.ts"
+    },
+    "./react-preview": {
+      "types": "./src/react-preview.tsx",
+      "default": "./src/react-preview.tsx"
+    },
+    "./react": {
+      "types": "./src/react.tsx",
+      "default": "./src/react.tsx"
+    },
+    "./react-replay": {
+      "types": "./src/react-replay.tsx",
+      "default": "./src/react-replay.tsx"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.0.0",
+    "zod": "^4.4.3"
+  }
+}

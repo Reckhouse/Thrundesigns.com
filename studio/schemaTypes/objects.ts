@@ -37,10 +37,75 @@ export const mediaAsset = defineType({
     }),
     defineField({
       name: "blobUrl",
-      title: "Blob URL",
+      title: "Blob URL or site path",
       type: "url",
-      description: "Optional Vercel Blob public URL for generated/production media.",
+      description:
+        "Vercel Blob https URL, or a site-relative path like /images/cover.jpg or /experiences/…. Relative paths are allowed.",
+      validation: (Rule) =>
+        Rule.uri({
+          allowRelative: true,
+          scheme: ["http", "https"],
+        }),
     }),
     defineField({ name: "alt", type: "string", validation: (r) => r.required() }),
   ],
+});
+
+/** Curated reference to an application-stored creation (ID only — no payload JSON). */
+export const featuredCreation = defineType({
+  name: "featuredCreation",
+  title: "Featured creation",
+  type: "object",
+  fields: [
+    defineField({
+      name: "creationId",
+      title: "Creation ID",
+      type: "string",
+      validation: (r) => r.required(),
+      description:
+        "Immutable ID from the portfolio creations API. Do not paste full creation JSON here.",
+    }),
+    defineField({
+      name: "displayTitle",
+      title: "Display title",
+      type: "string",
+    }),
+    defineField({
+      name: "shortDescription",
+      title: "Short description",
+      type: "text",
+      rows: 2,
+    }),
+    defineField({
+      name: "curatorNote",
+      title: "Curator note",
+      type: "text",
+      rows: 2,
+    }),
+    defineField({
+      name: "thumbnail",
+      title: "Thumbnail override",
+      type: "mediaAsset",
+      description: "Optional override when the stored creation has no thumbnail.",
+    }),
+    defineField({
+      name: "order",
+      title: "Display order",
+      type: "number",
+    }),
+  ],
+  preview: {
+    select: {
+      title: "displayTitle",
+      creationId: "creationId",
+      media: "thumbnail.image",
+    },
+    prepare({ title, creationId, media }) {
+      return {
+        title: title || creationId || "Featured creation",
+        subtitle: creationId ? `Creation · ${creationId}` : "Featured creation",
+        media,
+      };
+    },
+  },
 });

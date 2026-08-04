@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
+import { securityHeaders } from "./src/lib/security-headers";
 
 const nextConfig: NextConfig = {
+  transpilePackages: [
+    "@thrun-design/controlled-chaos",
+    "@thrun-design/living-engraving",
+  ],
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
   images: {
     remotePatterns: [
       {
@@ -12,6 +18,14 @@ const nextConfig: NextConfig = {
         hostname: "*.public.blob.vercel-storage.com",
       },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: securityHeaders(),
+      },
+    ];
   },
 };
 

@@ -74,7 +74,13 @@ export function WorkSection({
               ? stegaClean(project.slug.current)
               : "";
             const href = slug ? `/work/${slug}` : "/work";
-            const src = project.imageSrc || project.cover?.blobUrl || null;
+            const src = (() => {
+              const raw = project.imageSrc || project.cover?.blobUrl || null;
+              return raw ? stegaClean(raw) : null;
+            })();
+            const alt = project.cover?.alt
+              ? stegaClean(project.cover.alt)
+              : project.title || "Concept study";
 
             return (
               <StaggerItem
@@ -92,41 +98,22 @@ export function WorkSection({
                         <AspectRatio ratio={286 / 390}>
                           {src ? (
                             <motion.div
-                              className="absolute inset-0"
-                              initial={
-                                reduce
-                                  ? false
-                                  : { clipPath: "inset(100% 0 0 0)" }
+                              className="absolute inset-0 origin-center"
+                              whileHover={
+                                reduce ? undefined : { scale: 1.05 }
                               }
-                              whileInView={{ clipPath: "inset(0% 0 0 0)" }}
-                              viewport={{ once: true, amount: 0.3 }}
                               transition={{
-                                duration: motionTokens.durationSlow,
+                                duration: 0.55,
                                 ease: motionTokens.easeOut,
                               }}
                             >
-                              <motion.div
-                                className="absolute inset-0"
-                                whileHover={
-                                  reduce ? undefined : { scale: 1.05 }
-                                }
-                                transition={{
-                                  duration: 0.55,
-                                  ease: motionTokens.easeOut,
-                                }}
-                              >
-                                <Image
-                                  src={src}
-                                  alt={
-                                    project.cover?.alt ||
-                                    project.title ||
-                                    "Concept study"
-                                  }
-                                  fill
-                                  className="object-cover grayscale transition duration-500 group-hover:grayscale-0"
-                                  sizes="(max-width: 768px) 100vw, 286px"
-                                />
-                              </motion.div>
+                              <Image
+                                src={src}
+                                alt={alt}
+                                fill
+                                className="object-cover grayscale transition duration-500 group-hover:grayscale-0"
+                                sizes="(max-width: 768px) 100vw, 286px"
+                              />
                             </motion.div>
                           ) : (
                             <div className="absolute inset-0 bg-[linear-gradient(160deg,#222522,#0c0d0c)]" />
