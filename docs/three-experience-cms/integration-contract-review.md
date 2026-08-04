@@ -359,6 +359,15 @@ Completed:
 - Added `mapSanityExperienceConfig` + fixtures/`validate-experience-mapper`
 - Manual module union includes `projectThreeExperience`
 
+## Phase 4–5 status
+
+Completed:
+
+- `ExperienceClientBoundary` with interaction / viewport / immediate load, reduced-motion downgrade, error retry
+- `ThreeExperienceModule` / section with poster → video → text fallbacks
+- Wired into `ProjectModules` and hero launch CTA from `primaryExperience`
+- Privacy-safe `trackExperienceEvent` adapter (console for now)
+
 
 ---
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ExperienceLaunchLink } from "@/components/experiences/ExperienceLaunchLink";
 import { ProjectModules } from "@/components/project/project-modules";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -10,6 +11,7 @@ import {
   PrimaryButtonLink,
   SectionHeading,
 } from "@/components/site/primitives";
+import { mapSanityExperienceConfig } from "@/experiences/mapSanityExperienceConfig";
 import { defaultHomeContent } from "@/lib/default-content";
 import {
   resolveMediaAlt,
@@ -23,6 +25,7 @@ import {
   siteSettingsQuery,
 } from "@/sanity/lib/queries";
 import type { ProjectModule } from "@/types/project-modules";
+import type { ThreeExperienceBlockValue } from "@/types/three-experience";
 import type { ProjectBySlugQueryResult } from "@/sanity/types";
 import type { SanityImageSource } from "@sanity/image-url";
 
@@ -31,7 +34,10 @@ type PageProps = {
 };
 
 type ProjectDoc = Partial<
-  Omit<NonNullable<ProjectBySlugQueryResult>, "modules" | "cover" | "seo">
+  Omit<
+    NonNullable<ProjectBySlugQueryResult>,
+    "modules" | "cover" | "seo" | "primaryExperience"
+  >
 > & {
   cover?: MediaAssetValue;
   seo?: {
@@ -40,6 +46,7 @@ type ProjectDoc = Partial<
     ogImage?: SanityImageSource | null;
   } | null;
   modules?: ProjectModule[] | null;
+  primaryExperience?: ThreeExperienceBlockValue | null;
 };
 
 function coverFallback(slug: string) {
@@ -127,6 +134,17 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   if (!project) notFound();
 
   const imageSrc = resolveMediaUrl(project.cover) || coverFallback(slug);
+  const primaryMapped = project.primaryExperience
+    ? mapSanityExperienceConfig(project.primaryExperience)
+    : null;
+  const primaryLaunch =
+    primaryMapped?.ok && primaryMapped.value.presentation.showFullscreenAction
+      ? {
+          href: primaryMapped.value.launchUrl,
+          label: primaryMapped.value.presentation.fullscreenLabel,
+          experienceKey: primaryMapped.value.experienceKey,
+        }
+      : null;
 
   return (
     <>
@@ -151,9 +169,20 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   {project.summary ||
                     "A focused case study exploring brand systems, digital presence, and production-ready visual language."}
                 </p>
-                <PrimaryButtonLink href="/quote" className="mt-10">
-                  Request a project quote
-                </PrimaryButtonLink>
+                <div className="mt-10 flex flex-wrap items-center gap-4">
+                  <PrimaryButtonLink href="/quote">
+                    Request a project quote
+                  </PrimaryButtonLink>
+                  {primaryLaunch ? (
+                    <ExperienceLaunchLink
+                      href={primaryLaunch.href}
+                      experienceKey={primaryLaunch.experienceKey}
+                      variant="text"
+                    >
+                      {primaryLaunch.label}
+                    </ExperienceLaunchLink>
+                  ) : null}
+                </div>
               </div>
               <div className="relative min-h-[420px] overflow-hidden bg-bg-raised lg:min-h-[620px]">
                 <Image

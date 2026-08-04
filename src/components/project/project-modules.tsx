@@ -6,6 +6,7 @@ import { ProcessModule } from "@/components/project/modules/process";
 import { QuoteModule } from "@/components/project/modules/quote";
 import { RichTextModule } from "@/components/project/modules/rich-text";
 import { SplitModule } from "@/components/project/modules/split";
+import { ThreeExperienceModule } from "@/components/project/modules/three-experience";
 import { VideoModule } from "@/components/project/modules/video";
 import type { ProjectModule } from "@/types/project-modules";
 
@@ -35,6 +36,8 @@ export function ProjectModules({ modules }: ProjectModulesProps) {
             return <QuoteModule key={module._key} module={module} />;
           case "projectVideo":
             return <VideoModule key={module._key} module={module} />;
+          case "projectThreeExperience":
+            return <ThreeExperienceModule key={module._key} module={module} />;
           case "projectCta":
             return <CtaModule key={module._key} module={module} />;
           case "projectCredits":
