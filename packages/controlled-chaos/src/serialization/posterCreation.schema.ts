@@ -28,6 +28,14 @@ import {
   elasticPresets,
 } from "../systems/elastic-type/elasticType.schema";
 import {
+  defaultTornPaperConfig,
+  tornPaperPresets,
+} from "../systems/torn-paper/tornPaper.schema";
+import {
+  defaultTypeArchitectureConfig,
+  typeArchitecturePresets,
+} from "../systems/type-architecture/typeArchitecture.schema";
+import {
   audioReactiveConfigSchema,
   defaultAudioReactiveConfig,
 } from "../audio/audio.schema";
@@ -331,6 +339,72 @@ const PRESET_DEFAULTS: Record<
       accent: "#9bb0c9",
     },
   },
+  "rough-tear": {
+    phrase: "TORN",
+    fontKey: "helvetiker-bold",
+    seed: "rought01",
+    palette: {
+      background: "#141210",
+      primary: "#1a1814",
+      secondary: "#8a6a38",
+      accent: "#d4af6a",
+    },
+  },
+  "collage-stack": {
+    phrase: "COLLAGE",
+    fontKey: "optimer-bold",
+    seed: "collage1",
+    palette: {
+      background: "#0c0d0c",
+      primary: "#1c1a16",
+      secondary: "#5c6b52",
+      accent: "#d4af6a",
+    },
+  },
+  "edge-fray": {
+    phrase: "FRAY",
+    fontKey: "gentilis-regular",
+    seed: "edgefray",
+    palette: {
+      background: "#0a0c10",
+      primary: "#12141a",
+      secondary: "#6a7385",
+      accent: "#9bb0c9",
+    },
+  },
+  "brutal-stack": {
+    phrase: "BRUTAL",
+    fontKey: "helvetiker-bold",
+    seed: "brutal01",
+    palette: {
+      background: "#0c0d0c",
+      primary: "#ebe7df",
+      secondary: "#8a6a38",
+      accent: "#d4af6a",
+    },
+  },
+  "column-grid": {
+    phrase: "COLUMN\nGRID",
+    fontKey: "optimer-bold",
+    seed: "colgrid1",
+    palette: {
+      background: "#121410",
+      primary: "#f4f1e9",
+      secondary: "#5c6b52",
+      accent: "#d4af6a",
+    },
+  },
+  cantilever: {
+    phrase: "OVERHANG",
+    fontKey: "gentilis-regular",
+    seed: "cantlev1",
+    palette: {
+      background: "#0a0c10",
+      primary: "#d7dde8",
+      secondary: "#6a7385",
+      accent: "#9bb0c9",
+    },
+  },
 };
 
 function resolveVisualSystemForPreset(presetKey?: string): {
@@ -390,6 +464,28 @@ function resolveVisualSystemForPreset(presetKey?: string): {
       key: "elastic-type",
       version: 1,
       config: elasticPreset.config as unknown as Record<string, unknown>,
+    };
+  }
+
+  const tornPreset = presetKey
+    ? tornPaperPresets.find((entry) => entry.key === presetKey)
+    : undefined;
+  if (tornPreset) {
+    return {
+      key: "torn-paper",
+      version: 1,
+      config: tornPreset.config as unknown as Record<string, unknown>,
+    };
+  }
+
+  const architecturePreset = presetKey
+    ? typeArchitecturePresets.find((entry) => entry.key === presetKey)
+    : undefined;
+  if (architecturePreset) {
+    return {
+      key: "type-architecture",
+      version: 1,
+      config: architecturePreset.config as unknown as Record<string, unknown>,
     };
   }
 
@@ -512,5 +608,7 @@ export {
   defaultCrtPhotocopyConfig,
   defaultInflatableTypeConfig,
   defaultElasticTypeConfig,
+  defaultTornPaperConfig,
+  defaultTypeArchitectureConfig,
   defaultAudioReactiveConfig,
 };

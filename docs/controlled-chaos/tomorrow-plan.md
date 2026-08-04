@@ -2,32 +2,17 @@
 
 ## Goal
 
-Resume at **Phase 9**.
+Resume at **Phase 10**.
 
 ## Remaining roadmap
 
-### Phase 9 — Torn paper + type-architecture
-
-Primary goal:
-
-- Add two new visual systems:
-  - torn-paper
-  - type-architecture
-
-Expected implementation areas:
-
-- `packages/controlled-chaos/src/systems/torn-paper/`
-- `packages/controlled-chaos/src/systems/type-architecture/`
-- `packages/controlled-chaos/src/systems/registry.ts`
-- shell inspector + schema presets + store helpers
-
 ### Phase 10 — Full audio mappings
 
-Expand audio beyond current particle/chrome/inflatable/elastic mappings:
+Expand audio beyond current particle/chrome/inflatable/elastic/torn/architecture mappings:
 
 - CRT/post stack modulation if tasteful
-- Phase 9 systems
-- more routing controls and weighted mappings
+- Weighted routing controls across all active systems
+- Stronger beat-reactive envelopes where they improve composition
 
 ### Phase 11 — Sanity case-study polish
 
@@ -62,7 +47,7 @@ npx tsc --noEmit -p packages/controlled-chaos/tsconfig.json
 
 ## Quick context summary
 
-- Current branch contains Phases 0–8
-- PR is open and updated
-- Inflatable + elastic use fixed-timestep Rapier, lazy-loaded from the scene host
-- Save/share, thumbnail upload, replay hydrate, and export remain working paths
+- Current branch contains Phases 0–9
+- All seven active visual systems are registered
+- Package version `0.9.0`
+- Next substantial work is fuller audio-displacement mappings

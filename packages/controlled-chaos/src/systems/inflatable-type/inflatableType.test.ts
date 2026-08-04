@@ -47,10 +47,12 @@ describe("inflatable + elastic type systems", () => {
       "crt-photocopy",
       "inflatable-type",
       "elastic-type",
+      "torn-paper",
+      "type-architecture",
     ]);
     assert.ok(getVisualSystemDefinition("inflatable-type"));
     assert.ok(getVisualSystemDefinition("elastic-type"));
-    assert.equal(listRegisteredVisualSystems().length, 5);
+    assert.equal(listRegisteredVisualSystems().length, 7);
     assert.equal(
       getVisualSystemDefinition("inflatable-type")?.capabilities.supportsPhysics,
       true,

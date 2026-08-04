@@ -43,6 +43,14 @@ import {
   elasticPresets,
 } from "../systems/elastic-type/elasticType.schema";
 import {
+  parseTornPaperConfig,
+  tornPaperPresets,
+} from "../systems/torn-paper/tornPaper.schema";
+import {
+  parseTypeArchitectureConfig,
+  typeArchitecturePresets,
+} from "../systems/type-architecture/typeArchitecture.schema";
+import {
   listRegisteredVisualSystems,
   type ActiveVisualSystemKey,
 } from "../systems/registry";
@@ -258,6 +266,18 @@ function PosterLabShellInner({
   const applyElasticPreset = usePosterLabStore(
     (state) => state.applyElasticPreset,
   );
+  const setTornPaperConfig = usePosterLabStore(
+    (state) => state.setTornPaperConfig,
+  );
+  const applyTornPaperPreset = usePosterLabStore(
+    (state) => state.applyTornPaperPreset,
+  );
+  const setTypeArchitectureConfig = usePosterLabStore(
+    (state) => state.setTypeArchitectureConfig,
+  );
+  const applyTypeArchitecturePreset = usePosterLabStore(
+    (state) => state.applyTypeArchitecturePreset,
+  );
   const setAudioConfig = usePosterLabStore((state) => state.setAudioConfig);
   const importSvgMarkup = usePosterLabStore((state) => state.importSvgMarkup);
   const clearSvgAsset = usePosterLabStore((state) => state.clearSvgAsset);
@@ -300,6 +320,14 @@ function PosterLabShellInner({
   );
   const elasticConfig = useMemo(
     () => parseElasticConfig(documentState.visualSystem.config),
+    [documentState.visualSystem.config],
+  );
+  const tornPaperConfig = useMemo(
+    () => parseTornPaperConfig(documentState.visualSystem.config),
+    [documentState.visualSystem.config],
+  );
+  const typeArchitectureConfig = useMemo(
+    () => parseTypeArchitectureConfig(documentState.visualSystem.config),
     [documentState.visualSystem.config],
   );
   const registeredSystems = useMemo(() => listRegisteredVisualSystems(), []);
@@ -566,100 +594,53 @@ function PosterLabShellInner({
             marginTop: "0.55rem",
           }}
         >
-          {systemKey === "chrome-liquid"
-            ? chromePresets.map((preset) => (
-                <button
-                  key={preset.key}
-                  type="button"
-                  onClick={() => applyChromePreset(preset.key)}
-                  style={{
-                    ...inputStyle,
-                    cursor: "pointer",
-                    textAlign: "left",
-                    fontFamily: tokens.fontMono,
-                    fontSize: "0.6875rem",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {preset.title}
-                </button>
-              ))
+          {(systemKey === "chrome-liquid"
+            ? chromePresets
             : systemKey === "crt-photocopy"
-              ? crtPresets.map((preset) => (
-                  <button
-                    key={preset.key}
-                    type="button"
-                    onClick={() => applyCrtPreset(preset.key)}
-                    style={{
-                      ...inputStyle,
-                      cursor: "pointer",
-                      textAlign: "left",
-                      fontFamily: tokens.fontMono,
-                      fontSize: "0.6875rem",
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {preset.title}
-                  </button>
-                ))
+              ? crtPresets
               : systemKey === "inflatable-type"
-                ? inflatablePresets.map((preset) => (
-                    <button
-                      key={preset.key}
-                      type="button"
-                      onClick={() => applyInflatablePreset(preset.key)}
-                      style={{
-                        ...inputStyle,
-                        cursor: "pointer",
-                        textAlign: "left",
-                        fontFamily: tokens.fontMono,
-                        fontSize: "0.6875rem",
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {preset.title}
-                    </button>
-                  ))
+                ? inflatablePresets
                 : systemKey === "elastic-type"
-                  ? elasticPresets.map((preset) => (
-                      <button
-                        key={preset.key}
-                        type="button"
-                        onClick={() => applyElasticPreset(preset.key)}
-                        style={{
-                          ...inputStyle,
-                          cursor: "pointer",
-                          textAlign: "left",
-                          fontFamily: tokens.fontMono,
-                          fontSize: "0.6875rem",
-                          letterSpacing: "0.08em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {preset.title}
-                      </button>
-                    ))
-                  : particlePresets.map((preset) => (
-                      <button
-                        key={preset.key}
-                        type="button"
-                        onClick={() => applyParticlePreset(preset.key)}
-                        style={{
-                          ...inputStyle,
-                          cursor: "pointer",
-                          textAlign: "left",
-                          fontFamily: tokens.fontMono,
-                          fontSize: "0.6875rem",
-                          letterSpacing: "0.08em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        {preset.title}
-                      </button>
-                    ))}
+                  ? elasticPresets
+                  : systemKey === "torn-paper"
+                    ? tornPaperPresets
+                    : systemKey === "type-architecture"
+                      ? typeArchitecturePresets
+                      : particlePresets
+          ).map((preset) => (
+            <button
+              key={preset.key}
+              type="button"
+              onClick={() => {
+                if (systemKey === "chrome-liquid") {
+                  applyChromePreset(preset.key);
+                } else if (systemKey === "crt-photocopy") {
+                  applyCrtPreset(preset.key);
+                } else if (systemKey === "inflatable-type") {
+                  applyInflatablePreset(preset.key);
+                } else if (systemKey === "elastic-type") {
+                  applyElasticPreset(preset.key);
+                } else if (systemKey === "torn-paper") {
+                  applyTornPaperPreset(preset.key);
+                } else if (systemKey === "type-architecture") {
+                  applyTypeArchitecturePreset(preset.key);
+                } else {
+                  applyParticlePreset(preset.key);
+                }
+              }}
+              style={{
+                ...inputStyle,
+                cursor: "pointer",
+                textAlign: "left",
+                fontFamily: tokens.fontMono,
+                fontSize: "0.6875rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
+            >
+              {preset.title}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -1020,6 +1001,162 @@ function PosterLabShellInner({
             onChange={(event) =>
               setElasticConfig({
                 pointerCoupling: Number(event.target.value),
+              })
+            }
+            style={{ width: "100%" }}
+          />
+        </div>
+      ) : null}
+
+      {systemKey === "torn-paper" ? (
+        <div style={{ marginTop: "1.25rem" }}>
+          <label style={labelStyle} htmlFor="cc-tear">
+            Tear · {tornPaperConfig.tearAmount.toFixed(2)}
+          </label>
+          <input
+            id="cc-tear"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={tornPaperConfig.tearAmount}
+            onChange={(event) =>
+              setTornPaperConfig({ tearAmount: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-layers"
+          >
+            Layers · {Math.round(tornPaperConfig.layerCount)}
+          </label>
+          <input
+            id="cc-layers"
+            type="range"
+            min={3}
+            max={12}
+            step={1}
+            value={tornPaperConfig.layerCount}
+            onChange={(event) =>
+              setTornPaperConfig({ layerCount: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-curl"
+          >
+            Curl · {tornPaperConfig.curl.toFixed(2)}
+          </label>
+          <input
+            id="cc-curl"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={tornPaperConfig.curl}
+            onChange={(event) =>
+              setTornPaperConfig({ curl: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-drift"
+          >
+            Drift · {tornPaperConfig.drift.toFixed(2)}
+          </label>
+          <input
+            id="cc-drift"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={tornPaperConfig.drift}
+            onChange={(event) =>
+              setTornPaperConfig({ drift: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+        </div>
+      ) : null}
+
+      {systemKey === "type-architecture" ? (
+        <div style={{ marginTop: "1.25rem" }}>
+          <label style={labelStyle} htmlFor="cc-massing">
+            Massing · {typeArchitectureConfig.massing.toFixed(2)}
+          </label>
+          <input
+            id="cc-massing"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={typeArchitectureConfig.massing}
+            onChange={(event) =>
+              setTypeArchitectureConfig({
+                massing: Number(event.target.value),
+              })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-columns"
+          >
+            Columns · {typeArchitectureConfig.columnDensity.toFixed(2)}
+          </label>
+          <input
+            id="cc-columns"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={typeArchitectureConfig.columnDensity}
+            onChange={(event) =>
+              setTypeArchitectureConfig({
+                columnDensity: Number(event.target.value),
+              })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-cantilever"
+          >
+            Cantilever · {typeArchitectureConfig.cantilever.toFixed(2)}
+          </label>
+          <input
+            id="cc-cantilever"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={typeArchitectureConfig.cantilever}
+            onChange={(event) =>
+              setTypeArchitectureConfig({
+                cantilever: Number(event.target.value),
+              })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-facade"
+          >
+            Facade · {typeArchitectureConfig.facadeDepth.toFixed(2)}
+          </label>
+          <input
+            id="cc-facade"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={typeArchitectureConfig.facadeDepth}
+            onChange={(event) =>
+              setTypeArchitectureConfig({
+                facadeDepth: Number(event.target.value),
               })
             }
             style={{ width: "100%" }}

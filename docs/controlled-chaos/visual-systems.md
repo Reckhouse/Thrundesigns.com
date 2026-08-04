@@ -1,7 +1,7 @@
 # Controlled Chaos — Visual Systems
 
-**Phase:** 8  
-**Active systems:** Particle Disintegration · Chrome Liquid · CRT / Photocopy · Inflatable Type · Elastic Type  
+**Phase:** 9  
+**Active systems:** Particle Disintegration · Chrome Liquid · CRT / Photocopy · Inflatable Type · Elastic Type · Torn Paper · Type Architecture  
 **Cross-cutting:** Audio-reactive displacement · Hardened still/video export · Save & share · Rapier physics (code-split)
 
 ## Plugin contract
@@ -43,12 +43,9 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 
 | Concern | Implementation |
 |---------|----------------|
-| Geometry | Per-character extruded meshes (`buildPhysicsLetterMeshes`) |
-| Physics | `@react-three/rapier` rigid bodies + hull colliders; fixed 60 Hz timestep |
-| Motion | Cyclic inflate impulses + rest springs + visual puff scale; seeded phase offsets |
-| Audio | Bass/energy/beat scale inflate pressure |
-| Reduced motion | Static letter meshes; no Physics world |
-| Bundle | Lazy-loaded from scene host so Rapier WASM stays out of other systems |
+| Geometry | Per-character extruded meshes |
+| Physics | `@react-three/rapier` hull rigid bodies; fixed 60 Hz timestep |
+| Motion | Cyclic inflate impulses + rest springs + visual puff scale |
 | Presets | Helium Drop, Balloon Grid, Soft Pressure |
 | Note | Rigid bodies + inflate-like forces — **not** true soft-body |
 
@@ -56,13 +53,29 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 
 | Concern | Implementation |
 |---------|----------------|
-| Geometry | Same per-character extruded meshes |
+| Geometry | Per-character extruded meshes |
 | Physics | Fixed-timestep Rapier cuboid bodies + spring forces toward rest |
-| Coupling | Neighbor pull + max stretch clamp + optional pointer forces |
-| Audio | Mid/energy/beat modulate oscillation |
 | Pointer | Raycast plane → push/pull/attract modes |
-| Reduced motion | Static letter meshes |
 | Presets | Rubber Band, Spring Lattice, Rebound |
+
+## Torn Paper
+
+| Concern | Implementation |
+|---------|----------------|
+| Shards | Seeded jagged `Shape` → `ExtrudeGeometry` paper plates |
+| Type | Shallow extruded ink type above the collage |
+| Motion | Curl/drift loop on shard transforms; audio scales drift |
+| Reduced motion | Shards hold rest poses |
+| Presets | Rough Tear, Collage Stack, Edge Fray |
+
+## Type Architecture
+
+| Concern | Implementation |
+|---------|----------------|
+| Slabs | Extruded line floors with elevation + cantilever offsets |
+| Structure | Seeded columns and beams as supporting massing |
+| Motion | Subtle rhythmic floor drift; audio scales amplitude |
+| Presets | Brutal Stack, Column Grid, Cantilever |
 
 ## Audio engine
 
@@ -82,6 +95,6 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 | Overlays | Hidden while `data-exporting` is set |
 | Physics | Fixed timestep + velocity clamps keep loops exportable |
 
-## Next systems
+## Next
 
-Torn paper, type-architecture; fuller audio mappings across physics systems; a11y/perf/launch hardening.
+Fuller audio mappings across systems; Sanity case-study polish; a11y/perf/launch hardening.

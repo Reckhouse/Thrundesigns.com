@@ -8,6 +8,8 @@ import { createSeededRandom } from "../seed/createSeededRandom";
 import { ParticleDisintegrationSystem } from "../systems/particle-disintegration/ParticleDisintegrationSystem";
 import { ChromeLiquidSystem } from "../systems/chrome-liquid/ChromeLiquidSystem";
 import { CrtPhotocopySystem } from "../systems/crt-photocopy/CrtPhotocopySystem";
+import { TornPaperSystem } from "../systems/torn-paper/TornPaperSystem";
+import { TypeArchitectureSystem } from "../systems/type-architecture/TypeArchitectureSystem";
 import type { ForceMode } from "../systems/types";
 import { PosterText } from "../typography/PosterText";
 
@@ -55,8 +57,16 @@ export function PosterSceneContent({
   const useCrt = systemKey === "crt-photocopy";
   const useInflatable = systemKey === "inflatable-type";
   const useElastic = systemKey === "elastic-type";
+  const useTornPaper = systemKey === "torn-paper";
+  const useTypeArchitecture = systemKey === "type-architecture";
   const useFallbackType =
-    !useParticles && !useChrome && !useCrt && !useInflatable && !useElastic;
+    !useParticles &&
+    !useChrome &&
+    !useCrt &&
+    !useInflatable &&
+    !useElastic &&
+    !useTornPaper &&
+    !useTypeArchitecture;
 
   const shardSeeds = useMemo(() => {
     if (!useFallbackType) return [];
@@ -155,6 +165,26 @@ export function PosterSceneContent({
             forceMode={forceMode}
           />
         </Suspense>
+      ) : null}
+
+      {useTornPaper ? (
+        <TornPaperSystem
+          document={document}
+          quality={quality}
+          paused={paused}
+          reducedMotion={reducedMotion}
+          assetBasePath={assetBasePath}
+        />
+      ) : null}
+
+      {useTypeArchitecture ? (
+        <TypeArchitectureSystem
+          document={document}
+          quality={quality}
+          paused={paused}
+          reducedMotion={reducedMotion}
+          assetBasePath={assetBasePath}
+        />
       ) : null}
 
       {useFallbackType ? (

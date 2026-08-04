@@ -2,7 +2,7 @@
 
 Interactive Three.js poster generator package for the Thrundesign portfolio.
 
-**Phase 8.** Inflatable + elastic typography via `@react-three/rapier` (code-split). Package `0.8.0`.
+**Phase 9.** Torn paper collage + type-architecture massing systems. Package `0.9.0`.
 
 ## Exports
 

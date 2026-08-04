@@ -49,10 +49,12 @@ describe("chrome liquid + crt systems", () => {
       "crt-photocopy",
       "inflatable-type",
       "elastic-type",
+      "torn-paper",
+      "type-architecture",
     ]);
     assert.ok(getVisualSystemDefinition("chrome-liquid"));
     assert.ok(getVisualSystemDefinition("crt-photocopy"));
-    assert.equal(listRegisteredVisualSystems().length, 5);
+    assert.equal(listRegisteredVisualSystems().length, 7);
   });
 
   it("builds chrome and crt documents from presets", () => {
