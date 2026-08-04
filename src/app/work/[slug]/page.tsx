@@ -14,6 +14,10 @@ import {
 } from "@/components/site/primitives";
 import { mapSanityExperienceConfig } from "@/experiences/mapSanityExperienceConfig";
 import { withLabReturnPath } from "@/experiences/controlled-chaos/parseLabSearchParams";
+import {
+  isControlledChaosSlug,
+  resolveControlledChaosCoverSrc,
+} from "@/lib/controlled-chaos-media";
 import { defaultHomeContent } from "@/lib/default-content";
 import {
   resolveMediaAlt,
@@ -139,7 +143,13 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   if (!project) notFound();
 
-  const imageSrc = resolveMediaUrl(project.cover) || coverFallback(slug);
+  const imageSrc = resolveControlledChaosCoverSrc(
+    slug,
+    resolveMediaUrl(project.cover) || coverFallback(slug),
+  );
+  const coverFitClass = isControlledChaosSlug(slug)
+    ? "object-contain object-center"
+    : "object-cover";
   const primaryMapped = project.primaryExperience
     ? mapSanityExperienceConfig(project.primaryExperience)
     : null;
@@ -193,12 +203,18 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   ) : null}
                 </div>
               </div>
-              <div className="relative flex min-h-[420px] items-center justify-center overflow-hidden bg-bg-raised lg:min-h-[620px]">
+              <div
+                className={
+                  isControlledChaosSlug(slug)
+                    ? "relative flex min-h-[420px] items-center justify-center overflow-hidden bg-bg-raised lg:min-h-[620px]"
+                    : "relative min-h-[420px] overflow-hidden bg-bg-raised lg:min-h-[620px]"
+                }
+              >
                 <Image
                   src={imageSrc}
                   alt={resolveMediaAlt(project.cover, project.title || "Project")}
                   fill
-                  className="object-contain object-center grayscale"
+                  className={`${coverFitClass} grayscale`}
                   sizes="(max-width: 1024px) 100vw, 60vw"
                   priority
                 />
