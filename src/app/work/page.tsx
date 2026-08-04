@@ -8,6 +8,9 @@ import { defaultHomeContent } from "@/lib/default-content";
 import { sanityFetch } from "@/sanity/lib/live";
 import { projectsQuery, siteSettingsQuery } from "@/sanity/lib/queries";
 
+/** Keep the work index fresh when projects are added in Sanity. */
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Concept studies",
   description:

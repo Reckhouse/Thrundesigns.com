@@ -37,9 +37,15 @@ export const mediaAsset = defineType({
     }),
     defineField({
       name: "blobUrl",
-      title: "Blob URL",
+      title: "Blob URL or site path",
       type: "url",
-      description: "Optional Vercel Blob public URL for generated/production media.",
+      description:
+        "Vercel Blob https URL, or a site-relative path like /images/cover.jpg or /experiences/…. Relative paths are allowed.",
+      validation: (Rule) =>
+        Rule.uri({
+          allowRelative: true,
+          scheme: ["http", "https"],
+        }),
     }),
     defineField({ name: "alt", type: "string", validation: (r) => r.required() }),
   ],

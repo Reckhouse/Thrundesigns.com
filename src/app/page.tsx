@@ -21,6 +21,9 @@ import {
   siteSettingsQuery,
 } from "@/sanity/lib/queries";
 
+/** Homepage featured work should pick up new Sanity projects within a minute. */
+export const revalidate = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const { data } = await sanityFetch({
     query: homePageQuery,

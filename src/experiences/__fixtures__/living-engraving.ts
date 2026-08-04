@@ -12,7 +12,7 @@ export const validLivingEngravingPreviewFixture: ThreeExperienceBlockValue = {
   description: "Interactive particle cameo from the homepage hero.",
   posterImage: {
     alt: "Horse head engraving poster",
-    blobUrl: "/experiences/living-engraving/poster.png",
+    blobUrl: "/images/horse-head.png",
   },
   quality: "auto",
   controls: "minimal",
