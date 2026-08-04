@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { withConceptLabel } from "@/lib/concept-label";
 import { defaultHomeContent } from "@/lib/default-content";
+import { resolveMediaUrl } from "@/lib/media";
 import { sanityFetch } from "@/sanity/lib/live";
 import { projectsQuery, siteSettingsQuery } from "@/sanity/lib/queries";
 
@@ -52,7 +53,8 @@ export default async function WorkIndexPage() {
           projects={projects.map((project, index) => ({
             ...project,
             imageSrc:
-              project.cover?.blobUrl || `/images/project-0${index + 1}.jpg`,
+              resolveMediaUrl(project.cover) ||
+              `/images/project-0${index + 1}.jpg`,
           }))}
         />
         <section className="border-b border-line">

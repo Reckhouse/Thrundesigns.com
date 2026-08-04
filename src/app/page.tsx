@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/site/site-header";
 import { MountainScene } from "@/components/site/mountain-scene";
 import { withConceptLabel } from "@/lib/concept-label";
 import { defaultHomeContent } from "@/lib/default-content";
+import { resolveMediaUrl } from "@/lib/media";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
   featuredProjectsQuery,
@@ -227,7 +228,8 @@ export default async function HomePage() {
             projects={resolvedProjects.map((project, index) => ({
               ...project,
               imageSrc:
-                project.cover?.blobUrl || `/images/project-0${index + 1}.jpg`,
+                resolveMediaUrl(project.cover) ||
+                `/images/project-0${index + 1}.jpg`,
             }))}
           />
           <ArtifactSection
