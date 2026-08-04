@@ -146,15 +146,20 @@ export function CrtPostStack({
 
   if (!enabled || !budget.enabled) return null;
 
+  // Callback refs only — object refs on wrapEffect components crash under
+  // React 19 when @react-three/postprocessing JSON.stringifies props (#334).
   return (
     <EffectComposer
+      key={`crt-post-${budget.tier}`}
       multisampling={budget.multisampling}
       enableNormalPass={false}
       resolutionScale={budget.resolutionScale}
     >
       {showScan ? (
         <Scanline
-          ref={scanRef as never}
+          ref={(effect: EffectWithOpacity | null) => {
+            scanRef.current = effect;
+          }}
           density={budget.scanlineDensity}
           opacity={baseScan}
           blendFunction={BlendFunction.OVERLAY}
@@ -164,7 +169,9 @@ export function CrtPostStack({
       )}
       {showGrain ? (
         <Noise
-          ref={grainRef as never}
+          ref={(effect: EffectWithOpacity | null) => {
+            grainRef.current = effect;
+          }}
           opacity={baseGrain}
           premultiply={!reducedMotion}
           blendFunction={BlendFunction.SOFT_LIGHT}
@@ -182,7 +189,9 @@ export function CrtPostStack({
       )}
       {showChromatic ? (
         <ChromaticAberration
-          ref={chromaRef as never}
+          ref={(effect: EffectWithOffset | null) => {
+            chromaRef.current = effect;
+          }}
           offset={baseOffset}
           radialModulation={false}
           modulationOffset={0}
@@ -192,7 +201,9 @@ export function CrtPostStack({
       )}
       {showVignette ? (
         <Vignette
-          ref={vignetteRef as never}
+          ref={(effect: EffectWithDarkness | null) => {
+            vignetteRef.current = effect;
+          }}
           offset={0.25 + config.inkBleed * 0.15}
           darkness={baseVignette}
           blendFunction={BlendFunction.NORMAL}
@@ -202,7 +213,9 @@ export function CrtPostStack({
       )}
       {showBloom ? (
         <Bloom
-          ref={bloomRef as never}
+          ref={(effect: EffectWithIntensity | null) => {
+            bloomRef.current = effect;
+          }}
           intensity={baseBloom * 1.4}
           luminanceThreshold={0.55}
           luminanceSmoothing={0.35}
