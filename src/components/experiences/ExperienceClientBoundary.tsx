@@ -175,9 +175,14 @@ export function ExperienceClientBoundary({
         </div>
       ) : (
         <>
-          <div className="absolute inset-0">
-            {state === "error" && fallbackVideo ? fallbackVideo : poster}
-          </div>
+          {/* Poster only for opt-in loads / errors — immediate/viewport go straight to WebGL. */}
+          {effectiveBehavior === "interaction" || state === "error" ? (
+            <div className="absolute inset-0">
+              {state === "error" && fallbackVideo ? fallbackVideo : poster}
+            </div>
+          ) : (
+            <div className="absolute inset-0 bg-bg-raised" aria-hidden />
+          )}
 
           <div className="absolute inset-0 z-[1] flex flex-col items-start justify-end gap-4 bg-gradient-to-t from-bg-deep/90 via-bg-deep/20 to-transparent p-6 md:p-8">
             {state === "error" ? (
@@ -191,12 +196,17 @@ export function ExperienceClientBoundary({
               </p>
             ) : null}
 
-            {state === "loading" ? (
+            {state === "loading" ||
+            (state === "idle" &&
+              (effectiveBehavior === "viewport" ||
+                effectiveBehavior === "immediate")) ? (
               <p
                 className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold"
                 aria-live="polite"
               >
-                Loading interactive experience…
+                {reduceMotion && effectiveBehavior !== "interaction"
+                  ? "Interactive load available on demand"
+                  : "Loading interactive experience…"}
               </p>
             ) : null}
 
@@ -210,16 +220,6 @@ export function ExperienceClientBoundary({
                   ? "Load interactive version"
                   : "Try the interactive version"}
               </button>
-            ) : null}
-
-            {state === "idle" &&
-            (effectiveBehavior === "viewport" ||
-              effectiveBehavior === "immediate") ? (
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted">
-                {reduceMotion
-                  ? "Interactive load available on demand"
-                  : "Preparing interactive experience"}
-              </p>
             ) : null}
 
             {state === "error" ? (

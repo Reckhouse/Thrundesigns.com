@@ -52,6 +52,7 @@ uniform float uPixelRatio;
 uniform vec2 uPointerLocal;
 uniform float uStatic;
 uniform float uOrbit; // 0–1 while click-holding — deepens relief
+uniform float uPosterCapture; // >0 boosts point size for poster snapshots
 
 attribute vec3 aRandom;
 attribute vec3 aMeta; // edge, tone, rear
@@ -130,7 +131,9 @@ void main() {
   sizeBase *= twinkle;
   sizeBase *= mix(0.5, 1.0, appearEase);
   float attenuated = sizeBase * uPixelRatio * (96.0 / max(1.0, -mvPosition.z));
-  gl_PointSize = clamp(attenuated, 0.9, 2.4);
+  float minSize = mix(0.9, 2.2, uPosterCapture);
+  float maxSize = mix(2.4, 7.5, uPosterCapture);
+  gl_PointSize = clamp(attenuated * mix(1.0, 2.4, uPosterCapture), minSize, maxSize);
 }
 `;
 
@@ -200,6 +203,10 @@ export type HorseParticlesProps = {
   layout?: LivingEngravingLayout;
   /** Base URL for particle buffers (no trailing slash). */
   assetBaseUrl?: string;
+  /** Keep the last WebGL frame readable for screenshots / toDataURL. */
+  preserveDrawingBuffer?: boolean;
+  /** Larger points + opaque clear for poster snapshots. */
+  posterCapture?: boolean;
   ctaRef?: RefObject<HTMLElement | null>;
   sectionRef?: RefObject<HTMLElement | null>;
 };
@@ -262,6 +269,7 @@ function HorseParticleField({
   staticMode = false,
   layout = "centered",
   assetBaseUrl = DEFAULT_ASSET_BASE,
+  posterCapture = false,
   ctaRef,
   sectionRef,
   active,
@@ -565,6 +573,7 @@ function HorseParticleField({
         uPixelRatio: { value: 1 },
         uPointerLocal: { value: new Vector2(10, 10) },
         uOrbit: { value: 0 },
+        uPosterCapture: { value: posterCapture ? 1 : 0 },
         uStone: { value: new Color(COLOR_STONE) },
         uBronze: { value: new Color(COLOR_BRONZE) },
         uGold: { value: new Color(COLOR_GOLD) },
@@ -572,7 +581,7 @@ function HorseParticleField({
     });
     materialRef.current = mat;
     return mat;
-  }, [staticMode]);
+  }, [posterCapture, staticMode]);
 
   useFrame((_, delta) => {
     const mat = materialRef.current;
@@ -676,6 +685,8 @@ export function HorseParticles({
   staticMode = false,
   layout = "centered",
   assetBaseUrl = DEFAULT_ASSET_BASE,
+  preserveDrawingBuffer = false,
+  posterCapture = false,
   ctaRef,
   sectionRef,
 }: HorseParticlesProps) {
@@ -720,12 +731,13 @@ export function HorseParticles({
           alpha: true,
           antialias: true,
           powerPreference: "high-performance",
+          preserveDrawingBuffer,
         }}
         camera={{ position: [0, 0, 6], fov: 40, near: 0.1, far: 50 }}
         dpr={[1, 1.5]}
         frameloop={running ? "always" : "never"}
         onCreated={({ gl }) => {
-          gl.setClearColor(0x000000, 0);
+          gl.setClearColor(posterCapture ? 0x0c0d0c : 0x000000, posterCapture ? 1 : 0);
         }}
       >
         <Suspense fallback={null}>
@@ -733,6 +745,7 @@ export function HorseParticles({
             staticMode={staticMode}
             layout={layout}
             assetBaseUrl={assetBaseUrl}
+            posterCapture={posterCapture}
             ctaRef={ctaRef}
             sectionRef={sectionRef}
             active={running}

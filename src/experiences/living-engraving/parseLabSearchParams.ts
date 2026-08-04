@@ -2,7 +2,6 @@ import type { LivingEngravingEmbedConfig } from "@thrun-design/living-engraving/
 import { livingEngravingManifest } from "@thrun-design/living-engraving/manifest";
 import { validateExperienceEmbedConfig } from "@/experiences/compatibility";
 import type { ExperienceCompatibilityResult } from "@/experiences/types";
-import { getSiteUrl } from "@/lib/site-url";
 
 export type LivingEngravingLabSearchParams = {
   mode?: string | string[];
@@ -38,7 +37,9 @@ export function parseLivingEngravingLabConfig(
   const returnHref =
     from && from.startsWith("/") && !from.startsWith("//") ? from : "/work";
 
-  const assetBaseUrl = `${getSiteUrl()}${livingEngravingManifest.assetBasePath}`;
+  // Always fetch particle buffers from this deployment — never pin to the
+  // production origin (preview/lab would 404 and render a blank canvas).
+  const assetBaseUrl = livingEngravingManifest.assetBasePath;
 
   const draft = {
     mode,

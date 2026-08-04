@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     "@thrun-design/controlled-chaos",
     "@thrun-design/living-engraving",
   ],
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
   images: {
     remotePatterns: [
       {

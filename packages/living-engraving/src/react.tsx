@@ -30,7 +30,9 @@ export function LivingEngravingExperience({
 }: LivingEngravingExperienceProps) {
   const height = configuration?.height ?? livingEngravingManifest.defaultHeight;
   const assetBaseUrl =
-    configuration?.assetBaseUrl ?? livingEngravingManifest.assetBasePath;
+    configuration?.assetBaseUrl && configuration.assetBaseUrl.startsWith("/")
+      ? configuration.assetBaseUrl
+      : livingEngravingManifest.assetBasePath;
 
   return (
     <div
@@ -39,18 +41,20 @@ export function LivingEngravingExperience({
         position: "relative",
         width: "100%",
         height: "100%",
-        minHeight: Math.min(height, 720),
+        minHeight: Math.max(height, 480),
         background:
           "radial-gradient(ellipse at 50% 45%, #1a1c18 0%, #0c0d0c 70%)",
       }}
       data-experience={livingEngravingManifest.experienceKey}
       data-mode={configuration?.mode}
     >
-      <HorseParticles
-        layout={layoutFromConfig(configuration)}
-        staticMode={staticFromConfig(configuration)}
-        assetBaseUrl={assetBaseUrl}
-      />
+      <div style={{ position: "absolute", inset: 0 }}>
+        <HorseParticles
+          layout={layoutFromConfig(configuration)}
+          staticMode={staticFromConfig(configuration)}
+          assetBaseUrl={assetBaseUrl}
+        />
+      </div>
     </div>
   );
 }

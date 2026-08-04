@@ -1,84 +1,24 @@
 "use client";
 
-import { useEffect, useState, type ComponentType } from "react";
+import dynamic from "next/dynamic";
 import type { LivingEngravingEmbedConfig } from "@thrun-design/living-engraving/schemas";
 import { livingEngravingManifest } from "@thrun-design/living-engraving/manifest";
 import { ExperienceErrorBoundary } from "@/components/experiences/ExperienceErrorBoundary";
-import { getExperienceClientPlugin } from "@/experiences/registry.client";
 import { trackExperienceEvent } from "@/experiences/analytics";
+import { useEffect } from "react";
 
 type LabExperienceClientProps = {
   configuration: LivingEngravingEmbedConfig;
 };
 
-export function LabExperienceClient({
-  configuration,
-}: LabExperienceClientProps) {
-  const [Component, setComponent] = useState<ComponentType<{
-    configuration?: LivingEngravingEmbedConfig;
-  }> | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const plugin = getExperienceClientPlugin(
-      livingEngravingManifest.experienceKey,
-    );
-    const loader =
-      configuration.mode === "preview"
-        ? plugin?.loadPreview
-        : plugin?.loadExperience;
-
-    if (!loader) {
-      setError("Living Engraving package loaders are not registered.");
-      trackExperienceEvent("experience_failed", {
-        experienceKey: livingEngravingManifest.experienceKey,
-        mode: configuration.mode,
-        reason: "missing_plugin",
-      });
-      return;
-    }
-
-    void loader()
-      .then((mod) => {
-        if (cancelled) return;
-        setComponent(() => mod.default);
-        trackExperienceEvent("experience_initialized", {
-          experienceKey: livingEngravingManifest.experienceKey,
-          mode: configuration.mode,
-        });
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setError("Failed to load the Living Engraving experience.");
-        trackExperienceEvent("experience_failed", {
-          experienceKey: livingEngravingManifest.experienceKey,
-          mode: configuration.mode,
-          reason: "dynamic_import",
-        });
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [configuration.mode]);
-
-  if (error) {
-    return (
-      <div
-        role="alert"
-        className="mx-auto flex min-h-[60vh] w-full max-w-[720px] flex-col items-start justify-center gap-4 px-6 py-16"
-      >
-        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
-          Experience unavailable
-        </p>
-        <p className="font-sans text-[15px] leading-7 text-fg">{error}</p>
-      </div>
-    );
-  }
-
-  if (!Component) {
-    return (
+const LivingEngravingDynamic = dynamic(
+  () =>
+    import("@thrun-design/living-engraving/react").then((mod) => ({
+      default: mod.default,
+    })),
+  {
+    ssr: false,
+    loading: () => (
       <div
         className="flex min-h-[70vh] items-center justify-center"
         aria-live="polite"
@@ -87,13 +27,24 @@ export function LabExperienceClient({
           Loading Living Engraving…
         </p>
       </div>
-    );
-  }
+    ),
+  },
+);
+
+export function LabExperienceClient({
+  configuration,
+}: LabExperienceClientProps) {
+  useEffect(() => {
+    trackExperienceEvent("experience_initialized", {
+      experienceKey: livingEngravingManifest.experienceKey,
+      mode: configuration.mode,
+    });
+  }, [configuration.mode]);
 
   return (
     <ExperienceErrorBoundary>
-      <div className="relative min-h-[calc(100vh-72px)] w-full">
-        <Component configuration={configuration} />
+      <div className="relative h-[calc(100vh-72px)] min-h-[640px] w-full">
+        <LivingEngravingDynamic configuration={configuration} />
       </div>
     </ExperienceErrorBoundary>
   );

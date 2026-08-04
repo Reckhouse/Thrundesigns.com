@@ -132,7 +132,11 @@ export function ThreeExperienceSection({
             experienceKey={mapped.value.experienceKey}
             mode={asMode(mapped.value.configuration.mode)}
             configuration={mapped.value.configuration}
-            loadBehavior={mapped.value.presentation.loadBehavior}
+            loadBehavior={
+              mapped.value.experienceKey === "living-engraving-horse"
+                ? "immediate"
+                : mapped.value.presentation.loadBehavior
+            }
             height={
               typeof mapped.value.configuration.height === "number"
                 ? mapped.value.configuration.height

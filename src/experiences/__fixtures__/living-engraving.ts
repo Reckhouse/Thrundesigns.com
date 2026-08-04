@@ -17,7 +17,7 @@ export const validLivingEngravingPreviewFixture: ThreeExperienceBlockValue = {
   quality: "auto",
   controls: "minimal",
   autoplay: false,
-  loadBehavior: "interaction",
+  loadBehavior: "immediate",
   height: 640,
   allowTextEditing: false,
   allowSvgUpload: false,
