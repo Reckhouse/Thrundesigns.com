@@ -1,7 +1,6 @@
 /**
  * Persistence adapter for Controlled Chaos.
- * Phase 7 wires these methods to `/api/creations*`.
- * The real package will call this interface — do not put storage logic in UI.
+ * Calls the portfolio creations API — storage logic stays server-side.
  */
 
 export type ControlledChaosCreationRecord = {
@@ -10,29 +9,71 @@ export type ControlledChaosCreationRecord = {
 };
 
 export type ControlledChaosPersistenceAdapter = {
-  save(creation: unknown): Promise<{ id: string }>;
+  save(creation: unknown): Promise<{ id: string; url: string }>;
   load(creationId: string): Promise<ControlledChaosCreationRecord>;
-  duplicate(creationId: string): Promise<{ id: string }>;
+  duplicate(creationId: string): Promise<{ id: string; url: string }>;
 };
 
-export class CreationsApiNotReadyError extends Error {
-  constructor(action: string) {
-    super(
-      `Controlled Chaos persistence "${action}" is not available yet. Creations API ships in Phase 7.`,
-    );
-    this.name = "CreationsApiNotReadyError";
-  }
+async function readJson(response: Response): Promise<Record<string, unknown>> {
+  return (await response.json().catch(() => ({}))) as Record<string, unknown>;
 }
 
 export const controlledChaosPersistenceAdapter: ControlledChaosPersistenceAdapter =
   {
-    async save() {
-      throw new CreationsApiNotReadyError("save");
+    async save(creation) {
+      const response = await fetch("/api/creations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(creation),
+      });
+      const data = await readJson(response);
+      if (!response.ok || typeof data.id !== "string") {
+        throw new Error(
+          typeof data.error === "string"
+            ? data.error
+            : "Failed to save creation",
+        );
+      }
+      return {
+        id: data.id,
+        url: typeof data.url === "string" ? data.url : `/creation/${data.id}`,
+      };
     },
-    async load() {
-      throw new CreationsApiNotReadyError("load");
+
+    async load(creationId) {
+      const response = await fetch(`/api/creations/${creationId}`, {
+        method: "GET",
+        cache: "no-store",
+      });
+      const data = await readJson(response);
+      if (!response.ok) {
+        throw new Error(
+          typeof data.error === "string"
+            ? data.error
+            : "Failed to load creation",
+        );
+      }
+      return {
+        id: creationId,
+        payload: data.creation,
+      };
     },
-    async duplicate() {
-      throw new CreationsApiNotReadyError("duplicate");
+
+    async duplicate(creationId) {
+      const response = await fetch(`/api/creations/${creationId}/duplicate`, {
+        method: "POST",
+      });
+      const data = await readJson(response);
+      if (!response.ok || typeof data.id !== "string") {
+        throw new Error(
+          typeof data.error === "string"
+            ? data.error
+            : "Failed to duplicate creation",
+        );
+      }
+      return {
+        id: data.id,
+        url: typeof data.url === "string" ? data.url : `/creation/${data.id}`,
+      };
     },
   };

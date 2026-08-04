@@ -379,6 +379,16 @@ Completed:
 - `ExperienceErrorBoundary` around the lab renderer
 - Sitemap entry for the lab route
 
+## Phase 7–8 status
+
+Completed:
+
+- Creations API: `POST /api/creations`, `GET /api/creations/[id]`, `POST .../duplicate`
+- Blob payload storage + Redis metadata index + rate limits
+- Persistence adapter wired to the API
+- `/creation/[creationId]` replay route (noindex) with edit + duplicate actions
+- Featured creations gallery on project pages (Sanity IDs → store fetch)
+
 
 ---
 

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExperienceLaunchLink } from "@/components/experiences/ExperienceLaunchLink";
+import { FeaturedCreationsGallery } from "@/components/project/featured-creations-gallery";
 import { ProjectModules } from "@/components/project/project-modules";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -26,7 +27,10 @@ import {
   siteSettingsQuery,
 } from "@/sanity/lib/queries";
 import type { ProjectModule } from "@/types/project-modules";
-import type { ThreeExperienceBlockValue } from "@/types/three-experience";
+import type {
+  FeaturedCreationValue,
+  ThreeExperienceBlockValue,
+} from "@/types/three-experience";
 import type { ProjectBySlugQueryResult } from "@/sanity/types";
 import type { SanityImageSource } from "@sanity/image-url";
 
@@ -37,7 +41,7 @@ type PageProps = {
 type ProjectDoc = Partial<
   Omit<
     NonNullable<ProjectBySlugQueryResult>,
-    "modules" | "cover" | "seo" | "primaryExperience"
+    "modules" | "cover" | "seo" | "primaryExperience" | "featuredCreations"
   >
 > & {
   cover?: MediaAssetValue;
@@ -48,6 +52,7 @@ type ProjectDoc = Partial<
   } | null;
   modules?: ProjectModule[] | null;
   primaryExperience?: ThreeExperienceBlockValue | null;
+  featuredCreations?: FeaturedCreationValue[] | null;
 };
 
 function coverFallback(slug: string) {
@@ -202,6 +207,10 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           </section>
           <ProjectModules
             modules={project.modules}
+            caseStudyPath={`/work/${slug}`}
+          />
+          <FeaturedCreationsGallery
+            items={project.featuredCreations}
             caseStudyPath={`/work/${slug}`}
           />
         </article>
