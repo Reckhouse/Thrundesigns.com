@@ -1,7 +1,8 @@
 # Controlled Chaos — Visual Systems
 
-**Phase:** 4  
-**Active systems:** Particle Disintegration · Chrome Liquid · CRT / Photocopy
+**Phase:** 5  
+**Active systems:** Particle Disintegration · Chrome Liquid · CRT / Photocopy  
+**Cross-cutting:** Audio-reactive displacement · Still/video export
 
 ## Plugin contract
 
@@ -15,22 +16,9 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 | Rendering | `InstancedMesh` + custom GLSL (refs/uniforms only in the frame loop) |
 | Loop | Phase `time / loopDuration`, cosine envelope, reassembly near loop end |
 | Pointer | Invisible interaction plane + raycast → `PointerForce` ref |
+| Audio | Bass/mid/treble/energy/beat uniforms displace particles |
 | Quality | low ~10k / medium ~28k / high ~70k × density |
 | Presets | Signal Failure, Grid Bloom, Cold Open |
-
-### Controls (basic)
-
-- Density, disintegration, motion
-- Particle shape (square / disc / shard)
-- Palette / seed (shared document)
-- Pointer force mode
-- SVG import (sanitized)
-
-### Privacy / security
-
-- SVG scripts, handlers, foreignObject, and external URLs are rejected
-- Local SVG markup may be stored in creation state when saved (checksummed)
-- Pointer coordinates are not sent to analytics
 
 ## Chrome Liquid
 
@@ -38,29 +26,36 @@ Each system exposes a `VisualSystemDefinition` with capabilities, Zod config, de
 |---------|----------------|
 | Geometry | Debounced extruded `TextGeometry` with depth/bevel boosts |
 | Material | `MeshPhysicalMaterial` — metalness, clearcoat, fresnel-tinted emissive |
-| Motion | Seeded liquid rotation/offset on the type group; frozen under reduced motion |
-| Lighting | Local key/fill/rim presets: studio-warm, cold-chrome, gallery-spot, rim-heavy |
+| Motion | Seeded liquid rotation/offset; audio scales amplitude + emissive |
+| Lighting | Local key/fill/rim presets |
 | Presets | Molten Signal, Mirror Grid, Black Ice |
-
-### Controls
-
-- Liquid amplitude, fresnel, roughness
-- Lighting preset
-- Shared phrase / font / palette / seed
 
 ## CRT / Photocopy
 
 | Concern | Implementation |
 |---------|----------------|
 | Type | Shallower extrusion + high-contrast ink bias |
-| Stack | `@react-three/postprocessing` EffectComposer |
-| Passes | Scanline, Noise, BrightnessContrast (threshold), ChromaticAberration, Vignette, Bloom |
-| Quality | `postprocessingBudget` — low drops chromatic/bloom and lowers resolution scale |
-| Reduced motion | Static grain (no premultiply animation), softened chromatic offset |
+| Stack | EffectComposer (scanlines, grain, threshold, chromatic, vignette, bloom) |
+| Audio | Not mapped in Phase 5 (supportsAudio: false) |
 | Presets | Static Channel, Xerox Draft, Broadcast Bleed |
 
-Document `postprocessing` fields sync from CRT config so saves capture the look.
+## Audio engine
+
+| Concern | Implementation |
+|---------|----------------|
+| Curated | Procedural looped buffers: Pulse Drone, Grid Click, Signal Hum |
+| Local | File decode in memory only — never analytics / auto-upload |
+| Persisted | `document.audio` mode/trackKey/gain/sensitivity/weights (no local bytes) |
+| Reduced motion | Displacement disabled; playback still optional |
+
+## Export
+
+| Output | Approach |
+|--------|----------|
+| PNG | `canvas.toBlob` with `preserveDrawingBuffer` |
+| Video | One loop via `captureStream` + MediaRecorder MIME ladder |
+| Overlays | Hidden while `data-exporting` is set |
 
 ## Next systems
 
-Inflatable type, torn paper, elastic type, type-architecture, and audio-reactive displacement.
+Inflatable type, torn paper, elastic type, type-architecture; fuller audio mappings; export hardening (FPS fallbacks, thumbnails).

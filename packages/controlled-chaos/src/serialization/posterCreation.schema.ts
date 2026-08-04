@@ -19,6 +19,10 @@ import {
   crtPresets,
   defaultCrtPhotocopyConfig,
 } from "../systems/crt-photocopy/crtPhotocopy.schema";
+import {
+  audioReactiveConfigSchema,
+  defaultAudioReactiveConfig,
+} from "../audio/audio.schema";
 
 export const VISUAL_SYSTEM_KEYS = [
   "particle-disintegration",
@@ -131,6 +135,8 @@ export const posterCreationV1Schema = z.object({
     bloom: z.number().min(0).max(1).default(0),
     chromaticOffset: z.number().min(0).max(1).default(0),
   }),
+
+  audio: audioReactiveConfigSchema.default(defaultAudioReactiveConfig),
 });
 
 export type PosterCreationV1 = z.infer<typeof posterCreationV1Schema>;
@@ -376,6 +382,7 @@ export function createDefaultPosterCreation(
           bloom: 0,
           chromaticOffset: 0,
         },
+    audio: defaultAudioReactiveConfig,
   };
 
   return posterCreationV1Schema.parse(draft);
@@ -407,4 +414,5 @@ export {
   defaultParticleDisintegrationConfig,
   defaultChromeLiquidConfig,
   defaultCrtPhotocopyConfig,
+  defaultAudioReactiveConfig,
 };

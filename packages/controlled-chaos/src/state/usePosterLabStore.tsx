@@ -41,6 +41,10 @@ import {
   ACTIVE_VISUAL_SYSTEM_KEYS,
   type ActiveVisualSystemKey,
 } from "../systems/registry";
+import {
+  parseAudioConfig,
+  type AudioReactiveConfig,
+} from "../audio/audio.schema";
 
 const HISTORY_LIMIT = 40;
 
@@ -77,6 +81,7 @@ export type PosterLabStoreState = {
   applyChromePreset: (presetKey: string) => void;
   setCrtConfig: (patch: Partial<CrtPhotocopyConfig>) => void;
   applyCrtPreset: (presetKey: string) => void;
+  setAudioConfig: (patch: Partial<AudioReactiveConfig>) => void;
   importSvgMarkup: (
     markup: string,
   ) => { ok: true } | { ok: false; message: string };
@@ -386,6 +391,16 @@ export function createPosterLabStore(options?: {
         if (get().onboardingStep < 3) {
           set({ onboardingStep: 3 });
         }
+      },
+
+      setAudioConfig(patch) {
+        patchDocument((document) => {
+          document.audio = parseAudioConfig({
+            ...document.audio,
+            ...patch,
+          });
+          return document;
+        });
       },
 
       importSvgMarkup(markup) {

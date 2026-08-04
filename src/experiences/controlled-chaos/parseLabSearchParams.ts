@@ -58,7 +58,7 @@ export function parseControlledChaosLabConfig(
     height: controlledChaosManifest.defaultHeight,
     allowTextEditing: mode === "inline",
     allowSvgUpload: mode === "inline",
-    allowAudio: false,
+    allowAudio: mode === "inline",
     allowExport: mode === "inline",
     embedConfigVersion: controlledChaosManifest.embedConfigVersion,
     assetBaseUrl,

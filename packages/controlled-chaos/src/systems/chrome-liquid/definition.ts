@@ -16,7 +16,7 @@ export const chromeLiquidDefinition: VisualSystemDefinition<ChromeLiquidConfig> 
     capabilities: {
       supportsText: true,
       supportsSvg: false,
-      supportsAudio: false,
+      supportsAudio: true,
       supportsPointerForces: false,
       supportsPhysics: false,
       supportsSeamlessLoop: true,

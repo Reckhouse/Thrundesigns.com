@@ -386,7 +386,7 @@ Particle disintegration is the active default system:
 - Quality budgets and curated presets
 - Docs: `visual-systems.md`
 
-**Next (Phase 5):** Audio-reactive displacement applied across ≥2 systems; export polish.
+**Next (Phase 6):** Export hardening (thumbnails, FPS fallbacks) + persistence polish.
 
 ---
 

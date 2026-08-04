@@ -16,7 +16,7 @@ export const particleDisintegrationDefinition: VisualSystemDefinition<ParticleDi
     capabilities: {
       supportsText: true,
       supportsSvg: true,
-      supportsAudio: false,
+      supportsAudio: true,
       supportsPointerForces: true,
       supportsPhysics: false,
       supportsSeamlessLoop: true,

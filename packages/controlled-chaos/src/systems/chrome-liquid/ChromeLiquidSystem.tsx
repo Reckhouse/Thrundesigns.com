@@ -16,6 +16,7 @@ import {
   CHROME_LIGHTING,
   parseChromeConfig,
 } from "./chromeLiquid.schema";
+import { useAudioBandsRef } from "../../audio/AudioReactiveContext";
 
 type ChromeLiquidSystemProps = {
   document: PosterCreationV1;
@@ -82,6 +83,12 @@ export function ChromeLiquidSystem({
   const activeGeometries = useRef<BufferGeometry[]>([]);
   const groupRef = useRef<Group>(null);
   const configRef = useRef(config);
+  const audioRef = useAudioBandsRef();
+  const audioEnabled =
+    document.audio.mode !== "off" && document.audio.reactive && !reducedMotion;
+  const audioGain = audioEnabled
+    ? document.audio.gain * document.audio.sensitivity
+    : 0;
 
   useEffect(() => {
     configRef.current = config;
@@ -209,7 +216,12 @@ export function ChromeLiquidSystem({
     const t = clock.getElapsedTime();
     const phase = (t % loopSeconds) / loopSeconds;
     const angle = phase * Math.PI * 2;
-    const amp = cfg.liquidAmplitude * 0.045;
+    const bands = audioRef.current;
+    const audioMul =
+      1 +
+      audioGain *
+        (bands.bass * 0.55 + bands.energy * 0.35 + bands.beat * 0.7);
+    const amp = cfg.liquidAmplitude * 0.045 * audioMul;
     const freq = cfg.liquidFrequency;
     const speed = cfg.liquidSpeed;
 
@@ -231,8 +243,12 @@ export function ChromeLiquidSystem({
     });
 
     updateMaterials(
-      cfg.fresnel * (0.06 + 0.1 * (0.5 + 0.5 * Math.sin(angle * 2))),
-      cfg.envIntensity * (0.92 + 0.08 * Math.sin(angle)),
+      cfg.fresnel *
+        (0.06 +
+          0.1 * (0.5 + 0.5 * Math.sin(angle * 2)) +
+          audioGain * bands.treble * 0.12),
+      cfg.envIntensity *
+        (0.92 + 0.08 * Math.sin(angle) + audioGain * bands.mid * 0.15),
     );
   });
 

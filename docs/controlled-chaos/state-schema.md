@@ -35,6 +35,7 @@ Creations saved through `/api/creations` use:
 | `camera` | Perspective defaults + motion preset |
 | `lighting` | Key / fill / rim / exposure |
 | `postprocessing` | Grain, vignette, bloom, chromatic; CRT system syncs these when active |
+| `audio` | Mode (off/curated/local), trackKey, gain, sensitivity, band weights; local bytes never persisted |
 
 ## Fonts
 

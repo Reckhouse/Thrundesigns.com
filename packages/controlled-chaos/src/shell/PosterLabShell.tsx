@@ -3,6 +3,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
   type CSSProperties,
@@ -39,6 +40,15 @@ import {
 } from "../systems/registry";
 import type { ForceMode } from "../systems/types";
 import { isSvgFileName } from "../svg/SvgSanitizer";
+import {
+  AudioReactiveProvider,
+  useAudioReactive,
+} from "../audio/AudioReactiveContext";
+import {
+  CURATED_AUDIO_TRACKS,
+  type AudioTrackKey,
+} from "../audio/audio.schema";
+import { captureStill, recordPosterLoop } from "../export/exportPoster";
 import { PosterErrorBoundary } from "./PosterErrorBoundary";
 import {
   PosterFallback,
@@ -227,9 +237,19 @@ function PosterLabShellInner({
   const applyChromePreset = usePosterLabStore((state) => state.applyChromePreset);
   const setCrtConfig = usePosterLabStore((state) => state.setCrtConfig);
   const applyCrtPreset = usePosterLabStore((state) => state.applyCrtPreset);
+  const setAudioConfig = usePosterLabStore((state) => state.setAudioConfig);
   const importSvgMarkup = usePosterLabStore((state) => state.importSvgMarkup);
   const clearSvgAsset = usePosterLabStore((state) => state.clearSvgAsset);
   const svgError = usePosterLabStore((state) => state.svgError);
+
+  const allowAudio = configuration?.allowAudio !== false && showInspector;
+  const allowExport =
+    configuration?.allowExport !== false && showFullControls;
+
+  const audio = useAudioReactive();
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const [exportMessage, setExportMessage] = useState<string | null>(null);
 
   const systemKey = documentState.visualSystem.key;
   const particleConfig = useMemo(
@@ -821,6 +841,157 @@ function PosterLabShellInner({
       </div>
       ) : null}
 
+      {allowAudio ? (
+        <div style={{ marginTop: "1.25rem" }}>
+          <p style={labelStyle}>Audio reactive</p>
+          <p style={{ ...muted, marginBottom: "0.55rem" }}>
+            Local files stay in memory. Built-in tracks are procedural loops.
+            {reducedMotion ? " Reduced motion disables displacement." : ""}
+          </p>
+          <label style={labelStyle} htmlFor="cc-audio-mode">
+            Mode
+          </label>
+          <select
+            id="cc-audio-mode"
+            value={documentState.audio.mode}
+            onChange={(event) => {
+              const mode = event.target.value as
+                | "off"
+                | "curated"
+                | "local";
+              setAudioConfig({ mode });
+              if (mode === "off") audio.stop();
+            }}
+            style={inputStyle}
+          >
+            <option value="off">Off</option>
+            <option value="curated">Curated</option>
+            <option value="local">Local file</option>
+          </select>
+
+          {documentState.audio.mode === "curated" ? (
+            <div style={{ marginTop: "0.65rem" }}>
+              <label style={labelStyle} htmlFor="cc-audio-track">
+                Track
+              </label>
+              <select
+                id="cc-audio-track"
+                value={documentState.audio.trackKey}
+                onChange={(event) =>
+                  setAudioConfig({
+                    trackKey: event.target.value as AudioTrackKey,
+                  })
+                }
+                style={inputStyle}
+              >
+                {CURATED_AUDIO_TRACKS.map((track) => (
+                  <option key={track.key} value={track.key}>
+                    {track.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+
+          {documentState.audio.mode === "local" ? (
+            <div style={{ marginTop: "0.65rem" }}>
+              <input
+                type="file"
+                accept="audio/*,.mp3,.wav,.ogg,.m4a"
+                aria-label="Upload audio"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = "";
+                  if (!file) return;
+                  void audio.loadLocalFile(file);
+                }}
+                style={{ ...inputStyle, padding: "0.45rem" }}
+              />
+              {audio.localFileName ? (
+                <p style={{ ...muted, marginTop: "0.4rem" }}>
+                  Loaded · {audio.localFileName}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {documentState.audio.mode !== "off" ? (
+            <>
+              <label
+                style={{ ...labelStyle, marginTop: "0.75rem" }}
+                htmlFor="cc-audio-gain"
+              >
+                Gain · {documentState.audio.gain.toFixed(2)}
+              </label>
+              <input
+                id="cc-audio-gain"
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={documentState.audio.gain}
+                onChange={(event) =>
+                  setAudioConfig({ gain: Number(event.target.value) })
+                }
+                style={{ width: "100%" }}
+              />
+              <label
+                style={{ ...labelStyle, marginTop: "0.75rem" }}
+                htmlFor="cc-audio-sensitivity"
+              >
+                Sensitivity · {documentState.audio.sensitivity.toFixed(2)}
+              </label>
+              <input
+                id="cc-audio-sensitivity"
+                type="range"
+                min={0}
+                max={2}
+                step={0.01}
+                value={documentState.audio.sensitivity}
+                onChange={(event) =>
+                  setAudioConfig({ sensitivity: Number(event.target.value) })
+                }
+                style={{ width: "100%" }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.45rem",
+                  marginTop: "0.75rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => void audio.play()}
+                  style={{ ...inputStyle, width: "auto", cursor: "pointer" }}
+                >
+                  Play
+                </button>
+                <button
+                  type="button"
+                  onClick={() => audio.pause()}
+                  style={{ ...inputStyle, width: "auto", cursor: "pointer" }}
+                >
+                  Pause
+                </button>
+                <button
+                  type="button"
+                  onClick={() => audio.stop()}
+                  style={{ ...inputStyle, width: "auto", cursor: "pointer" }}
+                >
+                  Stop
+                </button>
+              </div>
+              <p style={{ ...muted, marginTop: "0.45rem" }}>
+                Status · {audio.status}
+                {audio.error ? ` · ${audio.error}` : ""}
+              </p>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+
       <div style={{ marginTop: "1.25rem" }}>
         <p style={labelStyle}>Quality</p>
         <p style={muted}>
@@ -842,9 +1013,96 @@ function PosterLabShellInner({
         quality={configuration?.quality ?? "auto"}
         assetBasePath={assetBasePath}
         forceMode={forceMode}
+        canvasRef={canvasRef}
+        exporting={exporting}
       />
     </PosterErrorBoundary>
   );
+
+  const handleExportStill = async () => {
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) {
+      setExportMessage("Canvas not ready.");
+      return;
+    }
+    setExporting(true);
+    setExportMessage("Exporting still…");
+    await new Promise((resolve) => window.requestAnimationFrame(resolve));
+    const result = await captureStill({
+      canvas: canvasEl,
+      fileName: `controlled-chaos-${documentState.seed}.png`,
+    });
+    setExporting(false);
+    setExportMessage(result.ok ? `Saved ${result.fileName}` : result.message);
+    if (result.ok) analytics?.track("export_completed");
+  };
+
+  const handleExportVideo = async () => {
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) {
+      setExportMessage("Canvas not ready.");
+      return;
+    }
+    setExporting(true);
+    setExportMessage("Recording loop…");
+    const result = await recordPosterLoop({
+      canvas: canvasEl,
+      durationSeconds: documentState.document.loopDurationSeconds,
+      fps: 30,
+      fileName: `controlled-chaos-${documentState.seed}.webm`,
+      onProgress: (ratio) => {
+        setExportMessage(`Recording… ${Math.round(ratio * 100)}%`);
+      },
+    });
+    setExporting(false);
+    setExportMessage(result.ok ? `Saved ${result.fileName}` : result.message);
+    if (result.ok) analytics?.track("export_completed");
+  };
+
+  const exportActions = allowExport ? (
+    <>
+      <button
+        type="button"
+        disabled={exporting}
+        onClick={() => void handleExportStill()}
+        style={{
+          appearance: "none",
+          border: `1px solid ${tokens.line}`,
+          background: tokens.surface,
+          color: tokens.fg,
+          fontFamily: tokens.fontMono,
+          fontSize: "0.6875rem",
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          padding: "0.55rem 0.85rem",
+          cursor: exporting ? "wait" : "pointer",
+          opacity: exporting ? 0.5 : 1,
+        }}
+      >
+        PNG
+      </button>
+      <button
+        type="button"
+        disabled={exporting}
+        onClick={() => void handleExportVideo()}
+        style={{
+          appearance: "none",
+          border: `1px solid ${tokens.line}`,
+          background: tokens.surface,
+          color: tokens.fg,
+          fontFamily: tokens.fontMono,
+          fontSize: "0.6875rem",
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          padding: "0.55rem 0.85rem",
+          cursor: exporting ? "wait" : "pointer",
+          opacity: exporting ? 0.5 : 1,
+        }}
+      >
+        Video
+      </button>
+    </>
+  ) : null;
 
   return (
     <div
@@ -873,6 +1131,7 @@ function PosterLabShellInner({
         onUndo={undo}
         onRedo={redo}
         onRandomize={randomizeSeed}
+        actions={exportActions}
       />
 
       <div
@@ -922,9 +1181,14 @@ function PosterLabShellInner({
             Loop · {documentState.document.loopDurationSeconds}s
           </p>
           <p style={muted}>
-            Timeline, gesture recording, and export arrive later. Persistence
-            adapter
-            {_persistence ? " is connected." : " is not connected in this embed."}
+            {exportMessage
+              ? exportMessage
+              : "Export PNG or one loop as video from the toolbar. Persistence adapter"}
+            {!exportMessage
+              ? _persistence
+                ? " is connected."
+                : " is not connected in this embed."
+              : null}
           </p>
         </div>
       ) : null}
@@ -932,9 +1196,34 @@ function PosterLabShellInner({
   );
 }
 
+function PosterLabShellWithAudio({
+  configuration,
+  ...rest
+}: Omit<PosterLabShellProps, "initialDocument">) {
+  const audioConfig = usePosterLabStore((state) => state.document.audio);
+  const setAudioConfig = usePosterLabStore((state) => state.setAudioConfig);
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
+  const allowAudio = configuration?.allowAudio !== false;
+
+  return (
+    <AudioReactiveProvider
+      config={audioConfig}
+      onConfigChange={setAudioConfig}
+      enabled={allowAudio}
+      reducedMotion={reducedMotion}
+    >
+      <PosterLabShellInner configuration={configuration} {...rest} />
+    </AudioReactiveProvider>
+  );
+}
+
 /**
- * Phase 4 shell: visual system picker (particles / chrome / CRT),
- * quality-aware postprocessing, Zustand document state, and extruded type.
+ * Phase 5 shell: audio-reactive displacement, still/video export,
+ * visual system picker, and Zustand document state.
  */
 export function PosterLabShell({
   initialDocument,
@@ -946,7 +1235,7 @@ export function PosterLabShell({
       document={initialDocument}
       presetKey={configuration?.initialPresetKey}
     >
-      <PosterLabShellInner configuration={configuration} {...rest} />
+      <PosterLabShellWithAudio configuration={configuration} {...rest} />
     </PosterLabStoreProvider>
   );
 }

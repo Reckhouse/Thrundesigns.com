@@ -16,6 +16,7 @@ import { createSeededRandom } from "../../seed/createSeededRandom";
 import type { PointerForce } from "../types";
 import type { ParticleDisintegrationConfig } from "./particleDisintegration.schema";
 import type { SampledPoint } from "./pointSampling";
+import type { AudioBands } from "../../audio/audio.schema";
 
 const MAX_PARTICLES = 80_000;
 
@@ -47,6 +48,13 @@ varying vec3 vColor;
 varying float vAlpha;
 varying vec2 vUv;
 
+uniform float uAudioBass;
+uniform float uAudioMid;
+uniform float uAudioTreble;
+uniform float uAudioEnergy;
+uniform float uAudioBeat;
+uniform float uAudioGain;
+
 float loopNoise(vec3 p, float phase) {
   return sin(p.x * uNoiseFreq + phase * 6.2831853)
        * cos(p.y * uNoiseFreq * 0.85 + phase * 4.1887902);
@@ -65,6 +73,12 @@ void main() {
   float turb = loopNoise(aSource + aRandom, phase) * uNoiseAmp * uTurbulence;
   vec3 drift = dir * dissolve * (0.25 + uMotion * 0.9)
              + vec3(turb * 0.06, turb * 0.08, turb * 0.04);
+
+  float audioPush = uAudioGain * (1.0 - uReducedMotion);
+  drift += dir * (uAudioBass * 0.18 + uAudioEnergy * 0.1 + uAudioBeat * 0.22) * audioPush;
+  drift.x += (aRandom.x - 0.5) * uAudioMid * 0.08 * audioPush;
+  drift.y += (aRandom.y - 0.5) * uAudioTreble * 0.06 * audioPush;
+  drift.z += uAudioBass * 0.05 * audioPush * aEdge;
 
   float reassemble = pow(smoothstep(0.78, 1.0, phase), 1.4) * uReassembly;
   drift = mix(drift, vec3(0.0), reassemble);
@@ -126,6 +140,8 @@ type ParticleFieldProps = {
   seed: string;
   loopSeconds: number;
   pointerRef: MutableRefObject<PointerForce>;
+  audioRef?: MutableRefObject<AudioBands>;
+  audioGain?: number;
   paused?: boolean;
   reducedMotion?: boolean;
 };
@@ -151,6 +167,8 @@ export function ParticleField({
   seed,
   loopSeconds,
   pointerRef,
+  audioRef,
+  audioGain = 0,
   paused = false,
   reducedMotion = false,
 }: ParticleFieldProps) {
@@ -221,6 +239,12 @@ export function ParticleField({
         uForceMode: { value: 0 },
         uReducedMotion: { value: reducedMotion ? 1 : 0 },
         uShape: { value: shapeToFloat(config.particleShape) },
+        uAudioBass: { value: 0 },
+        uAudioMid: { value: 0 },
+        uAudioTreble: { value: 0 },
+        uAudioEnergy: { value: 0 },
+        uAudioBeat: { value: 0 },
+        uAudioGain: { value: 0 },
       },
       vertexShader: planeVertexShader,
       fragmentShader: planeFragmentShader,
@@ -293,6 +317,13 @@ export function ParticleField({
     mat.uniforms.uForceMode.value = forceModeToFloat(pointer.mode);
     mat.uniforms.uReducedMotion.value = reducedMotion ? 1 : 0;
     mat.uniforms.uShape.value = shapeToFloat(config.particleShape);
+    const bands = audioRef?.current;
+    mat.uniforms.uAudioBass.value = bands?.bass ?? 0;
+    mat.uniforms.uAudioMid.value = bands?.mid ?? 0;
+    mat.uniforms.uAudioTreble.value = bands?.treble ?? 0;
+    mat.uniforms.uAudioEnergy.value = bands?.energy ?? 0;
+    mat.uniforms.uAudioBeat.value = bands?.beat ?? 0;
+    mat.uniforms.uAudioGain.value = audioGain;
     (mat.uniforms.uPointer.value as Vector3).set(
       pointer.position[0],
       pointer.position[1],

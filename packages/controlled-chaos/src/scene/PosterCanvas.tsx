@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, type MutableRefObject } from "react";
 import { Canvas } from "@react-three/fiber";
 import type { PosterCreationV1 } from "../serialization/posterCreation.schema";
 import { PosterSceneContent } from "./PosterSceneContent";
@@ -14,6 +14,8 @@ type PosterSceneProps = {
   quality?: "auto" | "low" | "medium" | "high";
   assetBasePath?: string;
   forceMode?: import("../systems/types").ForceMode;
+  canvasRef?: MutableRefObject<HTMLCanvasElement | null>;
+  exporting?: boolean;
 };
 
 function Lighting({
@@ -62,6 +64,8 @@ export function PosterCanvas({
   quality = "auto",
   assetBasePath,
   forceMode = "push",
+  canvasRef,
+  exporting = false,
 }: PosterSceneProps) {
   const [contextLost, setContextLost] = useState(false);
   const camera = document.camera;
@@ -95,6 +99,7 @@ export function PosterCanvas({
     <div
       style={{ position: "absolute", inset: 0 }}
       aria-label="Interactive poster canvas"
+      data-exporting={exporting ? "true" : undefined}
     >
       <Canvas
         style={{ width: "100%", height: "100%", touchAction: "none" }}
@@ -115,6 +120,9 @@ export function PosterCanvas({
         shadows={quality !== "low"}
         onCreated={({ gl }) => {
           gl.setClearColor(document.palette.background, 1);
+          if (canvasRef) {
+            canvasRef.current = gl.domElement;
+          }
           const canvasEl = gl.domElement;
           const onLost = (event: Event) => {
             event.preventDefault();
