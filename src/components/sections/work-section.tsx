@@ -15,6 +15,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { motion, useReducedMotion } from "framer-motion";
+import { isControlledChaosSlug } from "@/lib/controlled-chaos-media";
 import { motionTokens } from "@/lib/motion-tokens";
 
 type Project = {
@@ -81,6 +82,11 @@ export function WorkSection({
             const alt = project.cover?.alt
               ? stegaClean(project.cover.alt)
               : project.title || "Concept study";
+            // Landscape concepts use cover-crop. Controlled Chaos uses a
+            // card-aspect still + contain so neighboring thumbs stay cover.
+            const imageFitClass = isControlledChaosSlug(slug)
+              ? "object-contain object-center"
+              : "object-cover";
 
             return (
               <StaggerItem
@@ -111,7 +117,7 @@ export function WorkSection({
                                 src={src}
                                 alt={alt}
                                 fill
-                                className="object-contain object-center grayscale transition duration-500 group-hover:grayscale-0"
+                                className={`${imageFitClass} grayscale transition duration-500 group-hover:grayscale-0`}
                                 sizes="(max-width: 768px) 100vw, 286px"
                               />
                             </motion.div>

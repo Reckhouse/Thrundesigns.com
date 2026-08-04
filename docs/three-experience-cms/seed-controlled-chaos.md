@@ -15,7 +15,7 @@ Cover asset (repo): `/images/controlled-chaos-cover.jpg`
 | Industry | Interactive poster systems |
 | Services | Three.js · Generative typography · Audio-reactive design |
 | Summary | An interactive 9:16 poster instrument — seven visual systems, seeded chaos, audio-reactive displacement, and shareable creations — built as a reusable experience package for the Thrundesign portfolio. |
-| Cover `blobUrl` | `/images/controlled-chaos-cover.jpg` |
+| Cover `blobUrl` | `/images/controlled-chaos-cover.jpg` (9:16 hero). Work cards override to `/images/controlled-chaos-card.jpg` (286×390 crop). |
 | Cover `alt` | Controlled Chaos Poster Lab vertical cover with disintegrating typography |
 | Featured | true |
 | Order | 1 |

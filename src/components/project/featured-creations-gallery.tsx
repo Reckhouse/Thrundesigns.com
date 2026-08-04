@@ -102,7 +102,7 @@ export async function FeaturedCreationsGallery({
                   src={item.imageSrc}
                   alt={item.imageAlt}
                   fill
-                  className="object-contain object-center transition-opacity duration-500 group-hover:opacity-90"
+                  className="object-cover transition-opacity duration-500 group-hover:opacity-90"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               ) : (
