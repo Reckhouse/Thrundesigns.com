@@ -53,14 +53,16 @@ Also referenced for dynamic import paths:
 - `@thrun-design/controlled-chaos/react`
 - `@thrun-design/controlled-chaos/react-replay`
 
-### Actual
+### Actual (after Phase 1 stub)
 
 | Export / entry | Actual |
 |----------------|--------|
-| Named React components | **None** |
-| `/manifest` | **None** |
-| `/schemas` | **None** |
-| `/react`, `/react-preview`, `/react-replay` | **None** |
+| Named React components | Stub: `ControlledChaosExperience` / `Preview` / `Replay` (non-WebGL placeholders) |
+| `/manifest` | Present — `controlledChaosManifest` |
+| `/schemas` | Present — embed + creation Zod schemas |
+| `/react`, `/react-preview`, `/react-replay` | Present — default-export stub components |
+
+Package path: `packages/controlled-chaos` linked as `file:packages/controlled-chaos`.
 
 ### Stub export map (Phase 1 target)
 
@@ -353,14 +355,15 @@ Do **not** edit these in Phase 0.
 
 ## 15. Recommended Phase 1 implementation
 
-After this audit is reviewed:
+**Completed in Phase 1.** Delivered:
 
-1. Create `packages/controlled-chaos` stub with manifest, schemas, and non-WebGL placeholder React entries.  
-2. Add root dependency + `transpilePackages` as needed.  
-3. Implement `src/experiences/types.ts`, `registry.server.ts`, `registry.client.ts`, `compatibility.ts`.  
-4. Prove production `next build` still succeeds and server registry does not pull `three`.  
-5. Add a small `validate-experience-compatibility` script that asserts registry keys match stub manifest.  
-6. Stop before Sanity schema edits until Phase 1 exit criteria pass — or proceed to Phase 2 in the same PR only if Phase 1 is green.
+1. `packages/controlled-chaos` stub with manifest, schemas, and non-WebGL placeholder React entries.
+2. Root `file:` dependency + `transpilePackages`.
+3. `src/experiences/types.ts`, `registry.server.ts`, `registry.client.ts`, `compatibility.ts`, `manifest-options.ts`.
+4. `npm run validate:experiences` — asserts no Three.js in server-safe modules and registry/export map integrity.
+5. Production `next build` succeeds (with existing Sanity token env requirement unchanged).
+
+**Next:** Phase 2 Sanity schema (`projectThreeExperience`, `primaryExperience`, Studio options from manifest).
 
 ---
 
