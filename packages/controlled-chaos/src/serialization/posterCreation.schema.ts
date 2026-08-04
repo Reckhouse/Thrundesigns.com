@@ -10,6 +10,15 @@ import {
   defaultParticleDisintegrationConfig,
   particlePresets,
 } from "../systems/particle-disintegration/particleDisintegration.schema";
+import {
+  chromePresets,
+  defaultChromeLiquidConfig,
+} from "../systems/chrome-liquid/chromeLiquid.schema";
+import {
+  crtConfigToPostprocessing,
+  crtPresets,
+  defaultCrtPhotocopyConfig,
+} from "../systems/crt-photocopy/crtPhotocopy.schema";
 
 export const VISUAL_SYSTEM_KEYS = [
   "particle-disintegration",
@@ -137,6 +146,7 @@ const PRESET_DEFAULTS: Record<
     fontKey: (typeof FONT_KEYS)[number];
     palette: PosterPalette;
     seed: string;
+    lightingEnvironment: string;
   }>
 > = {
   "signal-failure": {
@@ -172,7 +182,124 @@ const PRESET_DEFAULTS: Record<
       accent: "#9bb0c9",
     },
   },
+  "molten-signal": {
+    phrase: "MOLTEN",
+    fontKey: "helvetiker-bold",
+    seed: "molten01",
+    lightingEnvironment: "studio-warm",
+    palette: {
+      background: "#0c0d0c",
+      primary: "#d4af6a",
+      secondary: "#8a6a38",
+      accent: "#f0d9a8",
+    },
+  },
+  "mirror-grid": {
+    phrase: "MIRROR",
+    fontKey: "optimer-bold",
+    seed: "mirror01",
+    lightingEnvironment: "cold-chrome",
+    palette: {
+      background: "#0a0c10",
+      primary: "#d7dde8",
+      secondary: "#6a7385",
+      accent: "#9bb0c9",
+    },
+  },
+  "black-ice": {
+    phrase: "BLACK ICE",
+    fontKey: "helvetiker-bold",
+    seed: "blackice",
+    lightingEnvironment: "rim-heavy",
+    palette: {
+      background: "#08090a",
+      primary: "#c8c4bc",
+      secondary: "#4a4844",
+      accent: "#8a8680",
+    },
+  },
+  "static-channel": {
+    phrase: "STATIC",
+    fontKey: "helvetiker-regular",
+    seed: "static01",
+    palette: {
+      background: "#0c0d0c",
+      primary: "#ebe7df",
+      secondary: "#8a6a38",
+      accent: "#d4af6a",
+    },
+  },
+  "xerox-draft": {
+    phrase: "XEROX",
+    fontKey: "optimer-bold",
+    seed: "xerox01",
+    palette: {
+      background: "#141210",
+      primary: "#ebe7df",
+      secondary: "#6a645c",
+      accent: "#c4b8a0",
+    },
+  },
+  "broadcast-bleed": {
+    phrase: "BROADCAST",
+    fontKey: "gentilis-regular",
+    seed: "bcast01",
+    palette: {
+      background: "#0a0c10",
+      primary: "#d7dde8",
+      secondary: "#6a7385",
+      accent: "#9bb0c9",
+    },
+  },
 };
+
+function resolveVisualSystemForPreset(presetKey?: string): {
+  key: VisualSystemKey;
+  version: number;
+  config: Record<string, unknown>;
+} {
+  const particlePreset = presetKey
+    ? particlePresets.find((entry) => entry.key === presetKey)
+    : undefined;
+  if (particlePreset) {
+    return {
+      key: "particle-disintegration",
+      version: 1,
+      config: particlePreset.config as unknown as Record<string, unknown>,
+    };
+  }
+
+  const chromePreset = presetKey
+    ? chromePresets.find((entry) => entry.key === presetKey)
+    : undefined;
+  if (chromePreset) {
+    return {
+      key: "chrome-liquid",
+      version: 1,
+      config: chromePreset.config as unknown as Record<string, unknown>,
+    };
+  }
+
+  const crtPreset = presetKey
+    ? crtPresets.find((entry) => entry.key === presetKey)
+    : undefined;
+  if (crtPreset) {
+    return {
+      key: "crt-photocopy",
+      version: 1,
+      config: crtPreset.config as unknown as Record<string, unknown>,
+    };
+  }
+
+  return {
+    key: "particle-disintegration",
+    version: 1,
+    config: defaultParticleDisintegrationConfig as unknown as Record<
+      string,
+      unknown
+    >,
+  };
+}
 
 export function createDefaultPosterCreation(
   options?: {
@@ -185,8 +312,9 @@ export function createDefaultPosterCreation(
     ? PRESET_DEFAULTS[options.presetKey]
     : undefined;
 
-  const particlePreset = options?.presetKey
-    ? particlePresets.find((entry) => entry.key === options.presetKey)
+  const visualSystem = resolveVisualSystemForPreset(options?.presetKey);
+  const crtPreset = options?.presetKey
+    ? crtPresets.find((entry) => entry.key === options.presetKey)
     : undefined;
 
   const draft = {
@@ -208,8 +336,8 @@ export function createDefaultPosterCreation(
       lineHeight: 1.15,
       caseTransform: "uppercase" as const,
       maxWidth: 0.9,
-      depth: 0.06,
-      bevel: 0.012,
+      depth: visualSystem.key === "chrome-liquid" ? 0.09 : 0.06,
+      bevel: visualSystem.key === "chrome-liquid" ? 0.018 : 0.012,
     },
     composition: {
       position: [0, 0.05, 0.07] as [number, number, number],
@@ -217,12 +345,7 @@ export function createDefaultPosterCreation(
       scale: [1, 1, 1] as [number, number, number],
       safeAreaEnabled: true,
     },
-    visualSystem: {
-      key: "particle-disintegration" as const,
-      version: 1,
-      config:
-        particlePreset?.config ?? defaultParticleDisintegrationConfig,
-    },
+    visualSystem,
     palette: preset?.palette ?? {
       background: "#0c0d0c",
       primary: "#ebe7df",
@@ -238,19 +361,21 @@ export function createDefaultPosterCreation(
       motionIntensity: 0.35,
     },
     lighting: {
-      environmentKey: "studio-warm",
+      environmentKey: preset?.lightingEnvironment ?? "studio-warm",
       keyIntensity: 1.35,
       fillIntensity: 0.35,
       rimIntensity: 0.45,
       exposure: 1,
     },
-    postprocessing: {
-      enabled: false,
-      grain: 0.15,
-      vignette: 0.2,
-      bloom: 0,
-      chromaticOffset: 0,
-    },
+    postprocessing: crtPreset
+      ? crtConfigToPostprocessing(crtPreset.config)
+      : {
+          enabled: false,
+          grain: 0.15,
+          vignette: 0.2,
+          bloom: 0,
+          chromaticOffset: 0,
+        },
   };
 
   return posterCreationV1Schema.parse(draft);
@@ -276,3 +401,10 @@ export function validatePhraseInput(
   }
   return { ok: true, value };
 }
+
+/** Re-export defaults used by store helpers without pulling Three.js. */
+export {
+  defaultParticleDisintegrationConfig,
+  defaultChromeLiquidConfig,
+  defaultCrtPhotocopyConfig,
+};

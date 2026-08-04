@@ -25,6 +25,18 @@ import {
   parseParticleConfig,
   particlePresets,
 } from "../systems/particle-disintegration/particleDisintegration.schema";
+import {
+  parseChromeConfig,
+  chromePresets,
+} from "../systems/chrome-liquid/chromeLiquid.schema";
+import {
+  parseCrtConfig,
+  crtPresets,
+} from "../systems/crt-photocopy/crtPhotocopy.schema";
+import {
+  listRegisteredVisualSystems,
+  type ActiveVisualSystemKey,
+} from "../systems/registry";
 import type { ForceMode } from "../systems/types";
 import { isSvgFileName } from "../svg/SvgSanitizer";
 import { PosterErrorBoundary } from "./PosterErrorBoundary";
@@ -210,14 +222,32 @@ function PosterLabShellInner({
   const applyParticlePreset = usePosterLabStore(
     (state) => state.applyParticlePreset,
   );
+  const setVisualSystem = usePosterLabStore((state) => state.setVisualSystem);
+  const setChromeConfig = usePosterLabStore((state) => state.setChromeConfig);
+  const applyChromePreset = usePosterLabStore((state) => state.applyChromePreset);
+  const setCrtConfig = usePosterLabStore((state) => state.setCrtConfig);
+  const applyCrtPreset = usePosterLabStore((state) => state.applyCrtPreset);
   const importSvgMarkup = usePosterLabStore((state) => state.importSvgMarkup);
   const clearSvgAsset = usePosterLabStore((state) => state.clearSvgAsset);
   const svgError = usePosterLabStore((state) => state.svgError);
 
+  const systemKey = documentState.visualSystem.key;
   const particleConfig = useMemo(
     () => parseParticleConfig(documentState.visualSystem.config),
     [documentState.visualSystem.config],
   );
+  const chromeConfig = useMemo(
+    () => parseChromeConfig(documentState.visualSystem.config),
+    [documentState.visualSystem.config],
+  );
+  const crtConfig = useMemo(
+    () => parseCrtConfig(documentState.visualSystem.config),
+    [documentState.visualSystem.config],
+  );
+  const registeredSystems = useMemo(() => listRegisteredVisualSystems(), []);
+  const activeSystemTitle =
+    registeredSystems.find((system) => system.key === systemKey)?.title ??
+    systemKey;
 
   const paused = userPaused ?? reducedMotion;
   const assetBasePath = resolveAssetBasePath(configuration?.assetBaseUrl);
@@ -418,7 +448,26 @@ function PosterLabShellInner({
 
       <div style={{ marginTop: "1.25rem" }}>
         <p style={labelStyle}>Visual system</p>
-        <p style={muted}>Particle Disintegration</p>
+        <select
+          id="cc-visual-system"
+          aria-label="Visual system"
+          value={
+            systemKey === "chrome-liquid" || systemKey === "crt-photocopy"
+              ? systemKey
+              : "particle-disintegration"
+          }
+          onChange={(event) =>
+            setVisualSystem(event.target.value as ActiveVisualSystemKey)
+          }
+          style={inputStyle}
+        >
+          {registeredSystems.map((system) => (
+            <option key={system.key} value={system.key}>
+              {system.title}
+            </option>
+          ))}
+        </select>
+        <p style={{ ...muted, marginTop: "0.45rem" }}>{activeSystemTitle}</p>
         <div
           style={{
             display: "flex",
@@ -427,27 +476,66 @@ function PosterLabShellInner({
             marginTop: "0.55rem",
           }}
         >
-          {particlePresets.map((preset) => (
-            <button
-              key={preset.key}
-              type="button"
-              onClick={() => applyParticlePreset(preset.key)}
-              style={{
-                ...inputStyle,
-                cursor: "pointer",
-                textAlign: "left",
-                fontFamily: tokens.fontMono,
-                fontSize: "0.6875rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
-              {preset.title}
-            </button>
-          ))}
+          {systemKey === "chrome-liquid"
+            ? chromePresets.map((preset) => (
+                <button
+                  key={preset.key}
+                  type="button"
+                  onClick={() => applyChromePreset(preset.key)}
+                  style={{
+                    ...inputStyle,
+                    cursor: "pointer",
+                    textAlign: "left",
+                    fontFamily: tokens.fontMono,
+                    fontSize: "0.6875rem",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {preset.title}
+                </button>
+              ))
+            : systemKey === "crt-photocopy"
+              ? crtPresets.map((preset) => (
+                  <button
+                    key={preset.key}
+                    type="button"
+                    onClick={() => applyCrtPreset(preset.key)}
+                    style={{
+                      ...inputStyle,
+                      cursor: "pointer",
+                      textAlign: "left",
+                      fontFamily: tokens.fontMono,
+                      fontSize: "0.6875rem",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {preset.title}
+                  </button>
+                ))
+              : particlePresets.map((preset) => (
+                  <button
+                    key={preset.key}
+                    type="button"
+                    onClick={() => applyParticlePreset(preset.key)}
+                    style={{
+                      ...inputStyle,
+                      cursor: "pointer",
+                      textAlign: "left",
+                      fontFamily: tokens.fontMono,
+                      fontSize: "0.6875rem",
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {preset.title}
+                  </button>
+                ))}
         </div>
       </div>
 
+      {systemKey === "particle-disintegration" ? (
       <div style={{ marginTop: "1.25rem" }}>
         <label style={labelStyle} htmlFor="cc-disintegration">
           Disintegration · {particleConfig.disintegration.toFixed(2)}
@@ -497,7 +585,169 @@ function PosterLabShellInner({
           style={{ width: "100%" }}
         />
       </div>
+      ) : null}
 
+      {systemKey === "chrome-liquid" ? (
+        <div style={{ marginTop: "1.25rem" }}>
+          <label style={labelStyle} htmlFor="cc-liquid">
+            Liquid · {chromeConfig.liquidAmplitude.toFixed(2)}
+          </label>
+          <input
+            id="cc-liquid"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={chromeConfig.liquidAmplitude}
+            onChange={(event) =>
+              setChromeConfig({ liquidAmplitude: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-fresnel"
+          >
+            Fresnel · {chromeConfig.fresnel.toFixed(2)}
+          </label>
+          <input
+            id="cc-fresnel"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={chromeConfig.fresnel}
+            onChange={(event) =>
+              setChromeConfig({ fresnel: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-roughness"
+          >
+            Roughness · {chromeConfig.roughness.toFixed(2)}
+          </label>
+          <input
+            id="cc-roughness"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={chromeConfig.roughness}
+            onChange={(event) =>
+              setChromeConfig({ roughness: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-chrome-light"
+          >
+            Lighting
+          </label>
+          <select
+            id="cc-chrome-light"
+            value={chromeConfig.lightingPreset}
+            onChange={(event) =>
+              setChromeConfig({
+                lightingPreset: event.target
+                  .value as typeof chromeConfig.lightingPreset,
+              })
+            }
+            style={inputStyle}
+          >
+            {(
+              [
+                "studio-warm",
+                "cold-chrome",
+                "gallery-spot",
+                "rim-heavy",
+              ] as const
+            ).map((preset) => (
+              <option key={preset} value={preset}>
+                {preset}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
+
+      {systemKey === "crt-photocopy" ? (
+        <div style={{ marginTop: "1.25rem" }}>
+          <label style={labelStyle} htmlFor="cc-scanlines">
+            Scanlines · {crtConfig.scanlines.toFixed(2)}
+          </label>
+          <input
+            id="cc-scanlines"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={crtConfig.scanlines}
+            onChange={(event) =>
+              setCrtConfig({ scanlines: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-grain"
+          >
+            Grain · {crtConfig.grain.toFixed(2)}
+          </label>
+          <input
+            id="cc-grain"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={crtConfig.grain}
+            onChange={(event) =>
+              setCrtConfig({ grain: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-threshold"
+          >
+            Threshold · {crtConfig.threshold.toFixed(2)}
+          </label>
+          <input
+            id="cc-threshold"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={crtConfig.threshold}
+            onChange={(event) =>
+              setCrtConfig({ threshold: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+          <label
+            style={{ ...labelStyle, marginTop: "0.75rem" }}
+            htmlFor="cc-chroma"
+          >
+            Chromatic · {crtConfig.chromaticOffset.toFixed(2)}
+          </label>
+          <input
+            id="cc-chroma"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={crtConfig.chromaticOffset}
+            onChange={(event) =>
+              setCrtConfig({ chromaticOffset: Number(event.target.value) })
+            }
+            style={{ width: "100%" }}
+          />
+        </div>
+      ) : null}
+
+      {systemKey === "particle-disintegration" ? (
       <div style={{ marginTop: "1.25rem" }}>
         <label style={labelStyle} htmlFor="cc-force-mode">
           Pointer force
@@ -527,7 +777,9 @@ function PosterLabShellInner({
           Drag across the poster to apply force.
         </p>
       </div>
+      ) : null}
 
+      {systemKey === "particle-disintegration" ? (
       <div style={{ marginTop: "1.25rem" }}>
         <p style={labelStyle}>SVG import</p>
         <input
@@ -567,6 +819,7 @@ function PosterLabShellInner({
           </p>
         ) : null}
       </div>
+      ) : null}
 
       <div style={{ marginTop: "1.25rem" }}>
         <p style={labelStyle}>Quality</p>
@@ -680,8 +933,8 @@ function PosterLabShellInner({
 }
 
 /**
- * Phase 2 shell: Zustand document state, curated fonts, palette/seed controls,
- * undo/redo, and extruded typography on the vertical canvas.
+ * Phase 4 shell: visual system picker (particles / chrome / CRT),
+ * quality-aware postprocessing, Zustand document state, and extruded type.
  */
 export function PosterLabShell({
   initialDocument,

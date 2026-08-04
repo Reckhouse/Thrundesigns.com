@@ -11,12 +11,19 @@ import {
   sharedTextGeometryCache,
 } from "./TextGeometryCache";
 
+type PosterTextAppearance = {
+  metalness?: number;
+  roughness?: number;
+  emissiveIntensity?: number;
+};
+
 type PosterTextProps = {
   typography: PosterCreationV1["typography"];
   palette: PosterCreationV1["palette"];
   composition: PosterCreationV1["composition"];
   assetBasePath?: string;
   quality?: "auto" | "low" | "medium" | "high";
+  appearance?: PosterTextAppearance;
 };
 
 type LineMesh = {
@@ -43,6 +50,7 @@ export function PosterText({
   composition,
   assetBasePath = "/experiences/controlled-chaos",
   quality = "auto",
+  appearance,
 }: PosterTextProps) {
   const [fontState, setFontState] = useState<FontLoadState>({
     status: "loading",
@@ -173,8 +181,10 @@ export function PosterText({
         >
           <meshStandardMaterial
             color={palette.primary}
-            metalness={0.35}
-            roughness={0.42}
+            metalness={appearance?.metalness ?? 0.35}
+            roughness={appearance?.roughness ?? 0.42}
+            emissive={palette.accent}
+            emissiveIntensity={appearance?.emissiveIntensity ?? 0}
           />
         </mesh>
       ))}

@@ -6,6 +6,8 @@ import type { Mesh } from "three";
 import type { PosterCreationV1 } from "../serialization/posterCreation.schema";
 import { createSeededRandom } from "../seed/createSeededRandom";
 import { ParticleDisintegrationSystem } from "../systems/particle-disintegration/ParticleDisintegrationSystem";
+import { ChromeLiquidSystem } from "../systems/chrome-liquid/ChromeLiquidSystem";
+import { CrtPhotocopySystem } from "../systems/crt-photocopy/CrtPhotocopySystem";
 import type { ForceMode } from "../systems/types";
 import { PosterText } from "../typography/PosterText";
 
@@ -33,10 +35,14 @@ export function PosterSceneContent({
   const loopSeconds = document.document.loopDurationSeconds;
   const motionIntensity = document.camera.motionIntensity;
   const { palette, seed } = document;
-  const useParticles = document.visualSystem.key === "particle-disintegration";
+  const systemKey = document.visualSystem.key;
+  const useParticles = systemKey === "particle-disintegration";
+  const useChrome = systemKey === "chrome-liquid";
+  const useCrt = systemKey === "crt-photocopy";
+  const useFallbackType = !useParticles && !useChrome && !useCrt;
 
   const shardSeeds = useMemo(() => {
-    if (useParticles) return [];
+    if (!useFallbackType) return [];
     const rng = createSeededRandom(`${seed}:shards`);
     return Array.from({ length: 5 }, () => ({
       x: rng.nextRange(-0.32, 0.32),
@@ -46,7 +52,7 @@ export function PosterSceneContent({
       phase: rng.nextRange(0, Math.PI * 2),
       gold: rng.bool(0.55),
     }));
-  }, [seed, useParticles]);
+  }, [seed, useFallbackType]);
 
   useFrame(({ clock }) => {
     if (paused || reducedMotion || !plateRef.current) return;
@@ -87,7 +93,29 @@ export function PosterSceneContent({
           assetBasePath={assetBasePath}
           forceMode={forceMode}
         />
-      ) : (
+      ) : null}
+
+      {useChrome ? (
+        <ChromeLiquidSystem
+          document={document}
+          quality={quality}
+          paused={paused}
+          reducedMotion={reducedMotion}
+          assetBasePath={assetBasePath}
+        />
+      ) : null}
+
+      {useCrt ? (
+        <CrtPhotocopySystem
+          document={document}
+          quality={quality}
+          paused={paused}
+          reducedMotion={reducedMotion}
+          assetBasePath={assetBasePath}
+        />
+      ) : null}
+
+      {useFallbackType ? (
         <>
           {shardSeeds.map((spec, i) => (
             <mesh
@@ -111,7 +139,7 @@ export function PosterSceneContent({
             quality={quality}
           />
         </>
-      )}
+      ) : null}
     </group>
   );
 }

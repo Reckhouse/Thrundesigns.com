@@ -12,6 +12,7 @@ import {
   validatePhraseInput,
   type PosterCreationV1,
   type PosterPalette,
+  type VisualSystemKey,
 } from "../serialization/posterCreation.schema";
 import { createRandomSeed } from "../seed/createSeededRandom";
 import type { FontKey } from "../typography/font-manifest";
@@ -20,8 +21,26 @@ import {
   particlePresets,
   type ParticleDisintegrationConfig,
 } from "../systems/particle-disintegration/particleDisintegration.schema";
+import {
+  parseChromeConfig,
+  chromePresets,
+  defaultChromeLiquidConfig,
+  type ChromeLiquidConfig,
+} from "../systems/chrome-liquid/chromeLiquid.schema";
+import {
+  parseCrtConfig,
+  crtPresets,
+  crtConfigToPostprocessing,
+  defaultCrtPhotocopyConfig,
+  type CrtPhotocopyConfig,
+} from "../systems/crt-photocopy/crtPhotocopy.schema";
+import { defaultParticleDisintegrationConfig } from "../systems/particle-disintegration/particleDisintegration.schema";
 import { sanitizeSvgMarkup } from "../svg/SvgSanitizer";
 import type { ForceMode } from "../systems/types";
+import {
+  ACTIVE_VISUAL_SYSTEM_KEYS,
+  type ActiveVisualSystemKey,
+} from "../systems/registry";
 
 const HISTORY_LIMIT = 40;
 
@@ -51,8 +70,13 @@ export type PosterLabStoreState = {
   setUserPaused: (paused: boolean | null) => void;
   setOnboardingStep: (step: number) => void;
   setForceMode: (mode: ForceMode) => void;
+  setVisualSystem: (key: ActiveVisualSystemKey) => void;
   setParticleConfig: (patch: Partial<ParticleDisintegrationConfig>) => void;
   applyParticlePreset: (presetKey: string) => void;
+  setChromeConfig: (patch: Partial<ChromeLiquidConfig>) => void;
+  applyChromePreset: (presetKey: string) => void;
+  setCrtConfig: (patch: Partial<CrtPhotocopyConfig>) => void;
+  applyCrtPreset: (presetKey: string) => void;
   importSvgMarkup: (
     markup: string,
   ) => { ok: true } | { ok: false; message: string };
@@ -72,6 +96,19 @@ function pushHistory(
   const next = [...past, cloneDocument(current)];
   if (next.length > HISTORY_LIMIT) next.shift();
   return next;
+}
+
+function defaultConfigForSystem(key: VisualSystemKey): Record<string, unknown> {
+  if (key === "chrome-liquid") {
+    return defaultChromeLiquidConfig as unknown as Record<string, unknown>;
+  }
+  if (key === "crt-photocopy") {
+    return defaultCrtPhotocopyConfig as unknown as Record<string, unknown>;
+  }
+  return defaultParticleDisintegrationConfig as unknown as Record<
+    string,
+    unknown
+  >;
 }
 
 export function createPosterLabStore(options?: {
@@ -197,6 +234,39 @@ export function createPosterLabStore(options?: {
         set({ forceMode: mode });
       },
 
+      setVisualSystem(key) {
+        if (
+          !(ACTIVE_VISUAL_SYSTEM_KEYS as readonly string[]).includes(key)
+        ) {
+          return;
+        }
+        patchDocument((document) => {
+          const previousKey = document.visualSystem.key;
+          const keepConfig = previousKey === key;
+          document.visualSystem = {
+            key,
+            version: 1,
+            config: keepConfig
+              ? document.visualSystem.config
+              : defaultConfigForSystem(key),
+          };
+          if (key === "crt-photocopy") {
+            document.postprocessing = crtConfigToPostprocessing(
+              parseCrtConfig(document.visualSystem.config),
+            );
+          } else {
+            document.postprocessing = {
+              ...document.postprocessing,
+              enabled: false,
+            };
+          }
+          return document;
+        });
+        if (get().onboardingStep < 3) {
+          set({ onboardingStep: 3 });
+        }
+      },
+
       setParticleConfig(patch) {
         patchDocument((document) => {
           const current = parseParticleConfig(document.visualSystem.config);
@@ -204,6 +274,10 @@ export function createPosterLabStore(options?: {
             key: "particle-disintegration",
             version: 1,
             config: parseParticleConfig({ ...current, ...patch }),
+          };
+          document.postprocessing = {
+            ...document.postprocessing,
+            enabled: false,
           };
           return document;
         });
@@ -218,8 +292,97 @@ export function createPosterLabStore(options?: {
             version: 1,
             config: preset.config,
           };
+          document.postprocessing = {
+            ...document.postprocessing,
+            enabled: false,
+          };
           return document;
         });
+        set({ presetKey });
+        if (get().onboardingStep < 3) {
+          set({ onboardingStep: 3 });
+        }
+      },
+
+      setChromeConfig(patch) {
+        patchDocument((document) => {
+          const current = parseChromeConfig(document.visualSystem.config);
+          document.visualSystem = {
+            key: "chrome-liquid",
+            version: 1,
+            config: parseChromeConfig({ ...current, ...patch }),
+          };
+          document.postprocessing = {
+            ...document.postprocessing,
+            enabled: false,
+          };
+          return document;
+        });
+      },
+
+      applyChromePreset(presetKey) {
+        const preset = chromePresets.find((entry) => entry.key === presetKey);
+        if (!preset) return;
+        const next = createDefaultPosterCreation({
+          presetKey,
+          phrase: get().document.typography.phrase,
+          seed: get().document.seed,
+        });
+        patchDocument((document) => {
+          document.visualSystem = {
+            key: "chrome-liquid",
+            version: 1,
+            config: preset.config,
+          };
+          document.palette = next.palette;
+          document.lighting = next.lighting;
+          document.typography.depth = next.typography.depth;
+          document.typography.bevel = next.typography.bevel;
+          document.postprocessing = {
+            ...document.postprocessing,
+            enabled: false,
+          };
+          return document;
+        });
+        set({ presetKey });
+        if (get().onboardingStep < 3) {
+          set({ onboardingStep: 3 });
+        }
+      },
+
+      setCrtConfig(patch) {
+        patchDocument((document) => {
+          const current = parseCrtConfig(document.visualSystem.config);
+          const next = parseCrtConfig({ ...current, ...patch });
+          document.visualSystem = {
+            key: "crt-photocopy",
+            version: 1,
+            config: next,
+          };
+          document.postprocessing = crtConfigToPostprocessing(next);
+          return document;
+        });
+      },
+
+      applyCrtPreset(presetKey) {
+        const preset = crtPresets.find((entry) => entry.key === presetKey);
+        if (!preset) return;
+        const next = createDefaultPosterCreation({
+          presetKey,
+          phrase: get().document.typography.phrase,
+          seed: get().document.seed,
+        });
+        patchDocument((document) => {
+          document.visualSystem = {
+            key: "crt-photocopy",
+            version: 1,
+            config: preset.config,
+          };
+          document.palette = next.palette;
+          document.postprocessing = crtConfigToPostprocessing(preset.config);
+          return document;
+        });
+        set({ presetKey });
         if (get().onboardingStep < 3) {
           set({ onboardingStep: 3 });
         }

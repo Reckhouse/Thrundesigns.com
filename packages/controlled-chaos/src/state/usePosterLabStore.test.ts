@@ -37,4 +37,17 @@ describe("poster lab store history", () => {
     store.getState().undo();
     assert.equal(store.getState().document.typography.fontKey, before);
   });
+
+  it("switches visual systems and syncs crt postprocessing", () => {
+    const store = createPosterLabStore({
+      document: createDefaultPosterCreation({ seed: "sys00001" }),
+    });
+    store.getState().setVisualSystem("chrome-liquid");
+    assert.equal(store.getState().document.visualSystem.key, "chrome-liquid");
+    assert.equal(store.getState().document.postprocessing.enabled, false);
+
+    store.getState().setVisualSystem("crt-photocopy");
+    assert.equal(store.getState().document.visualSystem.key, "crt-photocopy");
+    assert.equal(store.getState().document.postprocessing.enabled, true);
+  });
 });

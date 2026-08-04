@@ -4,12 +4,12 @@ import {
   particleCountForDensity,
   qualityBudget,
   resolveQualityTier,
-} from "../quality/quality-presets.js";
+} from "../../quality/quality-presets.js";
 import {
   parseParticleConfig,
   particlePresets,
-} from "../systems/particle-disintegration/particleDisintegration.schema.js";
-import { createSeededRandom } from "../seed/createSeededRandom.js";
+} from "./particleDisintegration.schema.js";
+import { createSeededRandom } from "../../seed/createSeededRandom.js";
 
 describe("particle quality + config", () => {
   it("resolves auto quality with mobile hint to low", () => {

@@ -13,7 +13,7 @@
     "migrate:project-modules": "node --env-file=.env.local scripts/migrate-project-modules.mjs",
     "bake:horse": "node scripts/bake-horse-particles.mjs",
     "validate:experiences": "node scripts/validate-experience-compatibility.mjs && node --import tsx scripts/validate-experience-mapper.mjs",
-    "test:controlled-chaos": "node --import tsx --test packages/controlled-chaos/src/**/*.test.ts"
+    "test:controlled-chaos": "node --import tsx --test $(find packages/controlled-chaos/src -name '*.test.ts' | sort)"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.2",
@@ -22,6 +22,7 @@
     "@portabletext/types": "^4.0.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
+    "@react-three/postprocessing": "^3.0.4",
     "@sanity/client": "^7.25.0",
     "@sanity/image-url": "^2.1.1",
     "@thrun-design/controlled-chaos": "file:packages/controlled-chaos",
@@ -36,6 +37,7 @@
     "lucide-react": "^1.26.0",
     "next": "16.2.11",
     "next-sanity": "^13.2.1",
+    "postprocessing": "^6.39.4",
     "radix-ui": "^1.6.7",
     "react": "19.2.4",
     "react-dom": "19.2.4",

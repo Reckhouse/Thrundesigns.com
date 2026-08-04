@@ -41,7 +41,7 @@ function walkTsFiles(dir, acc = []) {
 }
 
 const FORBIDDEN_SERVER_IMPORT =
-  /from\s+["'](three|@react-three\/fiber|@react-three\/drei)["']|require\(["'](three|@react-three\/fiber|@react-three\/drei)["']\)/;
+  /from\s+["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|postprocessing)["']|require\(["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|postprocessing)["']\)/;
 
 const EXPERIENCE_REACT_IMPORT =
   /@thrun-design\/(?:controlled-chaos|living-engraving)\/react(?:-preview|-replay)?/;
@@ -68,6 +68,13 @@ const serverSafePaths = [
   join(root, "packages/controlled-chaos/src/svg/SvgSanitizer.ts"),
   join(root, "packages/controlled-chaos/src/systems/types.ts"),
   join(root, "packages/controlled-chaos/src/systems/particle-disintegration/particleDisintegration.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/chrome-liquid/chromeLiquid.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/chrome-liquid/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/crt-photocopy/crtPhotocopy.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/crt-photocopy/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/particle-disintegration/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/types.ts"),
+  join(root, "packages/controlled-chaos/src/systems/registry.ts"),
   join(root, "packages/controlled-chaos/src/quality/quality-presets.ts"),
   join(root, "packages/living-engraving/src/manifest.ts"),
   join(root, "packages/living-engraving/src/schemas.ts"),

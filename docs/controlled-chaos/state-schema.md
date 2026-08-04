@@ -34,7 +34,7 @@ Creations saved through `/api/creations` use:
 | `palette` | background / primary / secondary / accent |
 | `camera` | Perspective defaults + motion preset |
 | `lighting` | Key / fill / rim / exposure |
-| `postprocessing` | Reserved; mostly unused until Phase 4 |
+| `postprocessing` | Grain, vignette, bloom, chromatic; CRT system syncs these when active |
 
 ## Fonts
 
