@@ -1,8 +1,8 @@
 # Controlled Chaos — Visual Systems
 
-**Phase:** 5  
+**Phase:** 6  
 **Active systems:** Particle Disintegration · Chrome Liquid · CRT / Photocopy  
-**Cross-cutting:** Audio-reactive displacement · Still/video export
+**Cross-cutting:** Audio-reactive displacement · Hardened still/video export · Save & share
 
 ## Plugin contract
 

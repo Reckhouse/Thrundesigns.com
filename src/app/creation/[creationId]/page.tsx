@@ -141,13 +141,14 @@ export default async function CreationPage({
 
       <main className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-10 px-6 py-12 md:px-10 lg:px-[74px]">
         {loaded.value.meta.thumbnailUrl ? (
-          <div className="relative aspect-[4/5] max-w-md overflow-hidden bg-bg-raised">
+          <div className="relative aspect-[9/16] max-w-sm overflow-hidden bg-bg-raised">
             <Image
               src={loaded.value.meta.thumbnailUrl}
               alt=""
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 448px"
+              sizes="(max-width: 768px) 100vw, 384px"
+              loading="lazy"
             />
           </div>
         ) : null}

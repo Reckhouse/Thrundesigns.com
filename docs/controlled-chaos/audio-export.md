@@ -1,6 +1,6 @@
 # Controlled Chaos — Audio + Export
 
-**Phase:** 5
+**Phase:** 5–6
 
 ## Audio
 
@@ -11,7 +11,7 @@
 
 ## Export
 
-- **PNG** via `canvas.toBlob` (`preserveDrawingBuffer: true`).
-- **Video** records one poster loop with `captureStream` + MediaRecorder MIME ladder (webm/mp4).
-- Toolbar actions: PNG / Video. Status shown in the bottom dock.
-- Editor overlays should stay off the canvas capture surface (viewport chrome is outside the WebGL canvas).
+- **PNG** via `captureStill` (optional scale).
+- **Video** via FPS + MIME ladders; falls back to still when recording fails.
+- **Thumbnail** JPEG on Save & share → Blob HTTPS URL.
+- See `export-pipeline.md` for the full Phase 6 pipeline.

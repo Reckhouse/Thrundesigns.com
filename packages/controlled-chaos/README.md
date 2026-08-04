@@ -2,7 +2,7 @@
 
 Interactive Three.js poster generator package for the Thrundesign portfolio.
 
-**Phase 5.** Audio-reactive displacement on particles + chrome, curated/local audio engine, PNG + loop video export. Package `0.5.0`.
+**Phase 6.** Export hardening (thumbnails, FPS fallbacks, still fallback) and Save & share persistence. Package `0.6.0`.
 
 ## Exports
 

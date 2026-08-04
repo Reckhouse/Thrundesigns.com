@@ -386,7 +386,7 @@ Particle disintegration is the active default system:
 - Quality budgets and curated presets
 - Docs: `visual-systems.md`
 
-**Next (Phase 6):** Export hardening (thumbnails, FPS fallbacks) + persistence polish.
+**Next (Phase 7):** Security docs + deeper persistence hardening; then inflatable/elastic (Phase 8).
 
 ---
 

@@ -48,7 +48,10 @@ import {
   CURATED_AUDIO_TRACKS,
   type AudioTrackKey,
 } from "../audio/audio.schema";
-import { captureStill, recordPosterLoop } from "../export/exportPoster";
+import { captureStill, captureThumbnail, blobToDataUrl, recordPosterLoop, resolveVideoFpsLadder } from "../export/exportPoster";
+import { serializePosterCreation } from "../serialization/serializeCreation";
+import { deserializePosterCreation } from "../serialization/deserializeCreation";
+import { controlledChaosCreationSchema } from "../schemas";
 import { PosterErrorBoundary } from "./PosterErrorBoundary";
 import {
   PosterFallback,
@@ -182,7 +185,7 @@ const PALETTE_PRESETS = [
 
 function PosterLabShellInner({
   configuration,
-  persistence: _persistence,
+  persistence,
   analytics,
   creationId,
   creationTitle,
@@ -242,14 +245,23 @@ function PosterLabShellInner({
   const clearSvgAsset = usePosterLabStore((state) => state.clearSvgAsset);
   const svgError = usePosterLabStore((state) => state.svgError);
 
+  const hydrateFromDocument = usePosterLabStore(
+    (state) => state.hydrateFromDocument,
+  );
+  const presetKey = usePosterLabStore((state) => state.presetKey);
+
   const allowAudio = configuration?.allowAudio !== false && showInspector;
   const allowExport =
     configuration?.allowExport !== false && showFullControls;
+  const allowSave = Boolean(persistence) && showFullControls;
 
   const audio = useAudioReactive();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [exporting, setExporting] = useState(false);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const hydratedCreationRef = useRef<string | null>(null);
 
   const systemKey = documentState.visualSystem.key;
   const particleConfig = useMemo(
@@ -275,6 +287,42 @@ function PosterLabShellInner({
   useEffect(() => {
     analytics?.track(variant === "replay" ? "replay_loaded" : "initialized");
   }, [analytics, variant]);
+
+  useEffect(() => {
+    const id = configuration?.initialCreationId;
+    if (!id || !persistence || variant === "replay") return;
+    if (hydratedCreationRef.current === id) return;
+    hydratedCreationRef.current = id;
+    let cancelled = false;
+    void persistence
+      .load(id)
+      .then((record) => {
+        if (cancelled) return;
+        const parsed = controlledChaosCreationSchema.safeParse(record.payload);
+        if (!parsed.success) {
+          setLoadError("Saved creation could not be validated.");
+          return;
+        }
+        hydrateFromDocument(deserializePosterCreation(parsed.data.state), {
+          presetKey: parsed.data.presetKey,
+        });
+        setShareUrl(`/creation/${record.id}`);
+        setLoadError(null);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError("Could not load the saved creation.");
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    configuration?.initialCreationId,
+    hydrateFromDocument,
+    persistence,
+    variant,
+  ]);
 
   const modeLabel = useMemo(() => {
     const mode = configuration?.mode ?? variant;
@@ -1045,64 +1093,150 @@ function PosterLabShellInner({
     }
     setExporting(true);
     setExportMessage("Recording loop…");
+    const quality = configuration?.quality ?? "auto";
     const result = await recordPosterLoop({
       canvas: canvasEl,
       durationSeconds: documentState.document.loopDurationSeconds,
       fps: 30,
+      fpsLadder: resolveVideoFpsLadder(30, quality),
       fileName: `controlled-chaos-${documentState.seed}.webm`,
+      fallbackToStill: true,
+      onFallback: (reason) => {
+        setExportMessage(`Video unavailable (${reason}). Saving still…`);
+      },
       onProgress: (ratio) => {
         setExportMessage(`Recording… ${Math.round(ratio * 100)}%`);
       },
     });
     setExporting(false);
-    setExportMessage(result.ok ? `Saved ${result.fileName}` : result.message);
+    setExportMessage(
+      result.ok
+        ? `${result.kind === "still" ? "Fell back to still · " : ""}Saved ${result.fileName}`
+        : result.message,
+    );
     if (result.ok) analytics?.track("export_completed");
   };
 
-  const exportActions = allowExport ? (
+  const handleSaveShare = async () => {
+    if (!persistence) {
+      setExportMessage("Persistence is not connected.");
+      return;
+    }
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) {
+      setExportMessage("Canvas not ready.");
+      return;
+    }
+
+    setExporting(true);
+    setExportMessage("Capturing thumbnail…");
+    try {
+      let thumbnailUrl: string | undefined;
+      const thumb = await captureThumbnail({ canvas: canvasEl });
+      if (thumb.ok && persistence.uploadThumbnail) {
+        const dataUrl = await blobToDataUrl(thumb.blob);
+        const uploaded = await persistence.uploadThumbnail(dataUrl);
+        thumbnailUrl = uploaded.url;
+      }
+
+      setExportMessage("Saving creation…");
+      const payload = serializePosterCreation(documentState, {
+        presetKey: presetKey ?? configuration?.initialPresetKey,
+        title: documentState.title ?? title,
+        thumbnailUrl,
+      });
+      const saved = await persistence.save(payload);
+      const absolute =
+        typeof window !== "undefined"
+          ? new URL(saved.url, window.location.origin).toString()
+          : saved.url;
+      setShareUrl(saved.url);
+      try {
+        await navigator.clipboard.writeText(absolute);
+        analytics?.track("share_link_copied");
+        setExportMessage(`Saved · link copied`);
+      } catch {
+        setExportMessage(`Saved · ${saved.url}`);
+      }
+    } catch (error) {
+      setExportMessage(
+        error instanceof Error ? error.message : "Save failed.",
+      );
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const exportActions = (
     <>
-      <button
-        type="button"
-        disabled={exporting}
-        onClick={() => void handleExportStill()}
-        style={{
-          appearance: "none",
-          border: `1px solid ${tokens.line}`,
-          background: tokens.surface,
-          color: tokens.fg,
-          fontFamily: tokens.fontMono,
-          fontSize: "0.6875rem",
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          padding: "0.55rem 0.85rem",
-          cursor: exporting ? "wait" : "pointer",
-          opacity: exporting ? 0.5 : 1,
-        }}
-      >
-        PNG
-      </button>
-      <button
-        type="button"
-        disabled={exporting}
-        onClick={() => void handleExportVideo()}
-        style={{
-          appearance: "none",
-          border: `1px solid ${tokens.line}`,
-          background: tokens.surface,
-          color: tokens.fg,
-          fontFamily: tokens.fontMono,
-          fontSize: "0.6875rem",
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          padding: "0.55rem 0.85rem",
-          cursor: exporting ? "wait" : "pointer",
-          opacity: exporting ? 0.5 : 1,
-        }}
-      >
-        Video
-      </button>
+      {allowExport ? (
+        <>
+          <button
+            type="button"
+            disabled={exporting}
+            onClick={() => void handleExportStill()}
+            style={{
+              appearance: "none",
+              border: `1px solid ${tokens.line}`,
+              background: tokens.surface,
+              color: tokens.fg,
+              fontFamily: tokens.fontMono,
+              fontSize: "0.6875rem",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              padding: "0.55rem 0.85rem",
+              cursor: exporting ? "wait" : "pointer",
+              opacity: exporting ? 0.5 : 1,
+            }}
+          >
+            PNG
+          </button>
+          <button
+            type="button"
+            disabled={exporting}
+            onClick={() => void handleExportVideo()}
+            style={{
+              appearance: "none",
+              border: `1px solid ${tokens.line}`,
+              background: tokens.surface,
+              color: tokens.fg,
+              fontFamily: tokens.fontMono,
+              fontSize: "0.6875rem",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              padding: "0.55rem 0.85rem",
+              cursor: exporting ? "wait" : "pointer",
+              opacity: exporting ? 0.5 : 1,
+            }}
+          >
+            Video
+          </button>
+        </>
+      ) : null}
+      {allowSave ? (
+        <button
+          type="button"
+          disabled={exporting}
+          onClick={() => void handleSaveShare()}
+          style={{
+            appearance: "none",
+            border: "none",
+            background: tokens.gold,
+            color: tokens.ink,
+            fontFamily: tokens.fontMono,
+            fontSize: "0.6875rem",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            padding: "0.55rem 0.85rem",
+            cursor: exporting ? "wait" : "pointer",
+            opacity: exporting ? 0.5 : 1,
+          }}
+        >
+          Save & share
+        </button>
+      ) : null}
     </>
-  ) : null;
+  );
 
   return (
     <div
@@ -1163,6 +1297,33 @@ function PosterLabShellInner({
             <p style={muted}>
               {documentState.document.loopDurationSeconds}s · seed-stable accents
             </p>
+            {allowSave ? (
+              <>
+                <p style={{ ...labelStyle, marginTop: "1.25rem" }}>Share</p>
+                <p style={muted}>
+                  Save & share captures a thumbnail and creates an immutable
+                  link.
+                </p>
+                {shareUrl ? (
+                  <a
+                    href={shareUrl}
+                    style={{
+                      ...muted,
+                      display: "inline-block",
+                      marginTop: "0.45rem",
+                      color: tokens.gold,
+                    }}
+                  >
+                    {shareUrl}
+                  </a>
+                ) : null}
+              </>
+            ) : null}
+            {loadError ? (
+              <p style={{ ...muted, color: "#e2b4a2", marginTop: "0.75rem" }}>
+                {loadError}
+              </p>
+            ) : null}
           </aside>
         ) : null}
 
@@ -1183,11 +1344,13 @@ function PosterLabShellInner({
           <p style={muted}>
             {exportMessage
               ? exportMessage
-              : "Export PNG or one loop as video from the toolbar. Persistence adapter"}
-            {!exportMessage
-              ? _persistence
-                ? " is connected."
-                : " is not connected in this embed."
+              : allowSave
+                ? "Export PNG/video or Save & share from the toolbar."
+                : "Export PNG or one loop as video from the toolbar."}
+            {!exportMessage && !allowSave
+              ? persistence
+                ? " Persistence is connected."
+                : " Persistence is not connected in this embed."
               : null}
           </p>
         </div>
@@ -1222,8 +1385,7 @@ function PosterLabShellWithAudio({
 }
 
 /**
- * Phase 5 shell: audio-reactive displacement, still/video export,
- * visual system picker, and Zustand document state.
+ * Phase 6 shell: save/share with thumbnails, hardened export, audio, systems.
  */
 export function PosterLabShell({
   initialDocument,

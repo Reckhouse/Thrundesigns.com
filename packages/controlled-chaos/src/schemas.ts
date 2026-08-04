@@ -119,7 +119,13 @@ export const controlledChaosCreationSchema = z.object({
     (value) => migratePosterCreation(value),
     posterCreationV1Schema,
   ),
-  thumbnailUrl: z.string().url().optional(),
+  thumbnailUrl: z
+    .string()
+    .url()
+    .refine((value) => value.startsWith("https://"), {
+      message: "thumbnailUrl must be an https URL",
+    })
+    .optional(),
   title: z.string().min(1).max(120).optional(),
 });
 
