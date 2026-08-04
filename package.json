@@ -11,9 +11,11 @@
     "studio:deploy": "npm --prefix studio run deploy",
     "typegen": "npm --prefix studio run typegen",
     "migrate:project-modules": "node --env-file=.env.local scripts/migrate-project-modules.mjs",
-    "bake:horse": "node scripts/bake-horse-particles.mjs"
+    "bake:horse": "node scripts/bake-horse-particles.mjs",
+    "validate:experiences": "node scripts/validate-experience-compatibility.mjs"
   },
   "dependencies": {
+    "@thrun-design/controlled-chaos": "file:packages/controlled-chaos",
     "@hookform/resolvers": "^5.4.2",
     "@marsidev/react-turnstile": "^1.5.3",
     "@portabletext/react": "^7.0.1",

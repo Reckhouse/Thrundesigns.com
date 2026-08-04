@@ -2,7 +2,7 @@
 
 Phase 0 comparison of the **Master Spec expected contract** against what exists in this repository today.
 
-**Status:** Controlled Chaos has **not been created yet**. There is no installable package, no sibling workspace, and no public npm package `@thrun-design/controlled-chaos`. This review defines the **target contract** the portfolio will code against via a local stub until the real package lands.
+**Status:** Real Controlled Chaos renderer has **not been created yet**. Phase 1 added a local stub at `packages/controlled-chaos` (`@thrun-design/controlled-chaos@0.0.0-stub`) so the portfolio registry can ship against the contract. Re-run this review when the real package lands.
 
 ---
 
