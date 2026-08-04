@@ -35,7 +35,7 @@ export const validControlledChaosInlineFixture: ThreeExperienceBlockValue = {
   controls: "full",
   allowTextEditing: true,
   allowSvgUpload: true,
-  allowAudio: false,
+  allowAudio: true,
   allowExport: true,
   loadBehavior: "viewport",
 };

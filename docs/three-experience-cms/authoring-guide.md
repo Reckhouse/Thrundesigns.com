@@ -28,6 +28,22 @@ How editors configure Living Engraving, Controlled Chaos, and future experiences
 
 Lab: `/lab/living-engraving`. Seed notes: [seed-living-engraving.md](./seed-living-engraving.md).
 
+## Controlled Chaos presets
+
+| System | Example presets |
+|--------|-----------------|
+| Particles | `signal-failure`, `grid-bloom`, `cold-open` |
+| Chrome | `molten-signal`, `mirror-grid`, `black-ice` |
+| CRT | `static-channel`, `xerox-draft`, `broadcast-bleed` |
+| Inflatable | `helium-drop`, `balloon-grid`, `soft-pressure` |
+| Elastic | `rubber-band`, `spring-lattice`, `rebound` |
+| Torn paper | `rough-tear`, `collage-stack`, `edge-fray` |
+| Architecture | `brutal-stack`, `column-grid`, `cantilever` |
+
+**Marketing default:** `signal-failure`, mode `preview`, load `interaction`.  
+Lab: `/lab/controlled-chaos`. Seed notes: [seed-controlled-chaos.md](./seed-controlled-chaos.md).  
+Detail guide: [content-authoring-guide.md](../controlled-chaos/content-authoring-guide.md).
+
 ## Primary experience vs module
 
 - **Experience → Primary experience** — drives the hero “launch” link and project-level metadata.

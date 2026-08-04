@@ -12,6 +12,7 @@
 | [browser-report.md](./browser-report.md) | Browser / no-JS expectations |
 | [csp.md](./csp.md) | Content Security Policy rationale |
 | [seed-living-engraving.md](./seed-living-engraving.md) | Case study seed for Living Engraving |
+| [seed-controlled-chaos.md](./seed-controlled-chaos.md) | Case study seed for Controlled Chaos Poster Lab |
 | [launch-checklist.md](./launch-checklist.md) | Ship checklist |
 
 Validate locally:

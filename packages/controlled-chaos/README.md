@@ -1,21 +1,20 @@
-# @thrun-design/controlled-chaos (stub)
+# Controlled Chaos Poster Lab
 
-Local stub of the Controlled Chaos Poster Lab experience package.
+Interactive Three.js poster generator package for the Thrundesign portfolio.
 
-- **Does not** include Three.js / WebGL rendering.
-- Exposes the public contract the portfolio registry expects.
-- Replace this package with the real renderer when it is ready; keep export paths stable.
+**Phase 12.** Hardening reports, launch checklist, a11y/perf polish. Package `0.12.0`.
 
-## Entries
+## Exports
 
-| Path | Server-safe? | Purpose |
-|------|--------------|---------|
-| `./manifest` | Yes | Experience metadata + presets |
-| `./schemas` | Yes | Embed + creation Zod schemas |
-| `./react-preview` | No (client) | Preview component |
-| `./react` | No (client) | Full experience component |
-| `./react-replay` | No (client) | Replay component |
+- `@thrun-design/controlled-chaos/manifest` — server-safe manifest
+- `@thrun-design/controlled-chaos/schemas` — embed + creation Zod schemas
+- `@thrun-design/controlled-chaos/persistence` — server-safe harden-for-persist
+- `@thrun-design/controlled-chaos/react` — full lab experience
+- `@thrun-design/controlled-chaos/react-preview` — lightweight preview
+- `@thrun-design/controlled-chaos/react-replay` — shared creation replay
 
-## Experience key
+## Tests
 
-`controlled-chaos-poster-lab`
+```bash
+npm run test:controlled-chaos
+```

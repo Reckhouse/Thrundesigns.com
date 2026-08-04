@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { hashCreationId } from "@/lib/creations/id";
 import { enforceCreationsRateLimits } from "@/lib/creations/rate-limit";
 import { logCreationsSecurity } from "@/lib/creations/security-log";
-import { saveCreation } from "@/lib/creations/store";
+import {
+  assertContentLengthBudget,
+  maxCreationBytes,
+  saveCreation,
+} from "@/lib/creations/store";
 import { getClientIp } from "@/lib/quote/request-guards";
 import { hashIdentifier } from "@/lib/quote/security-log";
 
@@ -11,6 +15,7 @@ export async function POST(request: Request) {
   if (!rate.success) {
     logCreationsSecurity("creations.rate_limited", {
       ipHash: hashIdentifier(getClientIp(request)),
+      surface: "save",
     });
     return NextResponse.json(
       { error: "Too many requests. Please try again later." },
@@ -21,6 +26,18 @@ export async function POST(request: Request) {
           : undefined,
       },
     );
+  }
+
+  const lengthBudget = assertContentLengthBudget(
+    request,
+    maxCreationBytes() + 4096,
+  );
+  if (!lengthBudget.ok) {
+    logCreationsSecurity("creations.save_failed", {
+      ipHash: hashIdentifier(getClientIp(request)),
+      status: 413,
+    });
+    return NextResponse.json({ error: lengthBudget.message }, { status: 413 });
   }
 
   const body = await request.json().catch(() => null);
@@ -54,6 +71,11 @@ export async function POST(request: Request) {
         thumbnailUrl: saved.meta.thumbnailUrl ?? null,
       },
     },
-    { status: 201 },
+    {
+      status: 201,
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    },
   );
 }

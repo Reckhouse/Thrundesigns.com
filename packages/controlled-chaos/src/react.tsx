@@ -1,19 +1,29 @@
 "use client";
 
-import { StubShell } from "./stub-shell";
+import { PosterLabShell } from "./shell/PosterLabShell";
 import type { ControlledChaosEmbedConfig } from "./schemas";
+import type {
+  ControlledChaosAnalyticsAdapter,
+  ControlledChaosPersistenceAdapter,
+} from "./adapters.types";
 
 export type ControlledChaosExperienceProps = {
   configuration?: ControlledChaosEmbedConfig;
+  persistence?: ControlledChaosPersistenceAdapter;
+  analytics?: ControlledChaosAnalyticsAdapter;
 };
 
 export function ControlledChaosExperience({
   configuration,
+  persistence,
+  analytics,
 }: ControlledChaosExperienceProps) {
   return (
-    <StubShell
-      label="Controlled Chaos — Poster Lab"
+    <PosterLabShell
+      variant="lab"
       configuration={configuration}
+      persistence={persistence}
+      analytics={analytics}
     />
   );
 }

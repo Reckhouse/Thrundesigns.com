@@ -41,7 +41,7 @@ function walkTsFiles(dir, acc = []) {
 }
 
 const FORBIDDEN_SERVER_IMPORT =
-  /from\s+["'](three|@react-three\/fiber|@react-three\/drei)["']|require\(["'](three|@react-three\/fiber|@react-three\/drei)["']\)/;
+  /from\s+["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|@react-three\/rapier|postprocessing)["']|require\(["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|@react-three\/rapier|postprocessing)["']\)/;
 
 const EXPERIENCE_REACT_IMPORT =
   /@thrun-design\/(?:controlled-chaos|living-engraving)\/react(?:-preview|-replay)?/;
@@ -58,6 +58,35 @@ const serverSafePaths = [
   join(root, "src/experiences/living-engraving/parseLabSearchParams.ts"),
   join(root, "packages/controlled-chaos/src/manifest.ts"),
   join(root, "packages/controlled-chaos/src/schemas.ts"),
+  join(root, "packages/controlled-chaos/src/serialization/posterCreation.schema.ts"),
+  join(root, "packages/controlled-chaos/src/serialization/serializeCreation.ts"),
+  join(root, "packages/controlled-chaos/src/serialization/deserializeCreation.ts"),
+  join(root, "packages/controlled-chaos/src/serialization/canonicalizeCreation.ts"),
+  join(root, "packages/controlled-chaos/src/seed/createSeededRandom.ts"),
+  join(root, "packages/controlled-chaos/src/typography/font-manifest.ts"),
+  join(root, "packages/controlled-chaos/src/typography/TextLayout.ts"),
+  join(root, "packages/controlled-chaos/src/svg/SvgSanitizer.ts"),
+  join(root, "packages/controlled-chaos/src/systems/types.ts"),
+  join(root, "packages/controlled-chaos/src/systems/particle-disintegration/particleDisintegration.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/chrome-liquid/chromeLiquid.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/chrome-liquid/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/crt-photocopy/crtPhotocopy.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/crt-photocopy/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/inflatable-type/inflatableType.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/inflatable-type/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/elastic-type/elasticType.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/elastic-type/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/torn-paper/tornPaper.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/torn-paper/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/type-architecture/typeArchitecture.schema.ts"),
+  join(root, "packages/controlled-chaos/src/systems/type-architecture/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/particle-disintegration/definition.ts"),
+  join(root, "packages/controlled-chaos/src/systems/types.ts"),
+  join(root, "packages/controlled-chaos/src/systems/registry.ts"),
+  join(root, "packages/controlled-chaos/src/audio/audio.schema.ts"),
+  join(root, "packages/controlled-chaos/src/audio/audioMapping.ts"),
+  join(root, "packages/controlled-chaos/src/persistence/hardenCreation.ts"),
+  join(root, "packages/controlled-chaos/src/quality/quality-presets.ts"),
   join(root, "packages/living-engraving/src/manifest.ts"),
   join(root, "packages/living-engraving/src/schemas.ts"),
   join(root, "studio/lib/experienceManifestOptions.ts"),
@@ -91,6 +120,9 @@ for (const pkgName of [
     ok(`Resolved ${pkgName}@${pkg.version}`);
 
     const requiredExports = ["./manifest", "./schemas", "./react-preview", "./react"];
+    if (pkgName === "@thrun-design/controlled-chaos") {
+      requiredExports.push("./persistence");
+    }
     for (const entry of requiredExports) {
       if (!pkg.exports?.[entry]) {
         fail(`Missing package export ${entry} on ${pkgName}`);
@@ -128,9 +160,9 @@ try {
     "utf8",
   );
   if (!chaosManifest.includes('experienceKey: "controlled-chaos-poster-lab"')) {
-    fail("Controlled Chaos stub manifest experienceKey mismatch");
+    fail("Controlled Chaos manifest experienceKey mismatch");
   } else {
-    ok("Controlled Chaos stub manifest experienceKey matches registry");
+    ok("Controlled Chaos manifest experienceKey matches registry");
   }
 
   const livingManifest = readFileSync(
