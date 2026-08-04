@@ -340,16 +340,16 @@ export const experienceRegistryClient = {
 
 ---
 
-## 14. Existing schemas to extend (not replace)
+## Phase 2 status
 
-- [`studio/schemaTypes/documents.ts`](../../studio/schemaTypes/documents.ts) — `project`  
-- [`studio/schemaTypes/blocks/`](../../studio/schemaTypes/blocks/) — add `projectThreeExperience.ts`  
-- [`studio/schemaTypes/index.ts`](../../studio/schemaTypes/index.ts) — register type  
-- [`src/sanity/lib/queries.ts`](../../src/sanity/lib/queries.ts) — project projections  
-- [`src/types/project-modules.ts`](../../src/types/project-modules.ts) + typegen  
-- [`src/components/project/project-modules.tsx`](../../src/components/project/project-modules.tsx) — module case  
+Completed:
 
-Do **not** edit these in Phase 0.
+- `projectThreeExperience` module object with manifest-driven options + Studio validation
+- Static `ThreeExperiencePreview` (no WebGL in Studio)
+- Top-level `primaryExperience` and `featuredCreations` on `project`
+- `studio/lib/experienceManifestOptions.ts` imports `@thrun-design/controlled-chaos/manifest` only
+- Studio depends on the stub package via `file:../packages/controlled-chaos`
+
 
 ---
 

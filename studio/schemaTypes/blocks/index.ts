@@ -5,5 +5,6 @@ export { projectMetrics } from "./projectMetrics";
 export { projectProcess } from "./projectProcess";
 export { projectQuote } from "./projectQuote";
 export { projectVideo } from "./projectVideo";
+export { projectThreeExperience } from "./projectThreeExperience";
 export { projectCta } from "./projectCta";
 export { projectCredits } from "./projectCredits";

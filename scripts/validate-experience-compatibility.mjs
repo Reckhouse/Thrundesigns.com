@@ -49,6 +49,10 @@ const serverSafePaths = [
   join(root, "src/experiences/manifest-options.ts"),
   join(root, "packages/controlled-chaos/src/manifest.ts"),
   join(root, "packages/controlled-chaos/src/schemas.ts"),
+  join(root, "studio/lib/experienceManifestOptions.ts"),
+  join(root, "studio/lib/experienceValidation.ts"),
+  join(root, "studio/schemaTypes/blocks/projectThreeExperience.ts"),
+  join(root, "studio/components/ThreeExperiencePreview.tsx"),
 ];
 
 for (const file of serverSafePaths) {
