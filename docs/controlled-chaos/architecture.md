@@ -386,7 +386,7 @@ Particle disintegration is the active default system:
 - Quality budgets and curated presets
 - Docs: `visual-systems.md`
 
-**Next (Phase 11):** Sanity case-study content polish.
+**Next (Phase 12):** Accessibility, performance, browser matrix, security hardening, launch checklist.
 
 ---
 

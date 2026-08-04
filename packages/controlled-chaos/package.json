@@ -1,6 +1,6 @@
 {
   "name": "@thrun-design/controlled-chaos",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "private": true,
   "description": "Controlled Chaos Poster Lab — interactive Three.js poster generator for the Thrundesign portfolio.",
   "type": "module",

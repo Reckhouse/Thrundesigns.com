@@ -2,23 +2,18 @@
 
 ## Goal
 
-Resume at **Phase 11**.
+Resume at **Phase 12**.
 
 ## Remaining roadmap
 
-### Phase 11 — Sanity case-study polish
-
-- authoring and presentation polish
-- experience metadata/content integration
-- case-study copy / modules for Controlled Chaos
-
 ### Phase 12 — Hardening
 
-- accessibility report
+- accessibility report (`docs/controlled-chaos/accessibility-report.md`)
 - browser report
 - performance report
-- launch checklist
+- launch checklist (Controlled Chaos–specific)
 - final security polish
+- smoke `/work/controlled-chaos-poster-lab` + lab launch
 
 ## Known good commands
 
@@ -40,7 +35,7 @@ npx tsc --noEmit -p packages/controlled-chaos/tsconfig.json
 
 ## Quick context summary
 
-- Current branch contains Phases 0–10
-- Package version `0.10.0`
-- Audio maps across all seven systems including CRT
-- Next work is Sanity case-study polish, then launch hardening
+- Phases 0–11 complete; package `0.11.0`
+- Sanity case study published: slug `controlled-chaos-poster-lab`
+- Cover: `/images/controlled-chaos-cover.jpg`
+- Next: launch hardening reports + checklist

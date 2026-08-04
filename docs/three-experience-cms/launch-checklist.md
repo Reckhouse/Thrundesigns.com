@@ -11,15 +11,16 @@
 
 ## Content
 
-- [ ] At least one project with `projectThreeExperience` module + required poster
-- [ ] Primary experience launch link opens `/lab/controlled-chaos` with `from=`
+- [x] Living Engraving project with `projectThreeExperience` + poster
+- [x] Controlled Chaos project (`controlled-chaos-poster-lab`) with primary + modules + poster
+- [ ] Primary experience launch link opens `/lab/controlled-chaos` with `from=` (verify on deploy)
 - [ ] Featured creation IDs resolve (or gallery hides cleanly when empty)
 - [ ] Studio warnings are clean on published drafts
 
 ## Runtime
 
 - [ ] Case study readable without clicking load
-- [ ] Interaction load mounts stub/real experience
+- [ ] Interaction load mounts experience after visitor action
 - [ ] Reduced-motion does not auto-start viewport/immediate embeds
 - [ ] Lab back link returns to case study
 - [ ] Creation replay page is `noindex`
@@ -29,7 +30,8 @@
 
 ## After real Controlled Chaos package
 
-- [ ] Re-run integration contract review
+- [x] Package shipped through Phase 10 (systems + audio)
+- [x] Sanity case-study seed + authoring docs (Phase 11)
 - [ ] Re-measure bundle / LCP / lab first frame
 - [ ] Browser matrix smoke test
 - [ ] Accessibility pass on package controls

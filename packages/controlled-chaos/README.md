@@ -2,7 +2,7 @@
 
 Interactive Three.js poster generator package for the Thrundesign portfolio.
 
-**Phase 10.** Full audio-displacement mappings across all active systems + CRT post modulation. Package `0.10.0`.
+**Phase 11.** Sanity case-study seed + content authoring docs. Package `0.11.0`.
 
 ## Exports
 
