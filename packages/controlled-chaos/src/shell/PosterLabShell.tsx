@@ -1661,7 +1661,6 @@ function PosterLabShellInner({
     setExporting(true);
     setExportMessage("Saving to your device…");
     try {
-      analytics?.track("save_started");
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
       const still = await captureStill({
         canvas: canvasEl,
@@ -1671,7 +1670,6 @@ function PosterLabShellInner({
         throw new Error(still.message || "Still capture failed.");
       }
       downloadExportBlob(still.blob, `controlled-chaos-${stamp}.png`);
-      analytics?.track("export_still");
 
       const payload = serializePosterCreation(documentState, {
         presetKey: presetKey ?? configuration?.initialPresetKey,
@@ -1682,10 +1680,10 @@ function PosterLabShellInner({
       });
       downloadExportBlob(json, `controlled-chaos-${stamp}.json`);
 
-      analytics?.track("save_succeeded");
+      analytics?.track("export_completed");
       setExportMessage("Saved to your device · PNG + JSON");
     } catch (error) {
-      analytics?.track("save_failed");
+      analytics?.track("failed", { reason: "save_local" });
       setExportMessage(
         error instanceof Error ? error.message : "Save failed.",
       );
