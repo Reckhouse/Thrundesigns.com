@@ -1,3 +1,8 @@
+import { livingEngravingManifest } from "@thrun-design/living-engraving/manifest";
+import {
+  livingEngravingEmbedConfigSchema,
+  type LivingEngravingEmbedConfig,
+} from "@thrun-design/living-engraving/schemas";
 import { controlledChaosManifest } from "@thrun-design/controlled-chaos/manifest";
 import {
   controlledChaosEmbedConfigSchema,
@@ -45,11 +50,43 @@ function validateControlledChaosEmbedConfig(
   return parsed as ExperienceEmbedConfiguration;
 }
 
+function buildLivingEngravingLaunchUrl(
+  configuration: ExperienceEmbedConfiguration,
+): string {
+  const config = configuration as LivingEngravingEmbedConfig;
+  const url = new URL(
+    livingEngravingManifest.labPath,
+    "https://thrundesign.local",
+  );
+
+  url.searchParams.set("mode", config.mode);
+  if (config.initialPresetKey) {
+    url.searchParams.set("preset", config.initialPresetKey);
+  }
+  if (config.quality && config.quality !== "auto") {
+    url.searchParams.set("quality", config.quality);
+  }
+
+  return `${url.pathname}${url.search}`;
+}
+
+function validateLivingEngravingEmbedConfig(
+  value: unknown,
+): ExperienceEmbedConfiguration {
+  const parsed = livingEngravingEmbedConfigSchema.parse(value);
+  return parsed as ExperienceEmbedConfiguration;
+}
+
 export const experienceRegistryServer = {
   "controlled-chaos-poster-lab": {
     manifest: controlledChaosManifest as PortfolioExperienceManifest,
     validateEmbedConfig: validateControlledChaosEmbedConfig,
     buildLaunchUrl: buildControlledChaosLaunchUrl,
+  },
+  "living-engraving-horse": {
+    manifest: livingEngravingManifest as PortfolioExperienceManifest,
+    validateEmbedConfig: validateLivingEngravingEmbedConfig,
+    buildLaunchUrl: buildLivingEngravingLaunchUrl,
   },
 } as const satisfies Record<string, PortfolioExperienceServerPlugin>;
 

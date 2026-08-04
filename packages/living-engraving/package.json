@@ -1,0 +1,53 @@
+{
+  "name": "@thrun-design/living-engraving",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Living Engraving — interactive horse-head particle cameo extracted from the Thrundesign homepage hero.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./package.json": "./package.json",
+    "./manifest": {
+      "types": "./src/manifest.ts",
+      "default": "./src/manifest.ts"
+    },
+    "./schemas": {
+      "types": "./src/schemas.ts",
+      "default": "./src/schemas.ts"
+    },
+    "./react-preview": {
+      "types": "./src/react-preview.tsx",
+      "default": "./src/react-preview.tsx"
+    },
+    "./react": {
+      "types": "./src/react.tsx",
+      "default": "./src/react.tsx"
+    },
+    "./horse-particles": {
+      "types": "./src/horse-particles.tsx",
+      "default": "./src/horse-particles.tsx"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "peerDependencies": {
+    "@react-three/fiber": "^9.0.0",
+    "gsap": "^3.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.185.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/three": "^0.185.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.0.0",
+    "zod": "^4.4.3"
+  }
+}

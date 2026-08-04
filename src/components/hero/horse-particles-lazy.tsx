@@ -5,7 +5,9 @@ import type { HorseParticlesProps } from "@/components/hero/horse-particles";
 
 const HorseParticlesDynamic = dynamic(
   () =>
-    import("@/components/hero/horse-particles").then((mod) => mod.HorseParticles),
+    import("@/components/hero/horse-particles").then(
+      (mod) => mod.HeroHorseParticles,
+    ),
   {
     ssr: false,
     loading: () => (

@@ -4,6 +4,7 @@
  */
 
 import { controlledChaosManifest } from "@thrun-design/controlled-chaos/manifest";
+import { livingEngravingManifest } from "@thrun-design/living-engraving/manifest";
 
 export type ManifestOption = { title: string; value: string };
 
@@ -29,6 +30,7 @@ type ExperienceManifestLike = {
 
 /** Installed experience manifests available to Studio. */
 export const installedExperienceManifests: readonly ExperienceManifestLike[] = [
+  livingEngravingManifest,
   controlledChaosManifest,
 ];
 

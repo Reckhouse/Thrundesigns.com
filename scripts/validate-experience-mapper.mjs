@@ -13,6 +13,10 @@ import {
   validControlledChaosInlineFixture,
   validControlledChaosPreviewFixture,
 } from "../src/experiences/__fixtures__/controlled-chaos.ts";
+import {
+  validLivingEngravingInlineFixture,
+  validLivingEngravingPreviewFixture,
+} from "../src/experiences/__fixtures__/living-engraving.ts";
 
 const errors = [];
 
@@ -77,6 +81,22 @@ assert(embedVersion.ok === false, "unsupported embed version fails");
 
 const empty = mapSanityExperienceConfig(null);
 assert(empty.ok === false, "null configuration fails");
+
+const livingPreview = mapSanityExperienceConfig(validLivingEngravingPreviewFixture);
+assert(livingPreview.ok === true, "living engraving preview maps successfully");
+if (livingPreview.ok) {
+  assert(
+    livingPreview.value.experienceKey === "living-engraving-horse",
+    "living engraving keeps experience key",
+  );
+  assert(
+    livingPreview.value.launchUrl.startsWith("/lab/living-engraving"),
+    "living engraving builds launch URL",
+  );
+}
+
+const livingInline = mapSanityExperienceConfig(validLivingEngravingInlineFixture);
+assert(livingInline.ok === true, "living engraving inline maps successfully");
 
 if (errors.length) {
   console.error(`\n${errors.length} mapper fixture check(s) failed.`);

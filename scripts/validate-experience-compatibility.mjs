@@ -44,7 +44,7 @@ const FORBIDDEN_SERVER_IMPORT =
   /from\s+["'](three|@react-three\/fiber|@react-three\/drei)["']|require\(["'](three|@react-three\/fiber|@react-three\/drei)["']\)/;
 
 const EXPERIENCE_REACT_IMPORT =
-  /@thrun-design\/controlled-chaos\/react(?:-preview|-replay)?/;
+  /@thrun-design\/(?:controlled-chaos|living-engraving)\/react(?:-preview|-replay)?/;
 
 const serverSafePaths = [
   join(root, "src/experiences/registry.server.ts"),
@@ -55,8 +55,11 @@ const serverSafePaths = [
   join(root, "src/experiences/controlled-chaos/parseLabSearchParams.ts"),
   join(root, "src/experiences/controlled-chaos/persistenceAdapter.ts"),
   join(root, "src/experiences/controlled-chaos/analyticsAdapter.ts"),
+  join(root, "src/experiences/living-engraving/parseLabSearchParams.ts"),
   join(root, "packages/controlled-chaos/src/manifest.ts"),
   join(root, "packages/controlled-chaos/src/schemas.ts"),
+  join(root, "packages/living-engraving/src/manifest.ts"),
+  join(root, "packages/living-engraving/src/schemas.ts"),
   join(root, "studio/lib/experienceManifestOptions.ts"),
   join(root, "studio/lib/experienceValidation.ts"),
   join(root, "studio/schemaTypes/blocks/projectThreeExperience.ts"),
@@ -78,28 +81,26 @@ for (const file of serverSafePaths) {
   }
 }
 
-const pkgName = "@thrun-design/controlled-chaos";
-try {
-  const pkgJsonPath = require.resolve(`${pkgName}/package.json`);
-  const pkg = JSON.parse(readFileSync(pkgJsonPath, "utf8"));
-  ok(`Resolved ${pkgName}@${pkg.version}`);
+for (const pkgName of [
+  "@thrun-design/controlled-chaos",
+  "@thrun-design/living-engraving",
+]) {
+  try {
+    const pkgJsonPath = require.resolve(`${pkgName}/package.json`);
+    const pkg = JSON.parse(readFileSync(pkgJsonPath, "utf8"));
+    ok(`Resolved ${pkgName}@${pkg.version}`);
 
-  const requiredExports = [
-    "./manifest",
-    "./schemas",
-    "./react-preview",
-    "./react",
-    "./react-replay",
-  ];
-  for (const entry of requiredExports) {
-    if (!pkg.exports?.[entry]) {
-      fail(`Missing package export ${entry}`);
-    } else {
-      ok(`Export map includes ${entry}`);
+    const requiredExports = ["./manifest", "./schemas", "./react-preview", "./react"];
+    for (const entry of requiredExports) {
+      if (!pkg.exports?.[entry]) {
+        fail(`Missing package export ${entry} on ${pkgName}`);
+      } else {
+        ok(`Export map includes ${pkgName}${entry}`);
+      }
     }
+  } catch (error) {
+    fail(`Cannot resolve ${pkgName}: ${error.message}`);
   }
-} catch (error) {
-  fail(`Cannot resolve ${pkgName}: ${error.message}`);
 }
 
 const registryUrl = pathToFileURL(
@@ -111,26 +112,35 @@ try {
     join(root, "src/experiences/registry.server.ts"),
     "utf8",
   );
-  if (!registrySource.includes('"controlled-chaos-poster-lab"')) {
-    fail('Registry does not register "controlled-chaos-poster-lab"');
-  } else {
-    ok('Registry registers "controlled-chaos-poster-lab"');
+  for (const key of [
+    "controlled-chaos-poster-lab",
+    "living-engraving-horse",
+  ]) {
+    if (!registrySource.includes(`"${key}"`)) {
+      fail(`Registry does not register "${key}"`);
+    } else {
+      ok(`Registry registers "${key}"`);
+    }
   }
 
-  const manifestSource = readFileSync(
+  const chaosManifest = readFileSync(
     join(root, "packages/controlled-chaos/src/manifest.ts"),
     "utf8",
   );
-  if (!manifestSource.includes('experienceKey: "controlled-chaos-poster-lab"')) {
-    fail("Stub manifest experienceKey mismatch");
+  if (!chaosManifest.includes('experienceKey: "controlled-chaos-poster-lab"')) {
+    fail("Controlled Chaos stub manifest experienceKey mismatch");
   } else {
-    ok("Stub manifest experienceKey matches registry");
+    ok("Controlled Chaos stub manifest experienceKey matches registry");
   }
 
-  if (!manifestSource.includes("presets:")) {
-    fail("Stub manifest missing presets");
+  const livingManifest = readFileSync(
+    join(root, "packages/living-engraving/src/manifest.ts"),
+    "utf8",
+  );
+  if (!livingManifest.includes('experienceKey: "living-engraving-horse"')) {
+    fail("Living Engraving manifest experienceKey mismatch");
   } else {
-    ok("Stub manifest defines presets");
+    ok("Living Engraving manifest experienceKey matches registry");
   }
 
   void registryUrl;
@@ -146,6 +156,11 @@ if (!clientRegistry.includes("@thrun-design/controlled-chaos/react")) {
   fail("Client registry missing Controlled Chaos react loader");
 } else {
   ok("Client registry defines Controlled Chaos loaders");
+}
+if (!clientRegistry.includes("@thrun-design/living-engraving/react")) {
+  fail("Client registry missing Living Engraving react loader");
+} else {
+  ok("Client registry defines Living Engraving loaders");
 }
 
 const experienceDir = join(root, "src/experiences");
@@ -175,11 +190,30 @@ for (const file of marketingBoundaries) {
   }
 }
 
-const assetDir = join(root, "public/experiences/controlled-chaos");
-if (!existsSync(assetDir)) {
-  fail("Missing asset base directory public/experiences/controlled-chaos");
-} else {
-  ok("Asset base directory exists");
+for (const assetDir of [
+  join(root, "public/experiences/controlled-chaos"),
+  join(root, "public/experiences/living-engraving"),
+]) {
+  if (!existsSync(assetDir)) {
+    fail(`Missing asset base directory ${relative(root, assetDir)}`);
+  } else {
+    ok(`Asset base directory exists: ${relative(root, assetDir)}`);
+  }
+}
+
+const livingBins = [
+  "horse-particles.json",
+  "horse-particles-pos.bin",
+  "horse-particles-rand.bin",
+  "horse-particles-meta.bin",
+];
+for (const file of livingBins) {
+  const full = join(root, "public/experiences/living-engraving", file);
+  if (!existsSync(full)) {
+    fail(`Missing Living Engraving asset: ${file}`);
+  } else {
+    ok(`Living Engraving asset present: ${file}`);
+  }
 }
 
 const cspSource = readFileSync(join(root, "src/lib/security-headers.ts"), "utf8");

@@ -11,6 +11,7 @@
 | [accessibility-report.md](./accessibility-report.md) | A11y coverage and follow-ups |
 | [browser-report.md](./browser-report.md) | Browser / no-JS expectations |
 | [csp.md](./csp.md) | Content Security Policy rationale |
+| [seed-living-engraving.md](./seed-living-engraving.md) | Case study seed for Living Engraving |
 | [launch-checklist.md](./launch-checklist.md) | Ship checklist |
 
 Validate locally:

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@thrun-design/controlled-chaos": "file:packages/controlled-chaos",
+    "@thrun-design/living-engraving": "file:packages/living-engraving",
     "@hookform/resolvers": "^5.4.2",
     "@marsidev/react-turnstile": "^1.5.3",
     "@portabletext/react": "^7.0.1",

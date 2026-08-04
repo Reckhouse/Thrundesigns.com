@@ -2,7 +2,10 @@ import type { NextConfig } from "next";
 import { securityHeaders } from "./src/lib/security-headers";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@thrun-design/controlled-chaos"],
+  transpilePackages: [
+    "@thrun-design/controlled-chaos",
+    "@thrun-design/living-engraving",
+  ],
   images: {
     remotePatterns: [
       {

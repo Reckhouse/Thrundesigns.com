@@ -156,31 +156,36 @@ for (let i = 0; i < picked.length; i++) {
   metas[i * 3 + 2] = rear;
 }
 
-const outDir = path.join(root, "public/data");
-fs.mkdirSync(outDir, { recursive: true });
-fs.writeFileSync(
-  path.join(outDir, "horse-particles-pos.bin"),
-  Buffer.from(positions.buffer),
-);
-fs.writeFileSync(
-  path.join(outDir, "horse-particles-rand.bin"),
-  Buffer.from(randoms.buffer),
-);
-fs.writeFileSync(
-  path.join(outDir, "horse-particles-meta.bin"),
-  Buffer.from(metas.buffer),
-);
-fs.writeFileSync(
-  path.join(outDir, "horse-particles.json"),
-  JSON.stringify({
-    count: picked.length,
-    width: w,
-    height: h,
-    tiers: { high: picked.length, standard: 8000, constrained: 0 },
-    tones: { stone, bronze, gold },
-  }),
-);
+const metaJson = JSON.stringify({
+  count: picked.length,
+  width: w,
+  height: h,
+  tiers: { high: picked.length, standard: 8000, constrained: 0 },
+  tones: { stone, bronze, gold },
+});
+
+const outDirs = [
+  path.join(root, "public/data"),
+  path.join(root, "public/experiences/living-engraving"),
+];
+
+for (const outDir of outDirs) {
+  fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(outDir, "horse-particles-pos.bin"),
+    Buffer.from(positions.buffer),
+  );
+  fs.writeFileSync(
+    path.join(outDir, "horse-particles-rand.bin"),
+    Buffer.from(randoms.buffer),
+  );
+  fs.writeFileSync(
+    path.join(outDir, "horse-particles-meta.bin"),
+    Buffer.from(metas.buffer),
+  );
+  fs.writeFileSync(path.join(outDir, "horse-particles.json"), metaJson);
+}
 
 console.log(
-  `Baked ${picked.length} particles (stone ${stone}, bronze ${bronze}, gold ${gold}) from ${candidates.length} candidates`,
+  `Baked ${picked.length} particles (stone ${stone}, bronze ${bronze}, gold ${gold}) from ${candidates.length} candidates → ${outDirs.map((d) => path.relative(root, d)).join(", ")}`,
 );

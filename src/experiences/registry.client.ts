@@ -19,6 +19,12 @@ export const experienceRegistryClient = {
     loadReplay: () =>
       import("@thrun-design/controlled-chaos/react-replay") as Promise<ExperienceComponentModule>,
   },
+  "living-engraving-horse": {
+    loadPreview: () =>
+      import("@thrun-design/living-engraving/react-preview") as Promise<ExperienceComponentModule>,
+    loadExperience: () =>
+      import("@thrun-design/living-engraving/react") as Promise<ExperienceComponentModule>,
+  },
 } as const satisfies Record<string, PortfolioExperienceClientPlugin>;
 
 export type RegisteredClientExperienceKey =

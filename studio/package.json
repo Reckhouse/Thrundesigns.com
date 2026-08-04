@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@thrun-design/controlled-chaos": "file:../packages/controlled-chaos",
+    "@thrun-design/living-engraving": "file:../packages/living-engraving",
     "@sanity/icons": "^5.2.1",
     "@sanity/ui": "^3.1.11",
     "@sanity/vision": "^6.6.0",
