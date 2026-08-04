@@ -1,9 +1,10 @@
 # Controlled Chaos — Launch checklist
 
 **Phase:** 12 (complete) + production smoke  
-**Package:** `@thrun-design/controlled-chaos` `0.12.1` (CRT hotfix)  
+**Package:** `@thrun-design/controlled-chaos` `0.12.1`  
 **Case study slug:** `controlled-chaos-poster-lab`  
-**Production:** https://thrundesigns-com.vercel.app · deploy `dpl_HFweRQoGf1ESGC6DY5NjnoG3nQSX` (PR #26 merge)
+**Production:** https://thrundesigns-com.vercel.app  
+**Deploys:** PR #26 `dpl_HFweRQoGf1ESGC6DY5NjnoG3nQSX` · CRT hotfix PR #27 `dpl_Dw4c38JHLFNpAeyGssRwrkZvpXUf` (SHA `605d3fb`)
 
 Status legend: **done**, **code-verified**, **smoke-pass**, **needs follow-up**.
 
@@ -13,7 +14,7 @@ Status legend: **done**, **code-verified**, **smoke-pass**, **needs follow-up**.
 - [x] Creations unit tests (`src/lib/creations/*.test.ts`)
 - [x] `npm run validate:experiences`
 - [x] `npx tsc --noEmit -p packages/controlled-chaos/tsconfig.json`
-- [x] Production Vercel build for merge commit — **smoke-pass** (READY)
+- [x] Production Vercel builds for #26 and #27 — **smoke-pass** (READY)
 - [x] Hardening docs + CSP documented
 
 ## Content
@@ -34,7 +35,7 @@ Status legend: **done**, **code-verified**, **smoke-pass**, **needs follow-up**.
 - [x] Creations API validation / thumbnail rejects — **smoke-pass** (400 on bad input)
 - [x] Blob storage configured — **smoke-pass** (`POST /api/creations/thumbnail` → 201)
 - [ ] Upstash Redis configured — **needs follow-up** (not directly verified; saves may work via Blob head fallback)
-- [x] Context-lost / error boundary Retry UI — **smoke-pass** (seen on CRT crash)
+- [x] Context-lost / error boundary Retry UI — **smoke-pass**
 
 ## Package hardening (Phase 12)
 
@@ -50,10 +51,10 @@ Status legend: **done**, **code-verified**, **smoke-pass**, **needs follow-up**.
 - [x] Particle Disintegration + Chrome Liquid render — **smoke-pass**
 - [x] Export PNG downloads — **smoke-pass**
 - [x] Pause / Play — **smoke-pass**
-- [ ] CRT / Photocopy — **needs follow-up** (crashed on React 19 + postprocessing object refs; fixed in `0.12.1`)
-- [ ] Safari / mobile — **needs follow-up** (not exercised in agent smoke)
-- [ ] Save & share round-trip — **needs follow-up** (button present; share confirmation not clearly observed)
+- [x] CRT / Photocopy after `0.12.1` — **smoke-pass** (no error boundary; scanlines/presets render; switch away/back stable). Note: occasional blank frame until a slider/preset nudge — not a crash.
+- [ ] Safari / mobile — **needs follow-up**
+- [ ] Save & share round-trip — **needs follow-up**
 
 ## Hotfix note
 
-CRT crash root cause: object `ref`s on `@react-three/postprocessing` `wrapEffect` components under React 19 (`JSON.stringify(props)` circular structure). Fix: callback refs in `CrtPostStack.tsx` (package `0.12.1`).
+CRT crash root cause: object `ref`s on `@react-three/postprocessing` `wrapEffect` under React 19. Fixed with callback refs in `CrtPostStack.tsx` (`0.12.1`, PR #27). Re-smoke on production deploy `dpl_Dw4c38JHLFNpAeyGssRwrkZvpXUf` confirmed recovery.
