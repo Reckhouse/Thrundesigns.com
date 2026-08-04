@@ -23,7 +23,7 @@ WebGL, audio bytes, and export stay in the package / lab — not in Sanity.
 3. Narrative modules (systems / process / metrics / credits) — **no** in-page interactive embed when multiple lab CTAs already exist.
 4. CTA points at `/lab/controlled-chaos?mode=inline&from=/work/controlled-chaos-poster-lab`.
 
-Cover stills are **9:16** for the case-study hero (`controlled-chaos-cover.jpg`). Work cards use a separate **286×390** crop (`controlled-chaos-card.jpg`) so the shared grid can stay `object-cover` for other projects. Only the Controlled Chaos case-study hero uses `object-contain`.
+Cover stills are **9:16** for the case-study hero (`controlled-chaos-cover.jpg`). The case-study page uses a **9:16 frame** for Controlled Chaos so the poster fills edge-to-edge (no pillarboxing). Work cards use a separate **286×390** crop (`controlled-chaos-card.jpg`) so the homepage / work grid can stay `object-cover` for other projects.
 
 ## Presets by visual system
 
