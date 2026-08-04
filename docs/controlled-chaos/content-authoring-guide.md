@@ -19,10 +19,10 @@ WebGL, audio bytes, and export stay in the package / lab — not in Sanity.
 ## Recommended case-study pattern
 
 1. Cover + summary introduce the instrument.
-2. Primary experience → Launch Poster Lab (mode `preview`, load `interaction`).
-3. Module embed → lightweight preview with the same poster.
+2. Primary experience → Launch Poster Lab CTA. Case-study **embed** stays `preview` + minimal; the launch URL always opens the **full lab** (`mode=inline`).
+3. Module embed → lightweight preview with the same poster (not the full editor).
 4. Process / systems / metrics explain the architecture without a dashboard dump.
-5. CTA points at the lab with `from=` return path.
+5. CTA points at `/lab/controlled-chaos?mode=inline&from=/work/controlled-chaos-poster-lab`.
 
 ## Presets by visual system
 
@@ -42,11 +42,13 @@ Use these when choosing **Initial preset** on `projectThreeExperience`:
 
 ## Modes
 
-| Mode | Case study | Lab |
-|------|------------|-----|
-| `preview` | Preferred embed | Lightweight shareable start |
-| `inline` | Rare — heavier controls | Full inspector when intended |
+| Mode | Case study embed | Lab route (`/lab/controlled-chaos`) |
+|------|------------------|-------------------------------------|
+| `preview` | Preferred embed — minimal chrome | Do **not** use for Launch CTAs |
+| `inline` | Rare on the page | **Required** for Launch Poster Lab / fullscreen |
 | `replay` | Only with a real creation ID | Shared creation pages |
+
+`buildControlledChaosLaunchUrl` always emits `mode=inline` so marketing embeds can stay lightweight while CTAs open the full instrument.
 
 ## Loading behavior
 

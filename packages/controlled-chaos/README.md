@@ -2,7 +2,7 @@
 
 Interactive Three.js poster generator package for the Thrundesign portfolio.
 
-**Phase 12.** Hardening complete (`0.12.0`). CRT React 19 hotfix in `0.12.1`.
+**Phase 12.** Hardening complete. Full-lab launch CTAs + in-lab directions in `0.12.2`.
 
 ## Exports
 

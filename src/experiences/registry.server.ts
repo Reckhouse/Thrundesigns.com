@@ -29,10 +29,10 @@ function buildControlledChaosLaunchUrl(
     "https://thrundesign.local",
   );
 
-  url.searchParams.set("mode", config.mode);
-  if (config.initialPresetKey) {
-    url.searchParams.set("preset", config.initialPresetKey);
-  }
+  // Fullscreen / case-study CTAs always open the full editor.
+  // Embed `mode=preview` must not leak into the lab URL or visitors only get
+  // a locked minimal particle preview (signal-failure).
+  url.searchParams.set("mode", "inline");
   if (config.initialCreationId) {
     url.searchParams.set("creation", config.initialCreationId);
   }

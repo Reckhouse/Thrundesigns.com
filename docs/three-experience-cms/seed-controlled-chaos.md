@@ -39,14 +39,17 @@ Cover asset (repo): `/images/controlled-chaos-cover.jpg`
 4. **Process steps** — experience package → serializable creations → case-study embed.
 5. **Metrics** — 7 systems · 21 presets · 9:16 frame.
 6. **Credits** — Thrun Design Co. + stack line.
-7. **CTA** — Launch Poster Lab → `/lab/controlled-chaos?...&from=/work/controlled-chaos-poster-lab`.
+7. **CTA** — Launch Poster Lab → `/lab/controlled-chaos?mode=inline&from=/work/controlled-chaos-poster-lab`.
 
 ## Lab URL
 
+Fullscreen / CTA launches must open the **full editor**:
+
 ```text
-/lab/controlled-chaos?mode=preview&preset=signal-failure&from=/work/controlled-chaos-poster-lab
+/lab/controlled-chaos?mode=inline&from=/work/controlled-chaos-poster-lab
 ```
 
+Case-study embeds may still use `mode=preview` + `preset=signal-failure` for the lightweight in-page preview. Do not reuse that preview query string for Launch Poster Lab buttons.
 ## Regenerating the poster
 
 Prefer a designed 9:16 still. Optional capture path:
