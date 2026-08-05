@@ -170,6 +170,9 @@ export const defaultHomeContent = {
       slug: { current: "northline-advisory" },
       industry: "Professional services · Concept",
       services: "Brand identity · Website",
+      workCategory: "branding-strategy",
+      summary:
+        "A speculative advisory brand system exploring calm authority and a clear digital presence.",
       cover: {
         blobUrl: "/images/project-01.jpg",
         alt: "Mountain ridgeline for Northline Advisory concept study",
@@ -181,6 +184,9 @@ export const defaultHomeContent = {
       slug: { current: "summit-construction" },
       industry: "Construction · Concept",
       services: "Brand system · Marketing",
+      workCategory: "branding-strategy",
+      summary:
+        "A construction brand concept focused on durable systems and marketing clarity.",
       cover: {
         blobUrl: "/images/project-02.jpg",
         alt: "Modern architecture for Summit Construction concept study",
@@ -192,6 +198,9 @@ export const defaultHomeContent = {
       slug: { current: "orbit-systems" },
       industry: "Technology · Concept",
       services: "Website · Product narrative",
+      workCategory: "web-design",
+      summary:
+        "A technology product narrative and marketing site concept with crisp hierarchy.",
       cover: {
         blobUrl: "/images/project-03.jpg",
         alt: "Technical landscape for Orbit Systems concept study",

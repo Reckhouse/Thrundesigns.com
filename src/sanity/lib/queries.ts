@@ -69,12 +69,13 @@ export const processStepsQuery = defineQuery(`
 `);
 
 export const featuredProjectsQuery = defineQuery(`
-  *[_type == "project" && featured == true] | order(order asc)[0...6]{
+  *[_type == "project" && featured == true] | order(order asc){
     _id,
     title,
     slug,
     industry,
     services,
+    workCategory,
     summary,
     cover
   }
@@ -87,6 +88,7 @@ export const projectsQuery = defineQuery(`
     slug,
     industry,
     services,
+    workCategory,
     summary,
     cover
   }
@@ -99,6 +101,7 @@ export const projectBySlugQuery = defineQuery(`
     slug,
     industry,
     services,
+    workCategory,
     summary,
     cover{
       alt,

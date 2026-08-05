@@ -228,11 +228,11 @@ export default async function HomePage() {
             intro={home.workIntro?.intro}
             projects={resolvedProjects.map((project, index) => ({
               ...project,
-            imageSrc:
-              resolveControlledChaosCardSrc(
-                project.slug?.current,
-                resolveMediaUrl(project.cover),
-              ) || `/images/project-0${index + 1}.jpg`,
+              imageSrc:
+                resolveControlledChaosCardSrc(
+                  project.slug?.current,
+                  resolveMediaUrl(project.cover),
+                ) || `/images/project-0${index + 1}.jpg`,
             }))}
           />
           <ArtifactSection

@@ -15,6 +15,7 @@ npm --prefix studio run deploy-schema
 | Slug | `living-engraving` |
 | Industry | Interactive brand systems |
 | Services | Three.js · Particle systems · Brand mark motion |
+| Work category | Animation Studies (`animation-studies`) |
 | Summary | A particle cameo of the Thrun horse mark — edge-weighted engraving that breathes, tilts, and orbits under the pointer. |
 | Cover `blobUrl` | `/images/horse-head.png` (live today) or `/images/living-engraving-cover.png` after deploy |
 | Cover `alt` | Living Engraving horse-head particle cameo |
