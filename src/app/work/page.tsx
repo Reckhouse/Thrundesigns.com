@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { WorkSection } from "@/components/sections/work-section";
+import { WorkCategoryIndex } from "@/components/sections/work-category-index";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { withConceptLabel } from "@/lib/concept-label";
@@ -38,9 +38,14 @@ export default async function WorkIndexPage() {
     projectsRes.data,
   );
   const projects = (fetched.length ? fetched : defaultHomeContent.projects).map(
-    (project) => ({
+    (project, index) => ({
       ...project,
       industry: withConceptLabel(project.industry),
+      imageSrc:
+        resolveControlledChaosCardSrc(
+          project.slug?.current,
+          resolveMediaUrl(project.cover),
+        ) || `/images/project-0${index + 1}.jpg`,
     }),
   );
 
@@ -48,18 +53,21 @@ export default async function WorkIndexPage() {
     <>
       <SiteHeader />
       <main className="flex-1 pt-[96px] md:pt-[112px] lg:pt-[120px]">
-        <WorkSection
-          heading="Concept studies"
-          intro="Speculative projects that show how we think — not client case studies. Real work will replace these as engagements ship."
-          projects={projects.map((project, index) => ({
-            ...project,
-            imageSrc:
-              resolveControlledChaosCardSrc(
-                project.slug?.current,
-                resolveMediaUrl(project.cover),
-              ) || `/images/project-0${index + 1}.jpg`,
-          }))}
-        />
+        <header className="border-b border-line">
+          <div className="mx-auto max-w-[1440px] px-6 py-12 md:px-10 md:py-16 lg:px-[74px]">
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold">
+              Concept studies
+            </p>
+            <h1 className="mt-4 max-w-[18ch] font-display text-[clamp(2rem,4vw,3.25rem)] leading-[1.08] tracking-[-0.02em] text-fg">
+              Speculative work with production intent.
+            </h1>
+            <p className="mt-6 max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+              Speculative projects that show how we think — not client case
+              studies. Real work will replace these as engagements ship.
+            </p>
+          </div>
+        </header>
+        <WorkCategoryIndex projects={projects} />
         <section className="border-b border-line">
           <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-6 py-12 md:px-10 lg:px-[74px]">
             <p className="max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">

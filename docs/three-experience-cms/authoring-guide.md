@@ -2,6 +2,18 @@
 
 How editors configure Living Engraving, Controlled Chaos, and future experiences in Sanity Studio without loading WebGL in the CMS.
 
+## Work category (homepage + /work)
+
+Each project needs a **Work category** on the Identity tab:
+
+| Value | Homepage /work section |
+|-------|------------------------|
+| Animation Studies | Interactive / motion studies |
+| Web Design | Site and product narrative concepts |
+| Branding Strategy | Identity and brand-system concepts |
+
+Homepage marquees show **one row per non-empty category**. `/work` lists the same groups as a static grid (no marquee). Projects without a category are hidden from those surfaces.
+
 ## Add an experience block to a case study
 
 1. Open a **Project** in Studio.

@@ -77,6 +77,23 @@ export const project = defineType({
     defineField({ name: "industry", type: "string", group: "identity" }),
     defineField({ name: "services", type: "string", group: "identity" }),
     defineField({
+      name: "workCategory",
+      title: "Work category",
+      type: "string",
+      group: "identity",
+      description:
+        "Homepage marquee row and /work section. Empty categories are hidden.",
+      options: {
+        list: [
+          { title: "Animation Studies", value: "animation-studies" },
+          { title: "Web Design", value: "web-design" },
+          { title: "Branding Strategy", value: "branding-strategy" },
+        ],
+        layout: "radio",
+      },
+      validation: (r) => r.required(),
+    }),
+    defineField({
       name: "summary",
       type: "text",
       rows: 4,

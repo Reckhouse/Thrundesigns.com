@@ -117,6 +117,7 @@ export type Project = {
   slug?: Slug;
   industry?: string;
   services?: string;
+  workCategory?: "animation-studies" | "web-design" | "branding-strategy";
   summary?: string;
   cover?: MediaAsset;
   featured?: boolean;
@@ -774,26 +775,28 @@ export type ProcessStepsQueryResult = Array<{
 
 // Source: ../src/sanity/lib/queries.ts
 // Variable: featuredProjectsQuery
-// Query: *[_type == "project" && featured == true] | order(order asc)[0...6]{    _id,    title,    slug,    industry,    services,    summary,    cover  }
+// Query: *[_type == "project" && featured == true] | order(order asc){    _id,    title,    slug,    industry,    services,    workCategory,    summary,    cover  }
 export type FeaturedProjectsQueryResult = Array<{
   _id: string;
   title: string | null;
   slug: Slug | null;
   industry: string | null;
   services: string | null;
+  workCategory: "animation-studies" | "web-design" | "branding-strategy" | null;
   summary: string | null;
   cover: MediaAsset | null;
 }>;
 
 // Source: ../src/sanity/lib/queries.ts
 // Variable: projectsQuery
-// Query: *[_type == "project"] | order(order asc){    _id,    title,    slug,    industry,    services,    summary,    cover  }
+// Query: *[_type == "project"] | order(order asc){    _id,    title,    slug,    industry,    services,    workCategory,    summary,    cover  }
 export type ProjectsQueryResult = Array<{
   _id: string;
   title: string | null;
   slug: Slug | null;
   industry: string | null;
   services: string | null;
+  workCategory: "animation-studies" | "web-design" | "branding-strategy" | null;
   summary: string | null;
   cover: MediaAsset | null;
 }>;
@@ -807,6 +810,7 @@ export type ProjectBySlugQueryResult = {
   slug: Slug | null;
   industry: string | null;
   services: string | null;
+  workCategory: "animation-studies" | "web-design" | "branding-strategy" | null;
   summary: string | null;
   cover: {
     alt: string | null;
