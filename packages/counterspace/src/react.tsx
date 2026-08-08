@@ -61,7 +61,6 @@ export function CounterspaceExperience({
   return (
     <div
       className="counterspace-lab-root"
-      ref={hostRef}
       style={{
         position: "relative",
         width: "100%",
@@ -70,7 +69,9 @@ export function CounterspaceExperience({
       }}
       data-experience={counterspaceManifest.experienceKey}
       data-mode={configuration?.mode}
-    />
+    >
+      <div ref={hostRef} style={{ width: "100%", height: "100%" }} />
+    </div>
   );
 }
 
