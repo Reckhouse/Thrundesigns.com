@@ -109,6 +109,11 @@ export function ThreeExperienceSection({
   const fullscreenLabel = mapped.ok
     ? mapped.value.presentation.fullscreenLabel
     : value.fullscreenLabel || "Launch full experience";
+  // When a fullscreen lab CTA is present, show the poster + launch only —
+  // skip the redundant "Try the interactive version" overlay.
+  const preferLabLaunch = Boolean(
+    mapped.ok && showFullscreen && launchUrl,
+  );
 
   const stage = (
     <div className="space-y-8">
@@ -127,7 +132,7 @@ export function ThreeExperienceSection({
       </div>
 
       {posterSrc ? (
-        mapped.ok ? (
+        mapped.ok && !preferLabLaunch ? (
           <ExperienceClientBoundary
             experienceKey={mapped.value.experienceKey}
             mode={asMode(mapped.value.configuration.mode)}
@@ -156,12 +161,17 @@ export function ThreeExperienceSection({
         ) : (
           <div className="relative min-h-[420px] w-full overflow-hidden bg-bg-raised">
             <ExperiencePoster src={posterSrc} alt={posterAlt} />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg-deep/90 to-transparent p-6 md:p-8">
-              <p role="status" className="max-w-md font-sans text-[14px] text-fg">
-                The interactive version is temporarily unavailable. The case
-                study content above still explains the project.
-              </p>
-            </div>
+            {!mapped.ok ? (
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg-deep/90 to-transparent p-6 md:p-8">
+                <p
+                  role="status"
+                  className="max-w-md font-sans text-[14px] text-fg"
+                >
+                  The interactive version is temporarily unavailable. The case
+                  study content above still explains the project.
+                </p>
+              </div>
+            ) : null}
           </div>
         )
       ) : (
@@ -177,6 +187,7 @@ export function ThreeExperienceSection({
         <ExperienceLaunchLink
           href={launchUrl}
           experienceKey={mapped.value.experienceKey}
+          variant="button"
         >
           {fullscreenLabel}
         </ExperienceLaunchLink>

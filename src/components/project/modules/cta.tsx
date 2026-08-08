@@ -1,6 +1,6 @@
 import {
   Eyebrow,
-  PrimaryButtonLink,
+  SecondaryButtonLink,
   SectionHeading,
 } from "@/components/site/primitives";
 import { ModuleShell } from "@/components/project/module-shell";
@@ -18,12 +18,12 @@ export function CtaModule({ module }: { module: ProjectCtaModule }) {
             {module.heading}
           </SectionHeading>
         ) : null}
-        <PrimaryButtonLink
+        <SecondaryButtonLink
           href={module.href}
           className={module.heading || module.eyebrow ? "mt-8" : undefined}
         >
           {module.label}
-        </PrimaryButtonLink>
+        </SecondaryButtonLink>
       </div>
     </ModuleShell>
   );

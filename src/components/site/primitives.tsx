@@ -72,6 +72,10 @@ type PrimaryButtonLinkProps = {
   className?: string;
 };
 
+/**
+ * Gold-filled conversion control. Reserve for the site’s primary CTA
+ * (header “Request a quote”) — not for browsing, labs, or secondary quotes.
+ */
 export function PrimaryButtonLink({
   href,
   children,
@@ -101,6 +105,40 @@ export function PrimaryButtonLink({
   );
 
   return <Magnetic strength={0.22}>{link}</Magnetic>;
+}
+
+type SecondaryButtonLinkProps = {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+};
+
+/**
+ * Outline action for browse / lab / secondary quote paths.
+ * Visually distinct from the header gold primary CTA.
+ */
+export function SecondaryButtonLink({
+  href,
+  children,
+  className,
+}: SecondaryButtonLinkProps) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "group inline-flex h-[52px] items-center gap-2 border border-gold/65 bg-transparent px-[18px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:bg-gold/10 hover:text-gold",
+        className,
+      )}
+    >
+      <span className="inline-flex items-center gap-2">
+        {children}
+        <ArrowUpRight
+          className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          aria-hidden
+        />
+      </span>
+    </Link>
+  );
 }
 
 export function SectionRule({ className }: { className?: string }) {

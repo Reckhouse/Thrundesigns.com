@@ -4,7 +4,7 @@ import { stegaClean } from "@sanity/client/stega";
 import { ClipHeading } from "@/components/site/clip-heading";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 import { SceneSection } from "@/components/site/scene-section";
-import { PrimaryButtonLink, TextLink } from "@/components/site/primitives";
+import { SecondaryButtonLink, TextLink } from "@/components/site/primitives";
 import { Badge } from "@/components/ui/badge";
 import { quoteHrefForProjectType } from "@/lib/quote/project-type";
 
@@ -55,12 +55,12 @@ export function ArtifactSection({
               "Not a case study and not invented metrics: a plain excerpt of the questions we bring to a first review so you can judge the fit before you quote."}
           </p>
           <div className="mt-10 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-5">
-            <PrimaryButtonLink
+            <SecondaryButtonLink
               href={href}
               className="w-full justify-center sm:w-auto"
             >
               {ctaLabel || "Request an audit quote"}
-            </PrimaryButtonLink>
+            </SecondaryButtonLink>
             <TextLink href="/quote" className="justify-center sm:justify-start">
               Or start a broader brief
             </TextLink>

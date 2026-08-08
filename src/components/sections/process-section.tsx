@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  PrimaryButtonLink,
+  SecondaryButtonLink,
   TextLink,
 } from "@/components/site/primitives";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
@@ -107,9 +107,9 @@ export function ProcessSection({ heading, steps }: ProcessSectionProps) {
           </div>
 
           <div className="mt-10 md:mt-12 lg:hidden">
-            <PrimaryButtonLink href="/quote" className="w-full justify-center">
+            <SecondaryButtonLink href="/quote" className="w-full justify-center">
               Request a project quote
-            </PrimaryButtonLink>
+            </SecondaryButtonLink>
           </div>
         </div>
       </div>

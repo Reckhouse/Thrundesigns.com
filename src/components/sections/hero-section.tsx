@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { stegaClean } from "@sanity/client/stega";
-import { PrimaryButtonLink } from "@/components/site/primitives";
+import { SecondaryButtonLink } from "@/components/site/primitives";
 import { HorseParticlesLazy } from "@/components/hero/horse-particles-lazy";
 import { motion, useReducedMotion } from "framer-motion";
 import { motionTokens } from "@/lib/motion-tokens";
@@ -102,14 +102,14 @@ export function HeroSection({
               {...item(0.44)}
             >
               <div ref={ctaRef} className="w-full sm:w-auto">
-                <PrimaryButtonLink
+                <SecondaryButtonLink
                   href={
                     secondaryCta?.href ? stegaClean(secondaryCta.href) : "/work"
                   }
                   className="w-full justify-center sm:w-auto"
                 >
                   {secondaryCta?.label || "Browse concept studies"}
-                </PrimaryButtonLink>
+                </SecondaryButtonLink>
               </div>
             </motion.div>
 

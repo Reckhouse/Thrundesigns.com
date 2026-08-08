@@ -7,17 +7,14 @@ import { FeaturedCreationsGallery } from "@/components/project/featured-creation
 import { ProjectModules } from "@/components/project/project-modules";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import {
-  Eyebrow,
-  PrimaryButtonLink,
-  SectionHeading,
-} from "@/components/site/primitives";
+import { Eyebrow, SectionHeading } from "@/components/site/primitives";
 import { mapSanityExperienceConfig } from "@/experiences/mapSanityExperienceConfig";
 import { withLabReturnPath } from "@/experiences/controlled-chaos/parseLabSearchParams";
 import {
   isControlledChaosSlug,
   resolveControlledChaosCoverSrc,
 } from "@/lib/controlled-chaos-media";
+import { resolveCounterspaceCoverSrc } from "@/lib/counterspace-media";
 import { defaultHomeContent } from "@/lib/default-content";
 import {
   resolveMediaAlt,
@@ -143,9 +140,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   if (!project) notFound();
 
-  const imageSrc = resolveControlledChaosCoverSrc(
+  const imageSrc = resolveCounterspaceCoverSrc(
     slug,
-    resolveMediaUrl(project.cover) || coverFallback(slug),
+    resolveControlledChaosCoverSrc(
+      slug,
+      resolveMediaUrl(project.cover) || coverFallback(slug),
+    ),
   );
   const isPosterCover = isControlledChaosSlug(slug);
   const primaryMapped = project.primaryExperience
@@ -186,20 +186,17 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   {project.summary ||
                     "A focused case study exploring brand systems, digital presence, and production-ready visual language."}
                 </p>
-                <div className="mt-10 flex flex-wrap items-center gap-4">
-                  <PrimaryButtonLink href="/quote">
-                    Request a project quote
-                  </PrimaryButtonLink>
-                  {primaryLaunch ? (
+                {primaryLaunch ? (
+                  <div className="mt-10 flex flex-wrap items-center gap-4">
                     <ExperienceLaunchLink
                       href={primaryLaunch.href}
                       experienceKey={primaryLaunch.experienceKey}
-                      variant="text"
+                      variant="button"
                     >
                       {primaryLaunch.label}
                     </ExperienceLaunchLink>
-                  ) : null}
-                </div>
+                  </div>
+                ) : null}
               </div>
               {/* Poster case studies use a 9:16 frame so the cover fills
                   without pillarboxing. Other projects keep the wide hero box. */}
@@ -214,7 +211,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   src={imageSrc}
                   alt={resolveMediaAlt(project.cover, project.title || "Project")}
                   fill
-                  className="object-cover object-center grayscale"
+                  className="object-cover object-center"
                   sizes={
                     isPosterCover
                       ? "(max-width: 1024px) 360px, 400px"

@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/site/site-header";
 import { MountainScene } from "@/components/site/mountain-scene";
 import { withConceptLabel } from "@/lib/concept-label";
 import { resolveControlledChaosCardSrc } from "@/lib/controlled-chaos-media";
+import { resolveCounterspaceCardSrc } from "@/lib/counterspace-media";
 import { defaultHomeContent } from "@/lib/default-content";
 import { resolveMediaUrl } from "@/lib/media";
 import { sanityFetch } from "@/sanity/lib/live";
@@ -23,8 +24,8 @@ import {
   siteSettingsQuery,
 } from "@/sanity/lib/queries";
 
-/** Homepage featured work should pick up new Sanity projects within a minute. */
-export const revalidate = 60;
+/** Homepage featured work should pick up new Sanity projects quickly. */
+export const revalidate = 30;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { data } = await sanityFetch({
@@ -229,9 +230,12 @@ export default async function HomePage() {
             projects={resolvedProjects.map((project, index) => ({
               ...project,
               imageSrc:
-                resolveControlledChaosCardSrc(
+                resolveCounterspaceCardSrc(
                   project.slug?.current,
-                  resolveMediaUrl(project.cover),
+                  resolveControlledChaosCardSrc(
+                    project.slug?.current,
+                    resolveMediaUrl(project.cover),
+                  ),
                 ) || `/images/project-0${index + 1}.jpg`,
             }))}
           />
