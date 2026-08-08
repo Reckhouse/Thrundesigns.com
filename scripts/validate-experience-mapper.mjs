@@ -17,6 +17,10 @@ import {
   validLivingEngravingInlineFixture,
   validLivingEngravingPreviewFixture,
 } from "../src/experiences/__fixtures__/living-engraving.ts";
+import {
+  validCounterspaceInlineFixture,
+  validCounterspacePreviewFixture,
+} from "../src/experiences/__fixtures__/counterspace.ts";
 
 const errors = [];
 
@@ -105,6 +109,31 @@ if (livingPreview.ok) {
 
 const livingInline = mapSanityExperienceConfig(validLivingEngravingInlineFixture);
 assert(livingInline.ok === true, "living engraving inline maps successfully");
+
+const counterspacePreview = mapSanityExperienceConfig(
+  validCounterspacePreviewFixture,
+);
+assert(counterspacePreview.ok === true, "counterspace preview maps successfully");
+if (counterspacePreview.ok) {
+  assert(
+    counterspacePreview.value.experienceKey ===
+      "counterspace-field-laboratory",
+    "counterspace keeps experience key",
+  );
+  assert(
+    counterspacePreview.value.launchUrl.startsWith("/lab/counterspace"),
+    "counterspace builds launch URL",
+  );
+  assert(
+    counterspacePreview.value.launchUrl.includes("mode=inline"),
+    "counterspace fullscreen launch opens full lab (inline)",
+  );
+}
+
+const counterspaceInline = mapSanityExperienceConfig(
+  validCounterspaceInlineFixture,
+);
+assert(counterspaceInline.ok === true, "counterspace inline maps successfully");
 
 if (errors.length) {
   console.error(`\n${errors.length} mapper fixture check(s) failed.`);

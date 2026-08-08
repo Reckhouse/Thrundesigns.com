@@ -25,6 +25,12 @@ export const experienceRegistryClient = {
     loadExperience: () =>
       import("@thrun-design/living-engraving/react") as Promise<ExperienceComponentModule>,
   },
+  "counterspace-field-laboratory": {
+    loadPreview: () =>
+      import("@thrun-design/counterspace/react-preview") as Promise<ExperienceComponentModule>,
+    loadExperience: () =>
+      import("@thrun-design/counterspace/react") as Promise<ExperienceComponentModule>,
+  },
 } as const satisfies Record<string, PortfolioExperienceClientPlugin>;
 
 export type RegisteredClientExperienceKey =

@@ -4,6 +4,7 @@ import { securityHeaders } from "./src/lib/security-headers";
 const nextConfig: NextConfig = {
   transpilePackages: [
     "@thrun-design/controlled-chaos",
+    "@thrun-design/counterspace",
     "@thrun-design/living-engraving",
   ],
   allowedDevOrigins: ["127.0.0.1", "localhost"],

@@ -44,7 +44,7 @@ const FORBIDDEN_SERVER_IMPORT =
   /from\s+["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|@react-three\/rapier|postprocessing)["']|require\(["'](three|@react-three\/fiber|@react-three\/drei|@react-three\/postprocessing|@react-three\/rapier|postprocessing)["']\)/;
 
 const EXPERIENCE_REACT_IMPORT =
-  /@thrun-design\/(?:controlled-chaos|living-engraving)\/react(?:-preview|-replay)?/;
+  /@thrun-design\/(?:controlled-chaos|living-engraving|counterspace)\/react(?:-preview|-replay)?/;
 
 const serverSafePaths = [
   join(root, "src/experiences/registry.server.ts"),
@@ -56,6 +56,7 @@ const serverSafePaths = [
   join(root, "src/experiences/controlled-chaos/persistenceAdapter.ts"),
   join(root, "src/experiences/controlled-chaos/analyticsAdapter.ts"),
   join(root, "src/experiences/living-engraving/parseLabSearchParams.ts"),
+  join(root, "src/experiences/counterspace/parseLabSearchParams.ts"),
   join(root, "packages/controlled-chaos/src/manifest.ts"),
   join(root, "packages/controlled-chaos/src/schemas.ts"),
   join(root, "packages/controlled-chaos/src/serialization/posterCreation.schema.ts"),
@@ -89,6 +90,8 @@ const serverSafePaths = [
   join(root, "packages/controlled-chaos/src/quality/quality-presets.ts"),
   join(root, "packages/living-engraving/src/manifest.ts"),
   join(root, "packages/living-engraving/src/schemas.ts"),
+  join(root, "packages/counterspace/src/manifest.ts"),
+  join(root, "packages/counterspace/src/schemas.ts"),
   join(root, "studio/lib/experienceManifestOptions.ts"),
   join(root, "studio/lib/experienceValidation.ts"),
   join(root, "studio/schemaTypes/blocks/projectThreeExperience.ts"),
@@ -113,6 +116,7 @@ for (const file of serverSafePaths) {
 for (const pkgName of [
   "@thrun-design/controlled-chaos",
   "@thrun-design/living-engraving",
+  "@thrun-design/counterspace",
 ]) {
   try {
     const pkgJsonPath = require.resolve(`${pkgName}/package.json`);
@@ -147,6 +151,7 @@ try {
   for (const key of [
     "controlled-chaos-poster-lab",
     "living-engraving-horse",
+    "counterspace-field-laboratory",
   ]) {
     if (!registrySource.includes(`"${key}"`)) {
       fail(`Registry does not register "${key}"`);
@@ -175,6 +180,20 @@ try {
     ok("Living Engraving manifest experienceKey matches registry");
   }
 
+  const counterspaceManifestSource = readFileSync(
+    join(root, "packages/counterspace/src/manifest.ts"),
+    "utf8",
+  );
+  if (
+    !counterspaceManifestSource.includes(
+      'experienceKey: "counterspace-field-laboratory"',
+    )
+  ) {
+    fail("Counterspace manifest experienceKey mismatch");
+  } else {
+    ok("Counterspace manifest experienceKey matches registry");
+  }
+
   void registryUrl;
 } catch (error) {
   fail(`Registry inspection failed: ${error.message}`);
@@ -193,6 +212,11 @@ if (!clientRegistry.includes("@thrun-design/living-engraving/react")) {
   fail("Client registry missing Living Engraving react loader");
 } else {
   ok("Client registry defines Living Engraving loaders");
+}
+if (!clientRegistry.includes("@thrun-design/counterspace/react")) {
+  fail("Client registry missing Counterspace react loader");
+} else {
+  ok("Client registry defines Counterspace loaders");
 }
 
 const experienceDir = join(root, "src/experiences");
@@ -225,6 +249,7 @@ for (const file of marketingBoundaries) {
 for (const assetDir of [
   join(root, "public/experiences/controlled-chaos"),
   join(root, "public/experiences/living-engraving"),
+  join(root, "public/experiences/counterspace"),
 ]) {
   if (!existsSync(assetDir)) {
     fail(`Missing asset base directory ${relative(root, assetDir)}`);

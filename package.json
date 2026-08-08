@@ -27,6 +27,7 @@
     "@sanity/client": "^7.25.0",
     "@sanity/image-url": "^2.1.1",
     "@thrun-design/controlled-chaos": "file:packages/controlled-chaos",
+    "@thrun-design/counterspace": "file:packages/counterspace",
     "@thrun-design/living-engraving": "file:packages/living-engraving",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",

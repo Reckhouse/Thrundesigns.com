@@ -8,6 +8,11 @@ import {
   controlledChaosEmbedConfigSchema,
   type ControlledChaosEmbedConfig,
 } from "@thrun-design/controlled-chaos/schemas";
+import { counterspaceManifest } from "@thrun-design/counterspace/manifest";
+import {
+  counterspaceEmbedConfigSchema,
+  type CounterspaceEmbedConfig,
+} from "@thrun-design/counterspace/schemas";
 import type {
   ExperienceCompatibilityError,
   ExperienceEmbedConfiguration,
@@ -77,6 +82,34 @@ function validateLivingEngravingEmbedConfig(
   return parsed as ExperienceEmbedConfiguration;
 }
 
+function buildCounterspaceLaunchUrl(
+  configuration: ExperienceEmbedConfiguration,
+): string {
+  const config = configuration as CounterspaceEmbedConfig;
+  const url = new URL(
+    counterspaceManifest.labPath,
+    "https://thrundesign.local",
+  );
+
+  // Case-study CTAs always open the full laboratory.
+  url.searchParams.set("mode", "inline");
+  if (config.initialPresetKey) {
+    url.searchParams.set("preset", config.initialPresetKey);
+  }
+  if (config.quality && config.quality !== "auto") {
+    url.searchParams.set("quality", config.quality);
+  }
+
+  return `${url.pathname}${url.search}`;
+}
+
+function validateCounterspaceEmbedConfig(
+  value: unknown,
+): ExperienceEmbedConfiguration {
+  const parsed = counterspaceEmbedConfigSchema.parse(value);
+  return parsed as ExperienceEmbedConfiguration;
+}
+
 export const experienceRegistryServer = {
   "controlled-chaos-poster-lab": {
     manifest: controlledChaosManifest as PortfolioExperienceManifest,
@@ -87,6 +120,11 @@ export const experienceRegistryServer = {
     manifest: livingEngravingManifest as PortfolioExperienceManifest,
     validateEmbedConfig: validateLivingEngravingEmbedConfig,
     buildLaunchUrl: buildLivingEngravingLaunchUrl,
+  },
+  "counterspace-field-laboratory": {
+    manifest: counterspaceManifest as PortfolioExperienceManifest,
+    validateEmbedConfig: validateCounterspaceEmbedConfig,
+    buildLaunchUrl: buildCounterspaceLaunchUrl,
   },
 } as const satisfies Record<string, PortfolioExperienceServerPlugin>;
 
