@@ -254,8 +254,10 @@ async function loadParticleBuffers(
 
 function useHorseLayout(layout: LivingEngravingLayout) {
   const { viewport } = useThree();
+  // Hero: mild right bias so the cameo balances the left copy column
+  // without crowding the far edge.
   const offsetX =
-    layout === "hero" ? Math.min(viewport.width * 0.34, 4.6) : 0;
+    layout === "hero" ? Math.min(viewport.width * 0.2, 2.8) : 0;
   const offsetY = layout === "hero" ? viewport.height * 0.04 : 0;
   const scaleFactor = layout === "hero" ? 0.62 : 0.72;
   const scale = Math.min(

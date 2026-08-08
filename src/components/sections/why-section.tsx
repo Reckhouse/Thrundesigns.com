@@ -41,7 +41,7 @@ export function WhySection({
           {
             num: "02",
             label:
-              "Websites designed for clarity and conversion — then maintained",
+              "Websites designed for clarity and conversion, then maintained",
           },
           {
             num: "03",

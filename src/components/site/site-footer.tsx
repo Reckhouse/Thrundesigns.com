@@ -7,7 +7,7 @@ const defaultColumns = [
     heading: "Explore",
     links: [
       { label: "Services", href: "/#services" },
-      { label: "Concept studies", href: "/#work" },
+      { label: "Concept studies", href: "/work" },
       { label: "Process", href: "/#process" },
       { label: "Why Thrun", href: "/#about" },
     ],

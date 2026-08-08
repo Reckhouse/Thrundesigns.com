@@ -144,11 +144,11 @@ export function WorkCategoryMarquee({
 
   if (reduce) {
     return (
-      <div className="flex flex-col gap-4">
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold">
+      <div className="flex w-full flex-col gap-4">
+        <p className="px-5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold md:px-10 lg:px-[74px]">
           {label}
         </p>
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="flex gap-4 overflow-x-auto px-5 pb-2 md:px-10 lg:px-[74px]">
           {projects.map((project) => (
             <MarqueeCard key={project._id} project={project} />
           ))}
@@ -158,11 +158,11 @@ export function WorkCategoryMarquee({
   }
 
   return (
-    <div className="group/marquee flex flex-col gap-4">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold">
+    <div className="group/marquee flex w-full flex-col gap-4">
+      <p className="px-5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold md:px-10 lg:px-[74px]">
         {label}
       </p>
-      <div className="relative overflow-hidden">
+      <div className="relative w-full overflow-hidden">
         <div
           className="work-marquee-track flex w-max gap-4 py-1 group-hover/marquee:[animation-play-state:paused] group-focus-within/marquee:[animation-play-state:paused]"
           style={{

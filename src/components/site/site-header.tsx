@@ -25,7 +25,7 @@ import { useState } from "react";
 
 const defaultNav = [
   { label: "Services", href: "/#services" },
-  { label: "Work", href: "/#work" },
+  { label: "Work", href: "/work" },
   { label: "Process", href: "/#process" },
   { label: "Why Thrun", href: "/#about" },
 ];

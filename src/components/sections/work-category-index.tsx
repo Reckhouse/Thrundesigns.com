@@ -18,19 +18,19 @@ export function WorkCategoryIndex({ projects }: WorkCategoryIndexProps) {
 
   if (rows.length === 0) {
     return (
-      <p className="mx-auto max-w-[1440px] px-6 py-16 font-sans text-[15px] text-fg-muted md:px-10 lg:px-[74px]">
+      <p className="mx-auto max-w-[1440px] px-5 py-16 font-sans text-[15px] text-fg drop-shadow-[0_2px_16px_rgba(12,13,12,0.85)] md:px-10 lg:px-[74px]">
         No concept studies are published yet.
       </p>
     );
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-6 py-16 md:px-10 md:py-20 lg:px-[74px]">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-16 px-5 py-16 md:px-10 md:py-20 lg:px-[74px]">
       {rows.map((row) => (
         <section key={row.key} aria-labelledby={`work-cat-${row.key}`}>
           <h2
             id={`work-cat-${row.key}`}
-            className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold"
+            className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold drop-shadow-[0_2px_16px_rgba(12,13,12,0.8)]"
           >
             {row.label}
           </h2>

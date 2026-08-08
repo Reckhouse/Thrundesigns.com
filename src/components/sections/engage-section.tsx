@@ -27,7 +27,7 @@ const defaultSteps = [
   },
   {
     title: "Get a scoped reply",
-    copy: "Within a few business days we write back with options — not a hard sell.",
+    copy: "Within a few business days we write back with options, not a hard sell.",
   },
   {
     title: "Choose your next step",
@@ -61,7 +61,7 @@ export function EngageSection({
             Engagement
           </Badge>
           <ClipHeading className="mt-5 max-w-lg text-balance font-display text-[clamp(1.75rem,3.5vw,2.65rem)] leading-[1.1] tracking-[-0.02em] text-fg">
-            {heading || "How we engage — and what you’ll get in a reply."}
+            {heading || "How we engage, and what you’ll get in a reply."}
           </ClipHeading>
           <p className="mt-6 max-w-[48ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:text-base">
             No invented case studies required. This is the real first step with
