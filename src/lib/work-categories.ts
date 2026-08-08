@@ -3,6 +3,8 @@
  * Keep Studio `workCategory` options in sync with these values.
  */
 
+import { stegaClean } from "@sanity/client/stega";
+
 export const WORK_CATEGORY_KEYS = [
   "animation-studies",
   "web-design",
@@ -51,8 +53,9 @@ export function groupProjectsByWorkCategory<
   }
 
   for (const project of projects) {
-    if (!isWorkCategoryKey(project.workCategory)) continue;
-    buckets.get(project.workCategory)?.push(project);
+    const key = stegaClean(project.workCategory ?? "");
+    if (!isWorkCategoryKey(key)) continue;
+    buckets.get(key)?.push(project);
   }
 
   return WORK_CATEGORY_ORDER.flatMap((key) => {

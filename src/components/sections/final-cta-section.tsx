@@ -3,7 +3,7 @@
 import { stegaClean } from "@sanity/client/stega";
 import {
   PrecisionMark,
-  PrimaryButtonLink,
+  SecondaryButtonLink,
   SectionHeading,
   TextLink,
 } from "@/components/site/primitives";
@@ -64,14 +64,14 @@ export function FinalCtaSection({
                 "Share a short brief about your business, audience, and goal. We’ll reply within a few business days with scope options and clear next steps. No pressure, no invented promises."}
             </p>
             <div className="mt-10 flex flex-col items-stretch gap-4 sm:mt-12 sm:flex-row sm:items-center sm:gap-5">
-              <PrimaryButtonLink
+              <SecondaryButtonLink
                 href={
                   primaryCta?.href ? stegaClean(primaryCta.href) : "/quote"
                 }
                 className="w-full justify-center sm:w-auto"
               >
                 {primaryCta?.label || "Request a project quote"}
-              </PrimaryButtonLink>
+              </SecondaryButtonLink>
               <TextLink
                 href={
                   secondaryCta?.href ? stegaClean(secondaryCta.href) : "/work"

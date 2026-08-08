@@ -214,7 +214,7 @@ export function ExperienceClientBoundary({
               <button
                 type="button"
                 onClick={() => void startLoad()}
-                className="inline-flex h-[52px] items-center bg-gold px-[18px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bronze hover:text-fg"
+                className="inline-flex h-[52px] items-center border border-gold/65 bg-transparent px-[18px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:bg-gold/10 hover:text-gold"
               >
                 {reduceMotion
                   ? "Load interactive version"
