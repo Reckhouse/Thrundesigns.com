@@ -52,7 +52,7 @@ export function ArtifactSection({
           </ClipHeading>
           <p className="mt-6 max-w-[42ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8 md:text-base">
             {intro ||
-              "Not a case study and not invented metrics — a plain excerpt of the questions we bring to a first review so you can judge the fit before you quote."}
+              "Not a case study and not invented metrics: a plain excerpt of the questions we bring to a first review so you can judge the fit before you quote."}
           </p>
           <div className="mt-10 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-5">
             <PrimaryButtonLink

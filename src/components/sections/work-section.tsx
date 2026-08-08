@@ -27,7 +27,7 @@ export function WorkSection({
 
   return (
     <SceneSection id="work" tone="plate" reveal="wipe-left">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-12 px-5 py-16 md:gap-14 md:px-10 md:py-24 lg:px-[74px] lg:py-28">
+      <div className="mx-auto w-full max-w-[1440px] px-5 pt-16 md:px-10 md:pt-24 lg:px-[74px] lg:pt-28">
         <Reveal variant="blur">
           <div className="max-w-[40rem]">
             <Badge
@@ -41,28 +41,28 @@ export function WorkSection({
             </ClipHeading>
             <p className="mt-6 max-w-[48ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8 md:text-base">
               {intro ||
-                "These are concept projects — not client case studies — until we replace them with real engagements."}
+                "These are concept projects, not client case studies, until we replace them with real engagements."}
             </p>
           </div>
         </Reveal>
-
-        {rows.length > 0 ? (
-          <div className="flex flex-col gap-10 md:gap-12">
-            {rows.map((row, index) => (
-              <WorkCategoryMarquee
-                key={row.key}
-                label={row.label}
-                projects={row.projects}
-                durationSeconds={36 + index * 8}
-              />
-            ))}
-          </div>
-        ) : (
-          <p className="font-sans text-[15px] text-fg-muted">
-            No concept studies are published yet.
-          </p>
-        )}
       </div>
+
+      {rows.length > 0 ? (
+        <div className="mt-12 flex w-full flex-col gap-10 pb-16 md:mt-14 md:gap-12 md:pb-24 lg:pb-28">
+          {rows.map((row, index) => (
+            <WorkCategoryMarquee
+              key={row.key}
+              label={row.label}
+              projects={row.projects}
+              durationSeconds={36 + index * 8}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="mx-auto w-full max-w-[1440px] px-5 pb-16 font-sans text-[15px] text-fg-muted md:px-10 md:pb-24 lg:px-[74px] lg:pb-28">
+          No concept studies are published yet.
+        </p>
+      )}
     </SceneSection>
   );
 }

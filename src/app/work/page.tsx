@@ -16,7 +16,7 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Concept studies",
   description:
-    "Concept projects from Thrun Design Co. — speculative studies until real client work replaces them.",
+    "Concept projects from Thrun Design Co.: speculative studies until real client work replaces them.",
   alternates: { canonical: "/work" },
 };
 
@@ -62,7 +62,7 @@ export default async function WorkIndexPage() {
               Speculative work with production intent.
             </h1>
             <p className="mt-6 max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
-              Speculative projects that show how we think — not client case
+              Speculative projects that show how we think, not client case
               studies. Real work will replace these as engagements ship.
             </p>
           </div>

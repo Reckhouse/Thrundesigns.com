@@ -61,7 +61,7 @@ export function FinalCtaSection({
             </SectionHeading>
             <p className="mt-6 max-w-[60ch] text-pretty font-sans text-[15px] leading-7 text-fg md:mt-8 md:text-base md:text-fg/95">
               {copy ||
-                "Share a short brief about your business, audience, and goal. We’ll reply within a few business days with scope options and clear next steps — no pressure, no invented promises."}
+                "Share a short brief about your business, audience, and goal. We’ll reply within a few business days with scope options and clear next steps. No pressure, no invented promises."}
             </p>
             <div className="mt-10 flex flex-col items-stretch gap-4 sm:mt-12 sm:flex-row sm:items-center sm:gap-5">
               <PrimaryButtonLink

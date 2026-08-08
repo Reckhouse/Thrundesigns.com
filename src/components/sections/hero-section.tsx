@@ -2,10 +2,7 @@
 
 import { useRef } from "react";
 import { stegaClean } from "@sanity/client/stega";
-import {
-  PrimaryButtonLink,
-  TextLink,
-} from "@/components/site/primitives";
+import { PrimaryButtonLink } from "@/components/site/primitives";
 import { HorseParticlesLazy } from "@/components/hero/horse-particles-lazy";
 import { motion, useReducedMotion } from "framer-motion";
 import { motionTokens } from "@/lib/motion-tokens";
@@ -15,6 +12,7 @@ type HeroSectionProps = {
   headline?: string | null;
   support?: string | null;
   servicesMeta?: string | null;
+  /** @deprecated Hero shows a single studies CTA; kept for CMS compatibility. */
   primaryCta?: { label?: string | null; href?: string | null } | null;
   secondaryCta?: { label?: string | null; href?: string | null } | null;
   imageSrc?: string | null;
@@ -26,7 +24,6 @@ export function HeroSection({
   headline,
   support,
   servicesMeta,
-  primaryCta,
   secondaryCta,
   imageAlt,
 }: HeroSectionProps) {
@@ -97,7 +94,7 @@ export function HeroSection({
               {...item(0.34)}
             >
               {support ||
-                "We help founders and owners build clearer brands, websites, and marketing systems — so your next chapter feels confident, not chaotic."}
+                "We help founders and owners build clearer brands, websites, and marketing systems so your next chapter feels confident, not chaotic."}
             </motion.p>
 
             <motion.div
@@ -107,21 +104,13 @@ export function HeroSection({
               <div ref={ctaRef} className="w-full sm:w-auto">
                 <PrimaryButtonLink
                   href={
-                    primaryCta?.href ? stegaClean(primaryCta.href) : "/quote"
+                    secondaryCta?.href ? stegaClean(secondaryCta.href) : "/work"
                   }
                   className="w-full justify-center sm:w-auto"
                 >
-                  {primaryCta?.label || "Request a project quote"}
+                  {secondaryCta?.label || "Browse concept studies"}
                 </PrimaryButtonLink>
               </div>
-              <TextLink
-                href={
-                  secondaryCta?.href ? stegaClean(secondaryCta.href) : "/work"
-                }
-                className="justify-center text-fg hover:text-gold sm:justify-start"
-              >
-                {secondaryCta?.label || "Browse concept studies"}
-              </TextLink>
             </motion.div>
 
             {servicesMeta ? (

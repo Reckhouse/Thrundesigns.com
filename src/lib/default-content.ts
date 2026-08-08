@@ -4,9 +4,9 @@ export const defaultHomeContent = {
       eyebrow: "Thrun Design Co.",
       headline: "Strategic design when a rebrand, launch, or outdated site can’t wait.",
       support:
-        "For founders and owners facing a messy brand, a launch that needs to land, or marketing that no longer matches the business — we build clearer systems, websites, and materials so the next step is concrete.",
+        "For founders and owners facing a messy brand, a launch that needs to land, or marketing that no longer matches the business, we build clearer systems, websites, and materials so the next step is concrete.",
       servicesMeta: "Brand systems  ·  Web  ·  Audits  ·  Print & digital",
-      primaryCta: { label: "Request a project quote", href: "/quote" },
+      primaryCta: { label: "Browse concept studies", href: "/work" },
       secondaryCta: { label: "Browse concept studies", href: "/work" },
       image: {
         blobUrl: "/images/hero-mountain.jpg",
@@ -21,19 +21,19 @@ export const defaultHomeContent = {
     },
     processIntro: {
       eyebrow: null,
-      heading: "How a project runs — from brief to handoff.",
+      heading: "How a project runs, from brief to handoff.",
     },
     workIntro: {
       eyebrow: "Concept studies",
       heading: "Speculative work with production intent.",
       intro:
-        "These are concept projects — not client case studies — until we replace them with real engagements. They show how we think about advisory, construction, and systems brands.",
+        "These are concept projects, not client case studies, until we replace them with real engagements. They show how we think about advisory, construction, and systems brands.",
     },
     artifact: {
       eyebrow: "Sample lens",
       heading: "What a marketing audit actually looks for.",
       intro:
-        "Not a case study and not invented metrics — a plain excerpt of the questions we bring to a first review so you can judge the fit before you quote.",
+        "Not a case study and not invented metrics: a plain excerpt of the questions we bring to a first review so you can judge the fit before you quote.",
       items: [
         {
           label: "Message vs. reality",
@@ -43,7 +43,7 @@ export const defaultHomeContent = {
         {
           label: "Touchpoint friction",
           detail:
-            "Where do brand, site, and leave-behinds disagree — and which mismatch costs trust first?",
+            "Where do brand, site, and leave-behinds disagree, and which mismatch costs trust first?",
         },
         {
           label: "Priority order",
@@ -56,12 +56,12 @@ export const defaultHomeContent = {
             "What your team can keep current without a redesign every time something ships.",
         },
       ],
-      footnote: "Sample review lens — not results from a named client.",
+      footnote: "Sample review lens, not results from a named client.",
       ctaLabel: "Request an audit quote",
       ctaHref: "/quote?type=audit",
     },
     engage: {
-      heading: "How an inquiry works — and what’s in our reply.",
+      heading: "How an inquiry works, and what’s in our reply.",
       steps: [
         {
           title: "Send a short brief",
@@ -69,7 +69,7 @@ export const defaultHomeContent = {
         },
         {
           title: "Get a scoped reply",
-          copy: "Within a few business days we write back with options — not a hard sell.",
+          copy: "Within a few business days we write back with options, not a hard sell.",
         },
         {
           title: "Choose your next step",
@@ -96,7 +96,7 @@ export const defaultHomeContent = {
       credibilityHeading: "What you get when we work together.",
       proofPoints: [
         { num: "01", label: "Identity systems and guidelines your team can actually use" },
-        { num: "02", label: "Websites designed for clarity and conversion — then maintained" },
+        { num: "02", label: "Websites designed for clarity and conversion, then maintained" },
         { num: "03", label: "Marketing audits that show what’s working and what isn’t" },
         { num: "04", label: "Print and digital assets that speak in one voice" },
       ],
@@ -104,7 +104,7 @@ export const defaultHomeContent = {
     finalCta: {
       eyebrow: null,
       heading: "Tell us where the brand needs to go next.",
-      copy: "Share a short brief about your business, audience, and goal. We’ll reply within a few business days with scope options and clear next steps — no pressure, no invented promises.",
+      copy: "Share a short brief about your business, audience, and goal. We’ll reply within a few business days with scope options and clear next steps. No pressure, no invented promises.",
       primaryCta: { label: "Request a project quote", href: "/quote" },
       secondaryCta: { label: "Browse concept studies", href: "/work" },
     },
@@ -123,7 +123,7 @@ export const defaultHomeContent = {
       title: "Web design & maintenance",
       icon: "web",
       summary:
-        "Marketing sites with clear hierarchy and conversion paths — plus ongoing care after launch.",
+        "Marketing sites with clear hierarchy and conversion paths, plus ongoing care after launch.",
       linkLabel: "Plan a website",
     },
     {
@@ -154,7 +154,7 @@ export const defaultHomeContent = {
       _id: "step-2",
       number: "02",
       title: "Design & build",
-      copy: "Identity, site, and assets take shape together — then we implement with performance and CMS readiness in mind.",
+      copy: "Identity, site, and assets take shape together, then we implement with performance and CMS readiness in mind.",
     },
     {
       _id: "step-3",

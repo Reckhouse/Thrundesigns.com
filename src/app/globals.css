@@ -194,24 +194,6 @@
     @apply relative overflow-hidden rounded-none border border-line bg-surface;
   }
 
-  .editorial-panel::after {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--gold) 10%, transparent),
-      transparent 42%
-    );
-    opacity: 0;
-    transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .editorial-panel:hover::after {
-    opacity: 1;
-  }
-
   @keyframes work-marquee-scroll {
     from {
       transform: translate3d(0, 0, 0);
