@@ -3,6 +3,7 @@ import Link from "next/link";
 import { WorkCategoryIndex } from "@/components/sections/work-category-index";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { MountainScene } from "@/components/site/mountain-scene";
 import { withConceptLabel } from "@/lib/concept-label";
 import { resolveControlledChaosCardSrc } from "@/lib/controlled-chaos-media";
 import { defaultHomeContent } from "@/lib/default-content";
@@ -32,6 +33,7 @@ export default async function WorkIndexPage() {
 
   const settings = (settingsRes.data || null) as {
     tagline?: string | null;
+    nav?: { label?: string | null; href?: string | null }[] | null;
   } | null;
 
   const fetched = asArray<(typeof defaultHomeContent.projects)[number]>(
@@ -49,41 +51,49 @@ export default async function WorkIndexPage() {
     }),
   );
 
+  const mountainSrc = "/images/hero-mountain.jpg";
+
   return (
     <>
-      <SiteHeader />
-      <main className="flex-1 pt-[96px] md:pt-[112px] lg:pt-[120px]">
-        <header className="border-b border-line">
-          <div className="mx-auto max-w-[1440px] px-6 py-12 md:px-10 md:py-16 lg:px-[74px]">
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold">
-              Concept studies
-            </p>
-            <h1 className="mt-4 max-w-[18ch] font-display text-[clamp(2rem,4vw,3.25rem)] leading-[1.08] tracking-[-0.02em] text-fg">
-              Speculative work with production intent.
-            </h1>
-            <p className="mt-6 max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
-              Speculative projects that show how we think, not client case
-              studies. Real work will replace these as engagements ship.
-            </p>
-          </div>
-        </header>
-        <WorkCategoryIndex projects={projects} />
-        <section className="border-b border-line">
-          <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-6 py-12 md:px-10 lg:px-[74px]">
-            <p className="max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+      <MountainScene imageSrc={mountainSrc} />
+      <div className="relative z-10 flex min-h-full flex-1 flex-col">
+        <SiteHeader nav={settings?.nav} />
+        <main className="flex-1">
+          <header
+            className="relative flex min-h-[72svh] flex-col justify-end pb-16 pt-[120px] md:min-h-[78svh] md:pb-20 md:pt-[132px] lg:min-h-[84svh] lg:pb-24 lg:pt-[140px]"
+            aria-label="Concept studies"
+          >
+            <div className="mx-auto w-full max-w-[1440px] px-5 md:px-10 lg:px-[74px]">
+              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold drop-shadow-[0_2px_18px_rgba(12,13,12,0.75)]">
+                Concept studies
+              </p>
+              <h1 className="mt-4 max-w-[16ch] text-balance font-display text-[clamp(2.25rem,5vw,4rem)] leading-[1.05] tracking-[-0.02em] text-fg drop-shadow-[0_2px_28px_rgba(12,13,12,0.85)]">
+                Speculative work with production intent.
+              </h1>
+              <p className="mt-6 max-w-[48ch] text-pretty font-sans text-[15px] leading-7 text-fg drop-shadow-[0_2px_20px_rgba(12,13,12,0.9)] md:text-base md:leading-7">
+                Speculative projects that show how we think, not client case
+                studies. Real work will replace these as engagements ship.
+              </p>
+            </div>
+          </header>
+
+          <WorkCategoryIndex projects={projects} />
+
+          <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-5 py-16 md:px-10 md:py-20 lg:px-[74px]">
+            <p className="max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg drop-shadow-[0_2px_16px_rgba(12,13,12,0.85)]">
               Ready to talk about a real engagement? Send a short brief and
               we’ll reply with scope options.
             </p>
             <Link
               href="/quote"
-              className="inline-flex min-h-11 w-fit items-center font-mono text-[11px] uppercase tracking-[0.14em] text-gold"
+              className="inline-flex min-h-11 w-fit items-center font-mono text-[11px] uppercase tracking-[0.14em] text-gold drop-shadow-[0_2px_14px_rgba(12,13,12,0.8)]"
             >
               Request a project quote →
             </Link>
           </div>
-        </section>
-      </main>
-      <SiteFooter tagline={settings?.tagline} />
+        </main>
+        <SiteFooter tagline={settings?.tagline} />
+      </div>
     </>
   );
 }
