@@ -14,6 +14,7 @@ Implemented in [`src/lib/security-headers.ts`](../../src/lib/security-headers.ts
 | `connect-src` Sanity API/CDN, Blob, Turnstile, Vercel, Studio, Upstash | Live Content, Presentation, uploads |
 | `worker-src 'self' blob:` | Experience workers / WASM bridges |
 | `frame-src` Turnstile, YouTube-nocookie, Vimeo, Studio | Existing embeds + auth widgets |
+| `frame-ancestors 'self' thrundesign.sanity.studio www.sanity.io admin.sanity.io` | Presentation Tool preview iframe |
 | `object-src 'none'` | No plugins |
 | `base-uri 'self'` / `form-action 'self'` | Reduce injection surface |
 
