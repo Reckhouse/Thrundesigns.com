@@ -8,8 +8,9 @@
 const SANITY_IMG = "https://cdn.sanity.io";
 const SANITY_API = "https://*.api.sanity.io https://*.apicdn.sanity.io";
 const SANITY_STUDIO = "https://thrundesign.sanity.studio";
-/** Hosted Studio redirects into manage.sanity.io / www.sanity.io app shell. */
-const SANITY_STUDIO_SHELL = "https://www.sanity.io";
+/** Hosted Studio redirects into the Sanity manage / app shell. */
+const SANITY_STUDIO_SHELL =
+  "https://www.sanity.io https://admin.sanity.io";
 const BLOB = "https://*.public.blob.vercel-storage.com";
 const TURNSTILE = "https://challenges.cloudflare.com";
 const VERCEL = "https://vercel.live https://*.vercel.app";
