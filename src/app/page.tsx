@@ -7,7 +7,6 @@ import { ArtifactSection } from "@/components/sections/artifact-section";
 import { EngageSection } from "@/components/sections/engage-section";
 import { WhySection } from "@/components/sections/why-section";
 import { FinalCtaSection } from "@/components/sections/final-cta-section";
-import { ScrollStoryRoot } from "@/components/scroll/scroll-story-root";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { MountainScene } from "@/components/site/mountain-scene";
@@ -209,70 +208,68 @@ export default async function HomePage() {
       <div className="relative z-10 flex min-h-full flex-1 flex-col">
         <SiteHeader nav={settings?.nav} />
         <main className="flex-1">
-          <ScrollStoryRoot>
-            <HeroSection
-              eyebrow={home.hero?.eyebrow}
-              headline={home.hero?.headline}
-              support={home.hero?.support}
-              servicesMeta={home.hero?.servicesMeta}
-              primaryCta={home.hero?.primaryCta}
-              secondaryCta={home.hero?.secondaryCta}
-              imageSrc={mountainSrc}
-              imageAlt={mountainAlt}
-            />
-            <ServicesSection
-              heading={home.servicesIntro?.heading}
-              intro={home.servicesIntro?.intro}
-              services={resolvedServices}
-            />
-            <WorkSection
-              eyebrow={home.workIntro?.eyebrow}
-              heading={home.workIntro?.heading}
-              intro={home.workIntro?.intro}
-              projects={resolvedProjects.map((project, index) => ({
-                ...project,
-                imageSrc:
-                  resolveCounterspaceCardSrc(
+          <HeroSection
+            eyebrow={home.hero?.eyebrow}
+            headline={home.hero?.headline}
+            support={home.hero?.support}
+            servicesMeta={home.hero?.servicesMeta}
+            primaryCta={home.hero?.primaryCta}
+            secondaryCta={home.hero?.secondaryCta}
+            imageSrc={mountainSrc}
+            imageAlt={mountainAlt}
+          />
+          <ServicesSection
+            heading={home.servicesIntro?.heading}
+            intro={home.servicesIntro?.intro}
+            services={resolvedServices}
+          />
+          <WorkSection
+            eyebrow={home.workIntro?.eyebrow}
+            heading={home.workIntro?.heading}
+            intro={home.workIntro?.intro}
+            projects={resolvedProjects.map((project, index) => ({
+              ...project,
+              imageSrc:
+                resolveCounterspaceCardSrc(
+                  project.slug?.current,
+                  resolveControlledChaosCardSrc(
                     project.slug?.current,
-                    resolveControlledChaosCardSrc(
-                      project.slug?.current,
-                      resolveMediaUrl(project.cover),
-                    ),
-                  ) || `/images/project-0${index + 1}.jpg`,
-              }))}
-            />
-            <ArtifactSection
-              eyebrow={home.artifact?.eyebrow}
-              heading={home.artifact?.heading}
-              intro={home.artifact?.intro}
-              items={home.artifact?.items}
-              footnote={home.artifact?.footnote}
-              ctaLabel={home.artifact?.ctaLabel}
-              ctaHref={home.artifact?.ctaHref}
-            />
-            <ProcessSection
-              heading={home.processIntro?.heading}
-              steps={resolvedSteps}
-            />
-            <EngageSection
-              heading={home.engage?.heading}
-              engageSteps={home.engage?.steps}
-              replyHeading={home.engage?.replyHeading}
-              replyPoints={home.engage?.replyPoints}
-            />
-            <WhySection
-              heading={home.whyThrun?.heading}
-              bullets={home.whyThrun?.bullets}
-              credibilityHeading={home.whyThrun?.credibilityHeading}
-              proofPoints={home.whyThrun?.proofPoints}
-            />
-            <FinalCtaSection
-              heading={home.finalCta?.heading}
-              copy={home.finalCta?.copy}
-              primaryCta={home.finalCta?.primaryCta}
-              secondaryCta={home.finalCta?.secondaryCta}
-            />
-          </ScrollStoryRoot>
+                    resolveMediaUrl(project.cover),
+                  ),
+                ) || `/images/project-0${index + 1}.jpg`,
+            }))}
+          />
+          <ArtifactSection
+            eyebrow={home.artifact?.eyebrow}
+            heading={home.artifact?.heading}
+            intro={home.artifact?.intro}
+            items={home.artifact?.items}
+            footnote={home.artifact?.footnote}
+            ctaLabel={home.artifact?.ctaLabel}
+            ctaHref={home.artifact?.ctaHref}
+          />
+          <ProcessSection
+            heading={home.processIntro?.heading}
+            steps={resolvedSteps}
+          />
+          <EngageSection
+            heading={home.engage?.heading}
+            engageSteps={home.engage?.steps}
+            replyHeading={home.engage?.replyHeading}
+            replyPoints={home.engage?.replyPoints}
+          />
+          <WhySection
+            heading={home.whyThrun?.heading}
+            bullets={home.whyThrun?.bullets}
+            credibilityHeading={home.whyThrun?.credibilityHeading}
+            proofPoints={home.whyThrun?.proofPoints}
+          />
+          <FinalCtaSection
+            heading={home.finalCta?.heading}
+            copy={home.finalCta?.copy}
+            primaryCta={home.finalCta?.primaryCta}
+            secondaryCta={home.finalCta?.secondaryCta}
+          />
         </main>
         <SiteFooter tagline={settings?.tagline} />
       </div>
