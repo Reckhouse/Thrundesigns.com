@@ -1104,6 +1104,10 @@
               {
                 "type": "string",
                 "value": "controlled-chaos-poster-lab"
+              },
+              {
+                "type": "string",
+                "value": "counterspace-field-laboratory"
               }
             ]
           },
@@ -1237,6 +1241,18 @@
               {
                 "type": "string",
                 "value": "cantilever"
+              },
+              {
+                "type": "string",
+                "value": "twin-orbit"
+              },
+              {
+                "type": "string",
+                "value": "pressure-vessel"
+              },
+              {
+                "type": "string",
+                "value": "axial-rotor"
               }
             ]
           },
