@@ -36,6 +36,27 @@ export function useScrollStory(): ScrollStoryContextValue {
   return ctx;
 }
 
+function pinStartFor(el: HTMLElement): number | null {
+  const pinned = ScrollTrigger.getAll().find(
+    (st) => st.trigger === el && Boolean(st.pin),
+  );
+  if (pinned) return pinned.start;
+  const any = ScrollTrigger.getAll().find((st) => st.trigger === el);
+  if (any) return any.start;
+  return null;
+}
+
+function scrollToScene(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  ScrollTrigger.refresh();
+  const y = pinStartFor(el);
+  window.scrollTo({
+    top: Math.max(0, y ?? el.getBoundingClientRect().top + window.scrollY),
+    behavior: "auto",
+  });
+}
+
 type ScrollStoryRootProps = {
   children: ReactNode;
   className?: string;
@@ -91,29 +112,52 @@ export function ScrollStoryRoot({ children, className }: ScrollStoryRootProps) {
           img.addEventListener("load", onResize, { once: true });
         }
       });
+
       const scrollToHash = () => {
         const id = window.location.hash.replace(/^#/, "");
         if (!id) {
           ScrollTrigger.refresh();
           return;
         }
-        ScrollTrigger.refresh();
-        requestAnimationFrame(() => {
-          const el = document.getElementById(id);
-          if (!el) return;
-          const trigger = ScrollTrigger.getAll().find((st) => st.trigger === el);
-          const y = trigger ? trigger.start : el.getBoundingClientRect().top + window.scrollY;
-          window.scrollTo({ top: Math.max(0, y), behavior: "auto" });
-        });
+        // Retry after layout / pin creation settles.
+        scrollToScene(id);
+        window.setTimeout(() => scrollToScene(id), 80);
+        window.setTimeout(() => scrollToScene(id), 240);
       };
-      // Hash anchors: refresh then scroll to the scene’s pin start.
+
+      const onAnchorClick = (event: MouseEvent) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const link = target.closest("a[href]");
+        if (!(link instanceof HTMLAnchorElement)) return;
+        const href = link.getAttribute("href");
+        if (!href || !href.includes("#")) return;
+        let url: URL;
+        try {
+          url = new URL(href, window.location.href);
+        } catch {
+          return;
+        }
+        if (url.pathname !== window.location.pathname) return;
+        const id = url.hash.replace(/^#/, "");
+        if (!id || !document.getElementById(id)) return;
+        event.preventDefault();
+        if (window.location.hash !== `#${id}`) {
+          history.pushState(null, "", `#${id}`);
+        }
+        scrollToHash();
+      };
+
       window.addEventListener("hashchange", scrollToHash);
+      document.addEventListener("click", onAnchorClick);
       if (window.location.hash) {
-        window.setTimeout(scrollToHash, 160);
+        window.setTimeout(scrollToHash, 120);
+        window.setTimeout(scrollToHash, 400);
       }
       return () => {
         window.removeEventListener("resize", onResize);
         window.removeEventListener("hashchange", scrollToHash);
+        document.removeEventListener("click", onAnchorClick);
       };
     },
     { scope: rootRef, dependencies: [reduced] },

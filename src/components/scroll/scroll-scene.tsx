@@ -47,7 +47,7 @@ type ScrollSceneProps = {
   transition?: ScrollStoryTransition;
   /** Skip pin/scrub; useful for hero / footer. */
   pin?: boolean;
-  /** Soft pin uses a shorter scrub span. */
+  /** Soft pin uses a shorter scrub span when there is no next scene. */
   soft?: boolean;
   /** When false, do not force a full viewport stage (module groups). */
   fillViewport?: boolean;
@@ -119,13 +119,45 @@ export function ScrollScene({
         },
       });
 
+      // Pin until the next scene reaches the top so handoffs overlap
+      // (pinSpacing: false avoids blank post-exit gaps in document flow).
+      let sibling: Element | null = root.nextElementSibling;
+      let nextTrigger: HTMLElement | null = null;
+      while (sibling) {
+        if (
+          sibling instanceof HTMLElement &&
+          sibling.hasAttribute("data-scroll-scene")
+        ) {
+          nextTrigger = sibling;
+          break;
+        }
+        const nested =
+          sibling instanceof HTMLElement
+            ? sibling.querySelector<HTMLElement>("[data-scroll-scene]")
+            : null;
+        if (nested) {
+          nextTrigger = nested;
+          break;
+        }
+        sibling = sibling.nextElementSibling;
+      }
+
       const pinSpan = getPinSpan({ soft });
       const exitTl = gsap.timeline({
         defaults: { ease: scrollStoryEase },
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          end: `+=${pinSpan}`,
+          ...(nextTrigger
+            ? {
+                endTrigger: nextTrigger,
+                end: "top top",
+                pinSpacing: false,
+              }
+            : {
+                end: `+=${pinSpan}`,
+                pinSpacing: true,
+              }),
           pin: true,
           scrub: true,
           anticipatePin: 1,
@@ -134,8 +166,8 @@ export function ScrollScene({
         },
       });
 
-      // Hold through most of the pin, then exit into the next beat.
-      exitTl.to({}, { duration: 0.62 });
+      // Hold through most of the overlap, then exit into the next beat.
+      exitTl.to({}, { duration: 0.55 });
       applyExit(exitTl, plate, transition, exitTl.duration());
 
       refresh();
