@@ -116,6 +116,43 @@ export function ScrollScene({
       const root = rootRef.current;
       const plate = plateRef.current;
       if (!root || !plate || !active) {
+        // Unpinned scenes still scrub an enter wipe as they approach.
+        if (!root || !plate || reduced || !enabled) {
+          setEntered(true);
+          setProgress(1);
+          return;
+        }
+        if (!pin) {
+          const frames = getTransitionFrames(transition);
+          setEnterState(plate, transition);
+          const enterTween = gsap.fromTo(plate, frames.enterFrom, {
+            ...frames.enterTo,
+            ease: scrollStoryEase,
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: root,
+              start: "top 90%",
+              end: "top 35%",
+              scrub: true,
+              invalidateOnRefresh: true,
+              onUpdate: (self) => {
+                setProgress(self.progress);
+                if (self.progress > 0.2) setEntered(true);
+              },
+              onEnter: () => setEntered(true),
+              onEnterBack: () => setEntered(true),
+              onLeaveBack: () => {
+                setEntered(false);
+                setProgress(0);
+              },
+            },
+          });
+          refresh();
+          return () => {
+            enterTween.scrollTrigger?.kill();
+            enterTween.kill();
+          };
+        }
         setEntered(true);
         setProgress(1);
         return;
@@ -194,7 +231,7 @@ export function ScrollScene({
       };
     },
     {
-      dependencies: [active, soft, transition, refresh, fillViewport],
+      dependencies: [active, soft, transition, refresh, fillViewport, pin, enabled, reduced],
       revertOnUpdate: true,
     },
   );

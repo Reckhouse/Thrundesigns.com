@@ -83,7 +83,7 @@ export default async function WorkIndexPage() {
               </header>
             </ScrollScene>
 
-            <ScrollScene transition="wipe-left" fillViewport={false}>
+            <ScrollScene transition="wipe-left" pin={false} fillViewport={false}>
               <WorkCategoryIndex projects={projects} />
 
               <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-5 py-16 md:px-10 md:py-20 lg:px-[74px]">

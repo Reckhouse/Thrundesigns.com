@@ -165,6 +165,7 @@ export function ProjectModules({
           key={beat.key}
           transition={beat.transition}
           soft={beat.soft}
+          pin={false}
           fillViewport={false}
           className="border-b-0"
         >

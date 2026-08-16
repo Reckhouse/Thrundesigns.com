@@ -307,7 +307,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               documentId={project._id}
             />
             {project.featuredCreations?.length ? (
-              <ScrollScene transition="wipe-up" soft fillViewport={false}>
+              <ScrollScene
+                transition="wipe-up"
+                soft
+                pin={false}
+                fillViewport={false}
+              >
                 <FeaturedCreationsGallery
                   items={project.featuredCreations}
                   caseStudyPath={`/work/${slug}`}
