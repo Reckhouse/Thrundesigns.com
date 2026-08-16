@@ -222,7 +222,7 @@ export function ThreeExperienceSection({
         ) : (
           <div
             className={cn(
-              "relative mx-auto w-full overflow-hidden bg-bg-raised",
+              "relative mx-auto w-full overflow-hidden bg-bg-deep",
               posterWidthClass,
               previewHeight ? "max-w-3xl" : posterAspectClass,
             )}
