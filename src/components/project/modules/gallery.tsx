@@ -1,9 +1,7 @@
-import Image from "next/image";
 import { ModuleShell } from "@/components/project/module-shell";
+import { ProjectMediaFrame } from "@/components/project/project-media-frame";
 import {
-  mediaAspectRatioClass,
-  mediaDisplayWidthClass,
-  mediaObjectFitClass,
+  isScrollableDisplay,
   resolveAspectRatio,
   resolveDisplayWidth,
   resolveMediaAlt,
@@ -30,20 +28,22 @@ type GalleryRenderItem = {
   media: MediaAssetValue;
   src: string;
   alt: string;
-  widthClass: string;
-  aspectClass?: string;
-  fitClass: string;
+  displayWidth: ReturnType<typeof resolveDisplayWidth>;
+  aspectRatio: ReturnType<typeof resolveAspectRatio>;
+  objectFit: ReturnType<typeof resolveObjectFit>;
   objectPosition?: string;
+  aspectFallback?: string;
 };
 
 export function GalleryModule({ module, documentId }: GalleryModuleProps) {
   const items = (module.items || [])
     .map((item, index): GalleryRenderItem | null => {
-      const aspect = resolveAspectRatio(item);
+      const displayWidth = resolveDisplayWidth(item);
+      const scrollable = isScrollableDisplay(displayWidth);
+      const aspect = scrollable ? "auto" : resolveAspectRatio(item);
       const fit = resolveObjectFit(item);
-      const width = resolveDisplayWidth(item);
       const src = resolveMediaUrl(item, {
-        width: 1600,
+        width: scrollable ? 1400 : 1600,
         aspectRatio: aspect,
         objectFit: fit,
       });
@@ -60,12 +60,11 @@ export function GalleryModule({ module, documentId }: GalleryModuleProps) {
         media: item,
         src,
         alt: resolveMediaAlt(item, "Project image"),
-        widthClass: mediaDisplayWidthClass(width, {
-          fullBleed: module.layout === "fullBleed",
-        }),
-        aspectClass: mediaAspectRatioClass(aspect, layoutDefaultAspect),
-        fitClass: mediaObjectFitClass(fit),
+        displayWidth,
+        aspectRatio: aspect,
+        objectFit: fit,
         objectPosition: resolveMediaObjectPosition(item),
+        aspectFallback: layoutDefaultAspect,
       };
     })
     .filter((item): item is GalleryRenderItem => Boolean(item));
@@ -73,20 +72,30 @@ export function GalleryModule({ module, documentId }: GalleryModuleProps) {
   if (!items.length) return null;
 
   const layout = module.layout || "grid";
+  const fullBleed = layout === "fullBleed";
 
   if (layout === "fullBleed") {
     return (
       <ModuleShell contained={false} className="bg-bg-raised">
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-0">
           {items.map((item) => (
-            <div
+            <ProjectMediaFrame
               key={item.key}
-              className={cn(
-                "relative w-full overflow-hidden",
-                item.widthClass,
-                item.aspectClass || "aspect-[16/9] md:aspect-[21/9]",
-              )}
-              data-sanity={
+              src={item.src}
+              alt={item.alt}
+              displayWidth={item.displayWidth}
+              aspectRatio={item.aspectRatio}
+              objectFit={item.objectFit}
+              objectPosition={item.objectPosition}
+              aspectFallback={item.aspectFallback}
+              fullBleed
+              sizes="100vw"
+              className={
+                isScrollableDisplay(item.displayWidth)
+                  ? "bg-bg-deep"
+                  : undefined
+              }
+              dataSanity={
                 item.itemKey
                   ? projectMediaDataAttribute({
                       documentId,
@@ -94,20 +103,7 @@ export function GalleryModule({ module, documentId }: GalleryModuleProps) {
                     })
                   : undefined
               }
-            >
-              <Image
-                src={item.src}
-                alt={item.alt}
-                fill
-                className={item.fitClass}
-                style={
-                  item.objectPosition
-                    ? { objectPosition: item.objectPosition }
-                    : undefined
-                }
-                sizes="100vw"
-              />
-            </div>
+            />
           ))}
         </div>
         {module.caption ? (
@@ -129,54 +125,63 @@ export function GalleryModule({ module, documentId }: GalleryModuleProps) {
             "grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:gap-6",
         )}
       >
-        {items.map((item) => (
-          <div
-            key={item.key}
-            className={cn(
-              "relative overflow-hidden bg-bg-raised",
-              item.widthClass,
-              layout === "grid" && (item.aspectClass || "aspect-[4/3]"),
-              layout === "masonry" && "break-inside-avoid",
-              layout === "masonry" && item.aspectClass,
-            )}
-            data-sanity={
-              item.itemKey
-                ? projectMediaDataAttribute({
-                    documentId,
-                    path: galleryItemMediaPath(module._key, item.itemKey),
-                  })
-                : undefined
-            }
-          >
-            {layout === "masonry" && !item.aspectClass ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={item.src}
-                alt={item.alt}
-                className={cn("h-auto w-full", item.fitClass)}
-                style={
-                  item.objectPosition
-                    ? { objectPosition: item.objectPosition }
-                    : undefined
-                }
-                loading="lazy"
-              />
-            ) : (
-              <Image
-                src={item.src}
-                alt={item.alt}
-                fill
-                className={item.fitClass}
-                style={
-                  item.objectPosition
-                    ? { objectPosition: item.objectPosition }
-                    : undefined
-                }
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            )}
-          </div>
-        ))}
+        {items.map((item) => {
+          const scrollable = isScrollableDisplay(item.displayWidth);
+          const dataSanity = item.itemKey
+            ? projectMediaDataAttribute({
+                documentId,
+                path: galleryItemMediaPath(module._key, item.itemKey),
+              })
+            : undefined;
+
+          // Masonry + auto aspect keeps natural-height img (non-scroll).
+          if (layout === "masonry" && !item.aspectFallback && !scrollable) {
+            return (
+              <div
+                key={item.key}
+                className="relative break-inside-avoid overflow-hidden bg-bg-raised"
+                data-sanity={dataSanity}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.src}
+                  alt={item.alt}
+                  className="h-auto w-full object-cover"
+                  style={
+                    item.objectPosition
+                      ? { objectPosition: item.objectPosition }
+                      : undefined
+                  }
+                  loading="lazy"
+                />
+              </div>
+            );
+          }
+
+          return (
+            <ProjectMediaFrame
+              key={item.key}
+              src={item.src}
+              alt={item.alt}
+              displayWidth={item.displayWidth}
+              aspectRatio={item.aspectRatio}
+              objectFit={item.objectFit}
+              objectPosition={item.objectPosition}
+              aspectFallback={item.aspectFallback}
+              fullBleed={fullBleed}
+              sizes={
+                scrollable
+                  ? "(max-width: 1024px) 100vw, 1024px"
+                  : "(max-width: 768px) 100vw, 50vw"
+              }
+              className={cn(
+                layout === "masonry" && "break-inside-avoid",
+                scrollable && layout === "grid" && "md:col-span-2",
+              )}
+              dataSanity={dataSanity}
+            />
+          );
+        })}
       </div>
       {module.caption ? (
         <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted">

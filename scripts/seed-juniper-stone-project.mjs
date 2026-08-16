@@ -169,7 +169,7 @@ function buildModules() {
       caption: "Digital product — full site composition",
       items: [
         media("jsDigital1", "website-full-scroll.png", "Full-page website design mockup for Juniper & Stone Coffee", {
-          displayWidth: "full",
+          displayWidth: "scroll",
           aspectRatio: "auto",
           objectFit: "contain",
         }),

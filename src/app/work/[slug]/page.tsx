@@ -1,9 +1,6 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ExperienceLaunchLink } from "@/components/experiences/ExperienceLaunchLink";
 import { FeaturedCreationsGallery } from "@/components/project/featured-creations-gallery";
+import { ProjectMediaFrame } from "@/components/project/project-media-frame";
 import { ProjectModules } from "@/components/project/project-modules";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -17,6 +14,7 @@ import {
 import { resolveCounterspaceCoverSrc } from "@/lib/counterspace-media";
 import { defaultHomeContent } from "@/lib/default-content";
 import {
+  isScrollableDisplay,
   mediaAspectRatioClass,
   mediaDisplayWidthClass,
   mediaObjectFitClass,
@@ -43,6 +41,10 @@ import type {
 } from "@/types/three-experience";
 import type { ProjectBySlugQueryResult } from "@/sanity/types";
 import type { SanityImageSource } from "@sanity/image-url";
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -152,15 +154,18 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   if (!project) notFound();
 
-  const coverAspect = resolveAspectRatio(project.cover);
-  const coverFit = resolveObjectFit(project.cover);
   const coverWidth = resolveDisplayWidth(project.cover);
+  const coverScrollable = isScrollableDisplay(coverWidth);
+  const coverAspect = coverScrollable
+    ? "auto"
+    : resolveAspectRatio(project.cover);
+  const coverFit = resolveObjectFit(project.cover);
   const imageSrc = resolveCounterspaceCoverSrc(
     slug,
     resolveControlledChaosCoverSrc(
       slug,
       resolveMediaUrl(project.cover, {
-        width: 1600,
+        width: coverScrollable ? 1400 : 1600,
         aspectRatio: coverAspect,
         objectFit: coverFit,
       }) || coverFallback(slug),
@@ -234,35 +239,59 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               </div>
               {/* Poster case studies use a 9:16 frame so the cover fills
                   without pillarboxing. Other projects keep the wide hero box.
-                  CMS displayWidth / aspectRatio / objectFit override defaults. */}
-              <div
-                className={coverFrameClass}
-                data-sanity={projectMediaDataAttribute({
-                  documentId: project._id,
-                  path: "cover",
-                })}
-              >
-                <Image
+                  CMS displayWidth / aspectRatio / objectFit override defaults.
+                  Scrollable page uses an in-frame scrollbar for tall shots. */}
+              {isPosterCover || !coverScrollable ? (
+                <div
+                  className={coverFrameClass}
+                  data-sanity={projectMediaDataAttribute({
+                    documentId: project._id,
+                    path: "cover",
+                  })}
+                >
+                  <Image
+                    src={imageSrc}
+                    alt={resolveMediaAlt(
+                      project.cover,
+                      project.title || "Project",
+                    )}
+                    fill
+                    className={cn(
+                      mediaObjectFitClass(coverFit),
+                      !coverObjectPosition && "object-center",
+                    )}
+                    style={
+                      coverObjectPosition
+                        ? { objectPosition: coverObjectPosition }
+                        : undefined
+                    }
+                    sizes={
+                      isPosterCover
+                        ? "(max-width: 1024px) 360px, 400px"
+                        : "(max-width: 1024px) 100vw, 60vw"
+                    }
+                    priority
+                  />
+                </div>
+              ) : (
+                <ProjectMediaFrame
                   src={imageSrc}
-                  alt={resolveMediaAlt(project.cover, project.title || "Project")}
-                  fill
-                  className={cn(
-                    mediaObjectFitClass(coverFit),
-                    !coverObjectPosition && "object-center",
+                  alt={resolveMediaAlt(
+                    project.cover,
+                    project.title || "Project",
                   )}
-                  style={
-                    coverObjectPosition
-                      ? { objectPosition: coverObjectPosition }
-                      : undefined
-                  }
-                  sizes={
-                    isPosterCover
-                      ? "(max-width: 1024px) 360px, 400px"
-                      : "(max-width: 1024px) 100vw, 60vw"
-                  }
+                  displayWidth={coverWidth}
+                  aspectRatio={coverAspect}
+                  objectFit={coverFit}
+                  objectPosition={coverObjectPosition}
+                  sizes="(max-width: 1024px) 100vw, 60vw"
                   priority
+                  dataSanity={projectMediaDataAttribute({
+                    documentId: project._id,
+                    path: "cover",
+                  })}
                 />
-              </div>
+              )}
             </div>
           </section>
           <ProjectModules
