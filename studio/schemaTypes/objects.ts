@@ -1,4 +1,5 @@
 import { defineField, defineType } from "sanity";
+import { MediaAssetInput } from "../components/MediaAssetInput";
 
 export const cta = defineType({
   name: "cta",
@@ -29,20 +30,23 @@ export const mediaAsset = defineType({
   name: "mediaAsset",
   title: "Media asset",
   type: "object",
+  components: {
+    input: MediaAssetInput,
+  },
   fields: [
     defineField({
       name: "image",
       type: "image",
       options: { hotspot: true },
       description:
-        "Sanity CDN image. Hotspot/crop apply on the site. Prefer this over Blob URL when you need focal crop.",
+        "Sanity CDN image (preferred). Hotspot/crop apply on the site. Uploading or replacing this image clears any Blob URL / site path below.",
     }),
     defineField({
       name: "blobUrl",
       title: "Blob URL or site path",
       type: "url",
       description:
-        "Vercel Blob https URL, or a site-relative path like /images/cover.jpg or /experiences/…. Relative paths are allowed. Display width/fit apply; Sanity hotspot/crop do not.",
+        "Fallback only when Image is empty. Vercel Blob https URL, or a site-relative path like /images/cover.jpg. Cleared automatically when an Image is set.",
       validation: (Rule) =>
         Rule.uri({
           allowRelative: true,

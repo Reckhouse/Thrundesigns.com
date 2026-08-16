@@ -80,7 +80,7 @@ export function resolveObjectFit(media: MediaAssetValue): MediaObjectFit {
   );
 }
 
-/** Prefer Blob URL / site path, then Sanity CDN image. */
+/** Prefer Sanity CDN image when present; fall back to Blob URL / site path. */
 export function resolveMediaUrl(
   media: MediaAssetValue,
   widthOrOptions: number | ResolveMediaUrlOptions = 1600,
@@ -107,10 +107,6 @@ export function resolveMediaUrl(
       "contain",
     ] as const) || "cover";
 
-  if (media.blobUrl) {
-    const cleaned = stegaClean(media.blobUrl).trim();
-    if (cleaned) return cleaned;
-  }
   if (media.image) {
     try {
       let builder = urlFor(media.image).width(width).auto("format");
@@ -120,9 +116,15 @@ export function resolveMediaUrl(
       }
       return builder.url();
     } catch {
-      return null;
+      // Fall through to blobUrl / site path.
     }
   }
+
+  if (media.blobUrl) {
+    const cleaned = stegaClean(media.blobUrl).trim();
+    if (cleaned) return cleaned;
+  }
+
   return null;
 }
 
