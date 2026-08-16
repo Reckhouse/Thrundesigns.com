@@ -51,7 +51,7 @@ export function EngageSection({
   const replies = replyPoints?.length ? replyPoints : defaultReplyPoints;
 
   return (
-    <SceneSection id="engage" tone="glass" reveal="rise">
+    <SceneSection id="engage" tone="glass" reveal="wipe-up">
       <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:gap-14 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16 lg:px-[74px] lg:py-28">
         <Reveal variant="left">
           <Badge
