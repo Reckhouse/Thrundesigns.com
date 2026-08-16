@@ -8,6 +8,8 @@
 const SANITY_IMG = "https://cdn.sanity.io";
 const SANITY_API = "https://*.api.sanity.io https://*.apicdn.sanity.io";
 const SANITY_STUDIO = "https://thrundesign.sanity.studio";
+/** Hosted Studio redirects into manage.sanity.io / www.sanity.io app shell. */
+const SANITY_STUDIO_SHELL = "https://www.sanity.io";
 const BLOB = "https://*.public.blob.vercel-storage.com";
 const TURNSTILE = "https://challenges.cloudflare.com";
 const VERCEL = "https://vercel.live https://*.vercel.app";
@@ -30,6 +32,7 @@ const VERCEL = "https://vercel.live https://*.vercel.app";
  * - object-src 'none' — no plugins
  * - base-uri 'self' — block base-tag hijacks
  * - form-action 'self' — quotes/creations post to same origin
+ * - frame-ancestors — allow Presentation Tool iframe from hosted Studio
  */
 export function buildContentSecurityPolicy(): string {
   return [
@@ -46,7 +49,7 @@ export function buildContentSecurityPolicy(): string {
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'self'",
+    `frame-ancestors 'self' ${SANITY_STUDIO} ${SANITY_STUDIO_SHELL}`,
   ].join("; ");
 }
 
