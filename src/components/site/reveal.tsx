@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
+import { useScrollScene } from "@/components/scroll/scroll-scene";
 import { motionTokens, revealViewport } from "@/lib/motion-tokens";
 
 type RevealVariant = "up" | "left" | "blur" | "scale" | "clip";
@@ -49,10 +50,35 @@ export function Reveal({
   variant = "up",
 }: RevealProps) {
   const reduce = useReducedMotion();
+  const scene = useScrollScene();
   const motionVariant = variants[variant];
+  const duration =
+    variant === "blur" || variant === "clip"
+      ? motionTokens.durationSlow
+      : motionTokens.durationBase;
 
   if (reduce) {
     return <div className={className}>{children}</div>;
+  }
+
+  // Inside a ScrollScene: lock copy reveal to pin/approach progress.
+  if (scene) {
+    return (
+      <motion.div
+        className={className}
+        initial={motionVariant.initial}
+        animate={
+          scene.entered ? motionVariant.animate : motionVariant.initial
+        }
+        transition={{
+          duration,
+          ease: motionTokens.easeOut,
+          delay: scene.entered ? delay : 0,
+        }}
+      >
+        {children}
+      </motion.div>
+    );
   }
 
   return (
@@ -62,10 +88,7 @@ export function Reveal({
       whileInView={motionVariant.animate}
       viewport={revealViewport}
       transition={{
-        duration:
-          variant === "blur" || variant === "clip"
-            ? motionTokens.durationSlow
-            : motionTokens.durationBase,
+        duration,
         ease: motionTokens.easeOut,
         delay,
       }}
@@ -87,9 +110,31 @@ export function Stagger({
   stagger = motionTokens.stagger,
 }: StaggerProps) {
   const reduce = useReducedMotion();
+  const scene = useScrollScene();
 
   if (reduce) {
     return <div className={className}>{children}</div>;
+  }
+
+  if (scene) {
+    return (
+      <motion.div
+        className={className}
+        initial="hidden"
+        animate={scene.entered ? "show" : "hidden"}
+        variants={{
+          hidden: {},
+          show: {
+            transition: {
+              staggerChildren: stagger,
+              delayChildren: 0.06,
+            },
+          },
+        }}
+      >
+        {children}
+      </motion.div>
+    );
   }
 
   return (

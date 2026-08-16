@@ -32,7 +32,7 @@ export function ProcessSection({ heading, steps }: ProcessSectionProps) {
   const lineScale = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
-    <SceneSection id="process" tone="clear" reveal="rise">
+    <SceneSection id="process" tone="clear" reveal="clip-morph">
       <div ref={ref} className="relative">
         <div
           className="absolute inset-0 bg-bg-deep/35 md:bg-bg-deep/28"
