@@ -118,9 +118,10 @@ export function ThreeExperienceSection({
   const posterPosition = resolveMediaObjectPosition(value.posterImage);
   const posterWidthClass = mediaDisplayWidthClass(width);
   const posterAspectClass = mediaAspectRatioClass(aspect, "min-h-[420px]");
-  const posterDataAttr = posterPath
-    ? projectMediaDataAttribute({ documentId, path: posterPath })
-    : undefined;
+  const previewHeight =
+    typeof value.height === "number" && value.height > 0
+      ? value.height
+      : undefined;
   const videoSrc = resolveFileUrl(value.fallbackVideo ?? null);
   const videoLabel = resolveFileLabel(
     value.fallbackVideo ?? null,
@@ -153,6 +154,15 @@ export function ThreeExperienceSection({
   const preferLabLaunch = Boolean(
     mapped.ok && showFullscreen && launchUrl,
   );
+  const heightPath = value._key
+    ? `modules[_key=="${value._key}"].height`
+    : "primaryExperience.height";
+  const posterDataAttr = projectMediaDataAttribute({
+    documentId,
+    path: preferLabLaunch
+      ? heightPath
+      : posterPath || heightPath,
+  });
 
   const stage = (
     <div className="space-y-8">
@@ -212,10 +222,15 @@ export function ThreeExperienceSection({
         ) : (
           <div
             className={cn(
-              "relative w-full overflow-hidden bg-bg-raised",
+              "relative mx-auto w-full overflow-hidden bg-bg-raised",
               posterWidthClass,
-              posterAspectClass,
+              previewHeight ? "max-w-3xl" : posterAspectClass,
             )}
+            style={
+              previewHeight
+                ? { height: previewHeight, maxHeight: previewHeight }
+                : undefined
+            }
             data-sanity={posterDataAttr}
           >
             <ExperiencePoster

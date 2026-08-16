@@ -174,7 +174,7 @@ export const projectThreeExperience = defineType({
       title: "Loading poster",
       type: "mediaAsset",
       description:
-        "Required fallback shown before load and when WebGL is unavailable.",
+        "Required fallback shown before load and when WebGL is unavailable. Open this field to set display width, aspect ratio, object fit, and image hotspot (after Studio is redeployed with the latest schema).",
       validation: (Rule) =>
         Rule.required().custom((value) => {
           const media = value as
@@ -263,13 +263,15 @@ export const projectThreeExperience = defineType({
     }),
     defineField({
       name: "height",
-      title: "Desktop height",
+      title: "Preview height (px)",
       type: "number",
+      description:
+        "Height of the on-page poster or interactive preview. Lower this if the preview feels oversized in Presentation.",
       initialValue: (params) =>
         defaultExperienceHeight(
           (params as { parent?: ThreeExperienceValue }).parent?.experienceKey,
         ),
-      validation: (Rule) => Rule.min(400).max(1400),
+      validation: (Rule) => Rule.min(240).max(1400),
     }),
     defineField({
       name: "allowTextEditing",
