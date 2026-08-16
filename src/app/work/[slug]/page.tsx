@@ -2,8 +2,6 @@ import { ExperienceLaunchLink } from "@/components/experiences/ExperienceLaunchL
 import { FeaturedCreationsGallery } from "@/components/project/featured-creations-gallery";
 import { ProjectMediaFrame } from "@/components/project/project-media-frame";
 import { ProjectModules } from "@/components/project/project-modules";
-import { ScrollScene } from "@/components/scroll/scroll-scene";
-import { ScrollStoryRoot } from "@/components/scroll/scroll-story-root";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { Eyebrow, SectionHeading } from "@/components/site/primitives";
@@ -208,131 +206,105 @@ export default async function ProjectDetailPage({ params }: PageProps) {
     <>
       <SiteHeader nav={settings?.nav} />
       <main className="flex-1 pt-[120px] md:pt-[136px] lg:pt-[152px]">
-        <ScrollStoryRoot>
-          <article>
-            <ScrollScene
-              transition="wipe-up"
-              soft
-              fillViewport={false}
-              ariaLabel="Project cover"
-            >
-              <section className="border-b border-line">
-                <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-16 md:px-10 lg:grid-cols-[1fr_1.2fr] lg:px-[74px]">
-                  <div>
-                    <Link
-                      href="/work"
-                      className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted hover:text-gold"
+        <article>
+          <section className="border-b border-line">
+            <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-16 md:px-10 lg:grid-cols-[1fr_1.2fr] lg:px-[74px]">
+              <div>
+                <Link
+                  href="/work"
+                  className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted hover:text-gold"
+                >
+                  ← Back to work
+                </Link>
+                <Eyebrow className="mt-8">{project.industry}</Eyebrow>
+                <SectionHeading className="mt-4">{project.title}</SectionHeading>
+                <p className="mt-6 font-sans text-[15px] text-fg-muted">
+                  {project.services}
+                </p>
+                <p className="mt-8 max-w-md font-sans text-[15px] leading-7 text-fg-muted">
+                  {project.summary ||
+                    "A focused case study exploring brand systems, digital presence, and production-ready visual language."}
+                </p>
+                {primaryLaunch ? (
+                  <div className="mt-10 flex flex-wrap items-center gap-4">
+                    <ExperienceLaunchLink
+                      href={primaryLaunch.href}
+                      experienceKey={primaryLaunch.experienceKey}
+                      variant="button"
                     >
-                      ← Back to work
-                    </Link>
-                    <Eyebrow className="mt-8">{project.industry}</Eyebrow>
-                    <SectionHeading className="mt-4">
-                      {project.title}
-                    </SectionHeading>
-                    <p className="mt-6 font-sans text-[15px] text-fg-muted">
-                      {project.services}
-                    </p>
-                    <p className="mt-8 max-w-md font-sans text-[15px] leading-7 text-fg-muted">
-                      {project.summary ||
-                        "A focused case study exploring brand systems, digital presence, and production-ready visual language."}
-                    </p>
-                    {primaryLaunch ? (
-                      <div className="mt-10 flex flex-wrap items-center gap-4">
-                        <ExperienceLaunchLink
-                          href={primaryLaunch.href}
-                          experienceKey={primaryLaunch.experienceKey}
-                          variant="button"
-                        >
-                          {primaryLaunch.label}
-                        </ExperienceLaunchLink>
-                      </div>
-                    ) : null}
+                      {primaryLaunch.label}
+                    </ExperienceLaunchLink>
                   </div>
-                  {/* Poster case studies use a 9:16 frame so the cover fills
+                ) : null}
+              </div>
+              {/* Poster case studies use a 9:16 frame so the cover fills
                   without pillarboxing. Other projects keep the wide hero box.
                   CMS displayWidth / aspectRatio / objectFit override defaults.
                   Scrollable page uses an in-frame scrollbar for tall shots. */}
-                  {isPosterCover || !coverScrollable ? (
-                    <div
-                      className={coverFrameClass}
-                      data-sanity={projectMediaDataAttribute({
-                        documentId: project._id,
-                        path: "cover",
-                      })}
-                    >
-                      <Image
-                        src={imageSrc}
-                        alt={resolveMediaAlt(
-                          project.cover,
-                          project.title || "Project",
-                        )}
-                        fill
-                        className={cn(
-                          mediaObjectFitClass(coverFit),
-                          !coverObjectPosition && "object-center",
-                        )}
-                        style={
-                          coverObjectPosition
-                            ? { objectPosition: coverObjectPosition }
-                            : undefined
-                        }
-                        sizes={
-                          isPosterCover
-                            ? "(max-width: 1024px) 360px, 400px"
-                            : "(max-width: 1024px) 100vw, 60vw"
-                        }
-                        priority
-                      />
-                    </div>
-                  ) : (
-                    <ProjectMediaFrame
-                      src={imageSrc}
-                      alt={resolveMediaAlt(
-                        project.cover,
-                        project.title || "Project",
-                      )}
-                      displayWidth={coverWidth}
-                      aspectRatio={coverAspect}
-                      objectFit={coverFit}
-                      objectPosition={coverObjectPosition}
-                      sizes="(max-width: 1024px) 100vw, 60vw"
-                      priority
-                      dataSanity={projectMediaDataAttribute({
-                        documentId: project._id,
-                        path: "cover",
-                      })}
-                    />
-                  )}
+              {isPosterCover || !coverScrollable ? (
+                <div
+                  className={coverFrameClass}
+                  data-sanity={projectMediaDataAttribute({
+                    documentId: project._id,
+                    path: "cover",
+                  })}
+                >
+                  <Image
+                    src={imageSrc}
+                    alt={resolveMediaAlt(
+                      project.cover,
+                      project.title || "Project",
+                    )}
+                    fill
+                    className={cn(
+                      mediaObjectFitClass(coverFit),
+                      !coverObjectPosition && "object-center",
+                    )}
+                    style={
+                      coverObjectPosition
+                        ? { objectPosition: coverObjectPosition }
+                        : undefined
+                    }
+                    sizes={
+                      isPosterCover
+                        ? "(max-width: 1024px) 360px, 400px"
+                        : "(max-width: 1024px) 100vw, 60vw"
+                    }
+                    priority
+                  />
                 </div>
-              </section>
-            </ScrollScene>
-            <ProjectModules
-              modules={project.modules}
-              caseStudyPath={`/work/${slug}`}
-              documentId={project._id}
-            />
-            {project.featuredCreations?.length ? (
-              <ScrollScene
-                transition="wipe-up"
-                soft
-                pin={false}
-                fillViewport={false}
-              >
-                <FeaturedCreationsGallery
-                  items={project.featuredCreations}
-                  caseStudyPath={`/work/${slug}`}
-                  documentId={project._id}
+              ) : (
+                <ProjectMediaFrame
+                  src={imageSrc}
+                  alt={resolveMediaAlt(
+                    project.cover,
+                    project.title || "Project",
+                  )}
+                  displayWidth={coverWidth}
+                  aspectRatio={coverAspect}
+                  objectFit={coverFit}
+                  objectPosition={coverObjectPosition}
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  priority
+                  dataSanity={projectMediaDataAttribute({
+                    documentId: project._id,
+                    path: "cover",
+                  })}
                 />
-              </ScrollScene>
-            ) : (
-              <FeaturedCreationsGallery
-                items={project.featuredCreations}
-                caseStudyPath={`/work/${slug}`}
-                documentId={project._id}
-              />
-            )}
-          </article>
-        </ScrollStoryRoot>
+              )}
+            </div>
+          </section>
+          <ProjectModules
+            modules={project.modules}
+            caseStudyPath={`/work/${slug}`}
+            documentId={project._id}
+          />
+          <FeaturedCreationsGallery
+            items={project.featuredCreations}
+            caseStudyPath={`/work/${slug}`}
+            documentId={project._id}
+          />
+        </article>
       </main>
       <SiteFooter
         tagline={settings?.tagline}

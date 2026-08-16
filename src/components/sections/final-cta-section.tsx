@@ -28,7 +28,7 @@ export function FinalCtaSection({
   const reduce = useReducedMotion();
 
   return (
-    <SceneSection tone="clear" reveal="clip-morph" className="border-b-0">
+    <SceneSection tone="clear" reveal="rise" className="border-b-0">
       <div className="relative overflow-hidden">
         {/* Mountain returns — lighter veil so the ridge reappears */}
         <div
