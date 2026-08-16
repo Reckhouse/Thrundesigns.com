@@ -64,7 +64,7 @@ export default async function WorkIndexPage() {
         <SiteHeader nav={settings?.nav} />
         <main className="flex-1">
           <header
-            className="relative flex min-h-[72svh] flex-col justify-end pb-16 pt-[120px] md:min-h-[78svh] md:pb-20 md:pt-[132px] lg:min-h-[84svh] lg:pb-24 lg:pt-[140px]"
+            className="relative flex min-h-[72svh] flex-col justify-end pb-16 pt-[144px] md:min-h-[78svh] md:pb-20 md:pt-[156px] lg:min-h-[84svh] lg:pb-24 lg:pt-[172px]"
             aria-label="Concept studies"
           >
             <div className="mx-auto w-full max-w-[1440px] px-5 md:px-10 lg:px-[74px]">

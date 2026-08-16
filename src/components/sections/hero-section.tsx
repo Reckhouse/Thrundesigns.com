@@ -47,7 +47,7 @@ export function HeroSection({
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[100svh] overflow-hidden border-b border-line/40 pt-[96px] md:min-h-[920px] md:pt-[112px] lg:min-h-[100svh] lg:pt-[120px]"
+      className="relative min-h-[100svh] overflow-hidden border-b border-line/40 pt-[120px] md:min-h-[920px] md:pt-[136px] lg:min-h-[100svh] lg:pt-[152px]"
       aria-label="Introduction"
     >
       {/* Full-hero Living Engraving stage — static pose when reduced motion */}
@@ -59,7 +59,7 @@ export function HeroSection({
         />
       </div>
 
-      <div className="pointer-events-none relative z-10 mx-auto flex min-h-[calc(100svh-96px)] w-full max-w-[1440px] flex-col justify-end px-5 pb-16 pt-10 md:min-h-[calc(920px-112px)] md:justify-center md:px-10 md:pb-20 md:pt-12 lg:min-h-[calc(100svh-120px)] lg:px-[74px] lg:pb-24">
+      <div className="pointer-events-none relative z-10 mx-auto flex min-h-[calc(100svh-120px)] w-full max-w-[1440px] flex-col justify-end px-5 pb-16 pt-10 md:min-h-[calc(920px-136px)] md:justify-center md:px-10 md:pb-20 md:pt-12 lg:min-h-[calc(100svh-152px)] lg:px-[74px] lg:pb-24">
         <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,420px)] lg:gap-12 xl:gap-16">
           <div className="pointer-events-auto max-w-xl lg:max-w-[42rem]">
             <motion.p

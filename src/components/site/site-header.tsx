@@ -62,7 +62,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
           : "border-transparent bg-transparent",
       )}
     >
-      <div className="mx-auto flex h-[96px] w-full max-w-[1440px] items-center justify-between px-5 md:h-[112px] md:px-10 lg:h-[120px] lg:px-[74px]">
+      <div className="mx-auto flex h-[120px] w-full max-w-[1440px] items-center justify-between px-5 md:h-[136px] md:px-10 lg:h-[152px] lg:px-[74px]">
         <motion.div
           initial={reduce ? false : { opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -70,10 +70,10 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
         >
           <Link
             href="/"
-            className="inline-flex shrink-0 items-center overflow-visible"
+            className="inline-flex shrink-0 items-center overflow-hidden"
             aria-label="Thrun Design Co. home"
           >
-            <BrandLogo className="h-16 w-auto md:h-[76px] lg:h-[88px]" />
+            <BrandLogo className="h-24 w-auto md:h-[112px] lg:h-[128px]" />
           </Link>
         </motion.div>
 

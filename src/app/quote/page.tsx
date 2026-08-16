@@ -49,7 +49,7 @@ export default async function QuotePage({ searchParams }: QuotePageProps) {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1 pt-[96px] md:pt-[112px] lg:pt-[120px]">
+      <main className="flex-1 pt-[120px] md:pt-[136px] lg:pt-[152px]">
         <section className="border-b border-line">
           <QuoteForm
             config={config}
