@@ -66,6 +66,9 @@ type ProjectDoc = Partial<
 };
 
 function coverFallback(slug: string) {
+  if (slug === "juniper-and-stone-coffee") {
+    return "/images/juniper-stone/cup-mockup.png";
+  }
   if (slug === "northline-advisory") return "/images/project-01.jpg";
   if (slug === "summit-construction") return "/images/project-02.jpg";
   return "/images/project-03.jpg";

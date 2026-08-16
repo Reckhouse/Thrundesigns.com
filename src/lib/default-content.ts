@@ -165,6 +165,20 @@ export const defaultHomeContent = {
   ],
   projects: [
     {
+      _id: "project-juniper-stone",
+      title: "Juniper & Stone Coffee",
+      slug: { current: "juniper-and-stone-coffee" },
+      industry: "Specialty coffee · Colorado Springs",
+      services: "Brand identity · Visual system · Packaging · Website",
+      workCategory: "branding-strategy",
+      summary:
+        "A from-scratch specialty coffee brand — topographic mark, packaging language, and digital storefront rooted in Colorado Springs.",
+      cover: {
+        blobUrl: "/images/juniper-stone/cup-mockup.png",
+        alt: "Juniper & Stone takeaway cup on a granite counter",
+      },
+    },
+    {
       _id: "project-northline",
       title: "Northline Advisory",
       slug: { current: "northline-advisory" },

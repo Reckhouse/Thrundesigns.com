@@ -12,6 +12,7 @@
     "typegen": "npm --prefix studio run typegen",
     "migrate:project-modules": "node --env-file=.env.local scripts/migrate-project-modules.mjs",
     "seed:concept-modules": "node --env-file=.env.local scripts/seed-concept-project-modules.mjs",
+    "seed:juniper-stone": "node --env-file=.env.local scripts/seed-juniper-stone-project.mjs",
     "bake:horse": "node scripts/bake-horse-particles.mjs",
     "validate:experiences": "node scripts/validate-experience-compatibility.mjs && node --import tsx scripts/validate-experience-mapper.mjs",
     "test:controlled-chaos": "node --import tsx --test $(find packages/controlled-chaos/src -name '*.test.ts' | sort)"
