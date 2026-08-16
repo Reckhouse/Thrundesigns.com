@@ -10,7 +10,22 @@ import { withLabReturnPath } from "@/experiences/controlled-chaos/parseLabSearch
 import { mapSanityExperienceConfig } from "@/experiences/mapSanityExperienceConfig";
 import type { ExperienceMode } from "@/experiences/types";
 import { resolveFileLabel, resolveFileUrl } from "@/lib/file-asset";
-import { resolveMediaAlt, resolveMediaUrl } from "@/lib/media";
+import {
+  mediaAspectRatioClass,
+  mediaDisplayWidthClass,
+  mediaObjectFitClass,
+  resolveAspectRatio,
+  resolveDisplayWidth,
+  resolveMediaAlt,
+  resolveMediaObjectPosition,
+  resolveMediaUrl,
+  resolveObjectFit,
+} from "@/lib/media";
+import {
+  moduleMediaPath,
+  projectMediaDataAttribute,
+} from "@/lib/sanity-data-attribute";
+import { cn } from "@/lib/utils";
 import type { ProjectThreeExperienceModule } from "@/types/project-modules";
 import type { ThreeExperienceBlockValue } from "@/types/three-experience";
 import Image from "next/image";
@@ -20,6 +35,9 @@ type ThreeExperienceSectionProps = {
   /** When false, omit ModuleShell (e.g. nested usage). Default true. */
   shelled?: boolean;
   caseStudyPath?: string;
+  documentId?: string | null;
+  /** Sanity path for posterImage when this is an inline module. */
+  posterPath?: string;
 };
 
 function asMode(value: unknown): ExperienceMode {
@@ -32,16 +50,21 @@ function asMode(value: unknown): ExperienceMode {
 function ExperiencePoster({
   src,
   alt,
+  fitClass,
+  objectPosition,
 }: {
   src: string;
   alt: string;
+  fitClass: string;
+  objectPosition?: string;
 }) {
   return (
     <Image
       src={src}
       alt={alt}
       fill
-      className="object-cover"
+      className={fitClass}
+      style={objectPosition ? { objectPosition } : undefined}
       sizes="(max-width: 1024px) 100vw, 1200px"
     />
   );
@@ -75,13 +98,29 @@ export function ThreeExperienceSection({
   value,
   shelled = true,
   caseStudyPath,
+  documentId,
+  posterPath,
 }: ThreeExperienceSectionProps) {
+  const aspect = resolveAspectRatio(value.posterImage);
+  const fit = resolveObjectFit(value.posterImage);
+  const width = resolveDisplayWidth(value.posterImage);
   const mapped = mapSanityExperienceConfig(value);
-  const posterSrc = resolveMediaUrl(value.posterImage, 1600);
+  const posterSrc = resolveMediaUrl(value.posterImage, {
+    width: 1600,
+    aspectRatio: aspect,
+    objectFit: fit,
+  });
   const posterAlt = resolveMediaAlt(
     value.posterImage,
     value.heading || "Interactive experience poster",
   );
+  const posterFitClass = mediaObjectFitClass(fit);
+  const posterPosition = resolveMediaObjectPosition(value.posterImage);
+  const posterWidthClass = mediaDisplayWidthClass(width);
+  const posterAspectClass = mediaAspectRatioClass(aspect, "min-h-[420px]");
+  const posterDataAttr = posterPath
+    ? projectMediaDataAttribute({ documentId, path: posterPath })
+    : undefined;
   const videoSrc = resolveFileUrl(value.fallbackVideo ?? null);
   const videoLabel = resolveFileLabel(
     value.fallbackVideo ?? null,
@@ -133,34 +172,58 @@ export function ThreeExperienceSection({
 
       {posterSrc ? (
         mapped.ok && !preferLabLaunch ? (
-          <ExperienceClientBoundary
-            experienceKey={mapped.value.experienceKey}
-            mode={asMode(mapped.value.configuration.mode)}
-            configuration={mapped.value.configuration}
-            loadBehavior={
-              mapped.value.experienceKey === "living-engraving-horse"
-                ? "immediate"
-                : mapped.value.presentation.loadBehavior
-            }
-            height={
-              typeof mapped.value.configuration.height === "number"
-                ? mapped.value.configuration.height
-                : 720
-            }
-            poster={<ExperiencePoster src={posterSrc} alt={posterAlt} />}
-            fallbackVideo={
-              videoSrc ? (
-                <ExperienceFallbackVideo
-                  src={videoSrc}
-                  poster={posterSrc}
-                  label={videoLabel}
+          <div
+            className={cn("relative w-full", posterWidthClass)}
+            data-sanity={posterDataAttr}
+          >
+            <ExperienceClientBoundary
+              experienceKey={mapped.value.experienceKey}
+              mode={asMode(mapped.value.configuration.mode)}
+              configuration={mapped.value.configuration}
+              loadBehavior={
+                mapped.value.experienceKey === "living-engraving-horse"
+                  ? "immediate"
+                  : mapped.value.presentation.loadBehavior
+              }
+              height={
+                typeof mapped.value.configuration.height === "number"
+                  ? mapped.value.configuration.height
+                  : 720
+              }
+              poster={
+                <ExperiencePoster
+                  src={posterSrc}
+                  alt={posterAlt}
+                  fitClass={posterFitClass}
+                  objectPosition={posterPosition}
                 />
-              ) : undefined
-            }
-          />
+              }
+              fallbackVideo={
+                videoSrc ? (
+                  <ExperienceFallbackVideo
+                    src={videoSrc}
+                    poster={posterSrc}
+                    label={videoLabel}
+                  />
+                ) : undefined
+              }
+            />
+          </div>
         ) : (
-          <div className="relative min-h-[420px] w-full overflow-hidden bg-bg-raised">
-            <ExperiencePoster src={posterSrc} alt={posterAlt} />
+          <div
+            className={cn(
+              "relative w-full overflow-hidden bg-bg-raised",
+              posterWidthClass,
+              posterAspectClass,
+            )}
+            data-sanity={posterDataAttr}
+          >
+            <ExperiencePoster
+              src={posterSrc}
+              alt={posterAlt}
+              fitClass={posterFitClass}
+              objectPosition={posterPosition}
+            />
             {!mapped.ok ? (
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg-deep/90 to-transparent p-6 md:p-8">
                 <p
@@ -202,11 +265,18 @@ export function ThreeExperienceSection({
 export function ThreeExperienceModule({
   module,
   caseStudyPath,
+  documentId,
 }: {
   module: ProjectThreeExperienceModule;
   caseStudyPath?: string;
+  documentId?: string | null;
 }) {
   return (
-    <ThreeExperienceSection value={module} caseStudyPath={caseStudyPath} />
+    <ThreeExperienceSection
+      value={module}
+      caseStudyPath={caseStudyPath}
+      documentId={documentId}
+      posterPath={moduleMediaPath(module._key, "posterImage")}
+    />
   );
 }

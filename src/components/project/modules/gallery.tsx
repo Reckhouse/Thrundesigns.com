@@ -1,21 +1,74 @@
 import Image from "next/image";
 import { ModuleShell } from "@/components/project/module-shell";
-import { resolveMediaAlt, resolveMediaUrl } from "@/lib/media";
+import {
+  mediaAspectRatioClass,
+  mediaDisplayWidthClass,
+  mediaObjectFitClass,
+  resolveAspectRatio,
+  resolveDisplayWidth,
+  resolveMediaAlt,
+  resolveMediaObjectPosition,
+  resolveMediaUrl,
+  resolveObjectFit,
+  type MediaAssetValue,
+} from "@/lib/media";
+import {
+  galleryItemMediaPath,
+  projectMediaDataAttribute,
+} from "@/lib/sanity-data-attribute";
 import { cn } from "@/lib/utils";
 import type { ProjectGalleryModule } from "@/types/project-modules";
 
-export function GalleryModule({ module }: { module: ProjectGalleryModule }) {
+type GalleryModuleProps = {
+  module: ProjectGalleryModule;
+  documentId?: string | null;
+};
+
+type GalleryRenderItem = {
+  key: string;
+  itemKey?: string;
+  media: MediaAssetValue;
+  src: string;
+  alt: string;
+  widthClass: string;
+  aspectClass?: string;
+  fitClass: string;
+  objectPosition?: string;
+};
+
+export function GalleryModule({ module, documentId }: GalleryModuleProps) {
   const items = (module.items || [])
-    .map((item, index) => {
-      const src = resolveMediaUrl(item);
+    .map((item, index): GalleryRenderItem | null => {
+      const aspect = resolveAspectRatio(item);
+      const fit = resolveObjectFit(item);
+      const width = resolveDisplayWidth(item);
+      const src = resolveMediaUrl(item, {
+        width: 1600,
+        aspectRatio: aspect,
+        objectFit: fit,
+      });
       if (!src) return null;
+      const layoutDefaultAspect =
+        module.layout === "fullBleed"
+          ? "aspect-[16/9] md:aspect-[21/9]"
+          : module.layout === "masonry"
+            ? undefined
+            : "aspect-[4/3]";
       return {
-        key: `gallery-${index}`,
+        key: item?._key || `gallery-${index}`,
+        itemKey: item?._key || undefined,
+        media: item,
         src,
         alt: resolveMediaAlt(item, "Project image"),
+        widthClass: mediaDisplayWidthClass(width, {
+          fullBleed: module.layout === "fullBleed",
+        }),
+        aspectClass: mediaAspectRatioClass(aspect, layoutDefaultAspect),
+        fitClass: mediaObjectFitClass(fit),
+        objectPosition: resolveMediaObjectPosition(item),
       };
     })
-    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+    .filter((item): item is GalleryRenderItem => Boolean(item));
 
   if (!items.length) return null;
 
@@ -28,13 +81,30 @@ export function GalleryModule({ module }: { module: ProjectGalleryModule }) {
           {items.map((item) => (
             <div
               key={item.key}
-              className="relative aspect-[16/9] w-full overflow-hidden md:aspect-[21/9]"
+              className={cn(
+                "relative w-full overflow-hidden",
+                item.widthClass,
+                item.aspectClass || "aspect-[16/9] md:aspect-[21/9]",
+              )}
+              data-sanity={
+                item.itemKey
+                  ? projectMediaDataAttribute({
+                      documentId,
+                      path: galleryItemMediaPath(module._key, item.itemKey),
+                    })
+                  : undefined
+              }
             >
               <Image
                 src={item.src}
                 alt={item.alt}
                 fill
-                className="object-cover"
+                className={item.fitClass}
+                style={
+                  item.objectPosition
+                    ? { objectPosition: item.objectPosition }
+                    : undefined
+                }
                 sizes="100vw"
               />
             </div>
@@ -64,16 +134,31 @@ export function GalleryModule({ module }: { module: ProjectGalleryModule }) {
             key={item.key}
             className={cn(
               "relative overflow-hidden bg-bg-raised",
-              layout === "grid" && "aspect-[4/3]",
+              item.widthClass,
+              layout === "grid" && (item.aspectClass || "aspect-[4/3]"),
               layout === "masonry" && "break-inside-avoid",
+              layout === "masonry" && item.aspectClass,
             )}
+            data-sanity={
+              item.itemKey
+                ? projectMediaDataAttribute({
+                    documentId,
+                    path: galleryItemMediaPath(module._key, item.itemKey),
+                  })
+                : undefined
+            }
           >
-            {layout === "masonry" ? (
+            {layout === "masonry" && !item.aspectClass ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={item.src}
                 alt={item.alt}
-                className="h-auto w-full object-cover"
+                className={cn("h-auto w-full", item.fitClass)}
+                style={
+                  item.objectPosition
+                    ? { objectPosition: item.objectPosition }
+                    : undefined
+                }
                 loading="lazy"
               />
             ) : (
@@ -81,7 +166,12 @@ export function GalleryModule({ module }: { module: ProjectGalleryModule }) {
                 src={item.src}
                 alt={item.alt}
                 fill
-                className="object-cover"
+                className={item.fitClass}
+                style={
+                  item.objectPosition
+                    ? { objectPosition: item.objectPosition }
+                    : undefined
+                }
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             )}

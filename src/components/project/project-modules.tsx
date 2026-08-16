@@ -14,11 +14,14 @@ type ProjectModulesProps = {
   modules?: ProjectModule[] | null;
   /** Case study path used for lab "back" links, e.g. `/work/orbit-systems`. */
   caseStudyPath?: string;
+  /** Published project document id for Presentation click-to-edit overlays. */
+  documentId?: string | null;
 };
 
 export function ProjectModules({
   modules,
   caseStudyPath,
+  documentId,
 }: ProjectModulesProps) {
   if (!modules?.length) return null;
 
@@ -30,9 +33,21 @@ export function ProjectModules({
           case "projectRichText":
             return <RichTextModule key={module._key} module={module} />;
           case "projectGallery":
-            return <GalleryModule key={module._key} module={module} />;
+            return (
+              <GalleryModule
+                key={module._key}
+                module={module}
+                documentId={documentId}
+              />
+            );
           case "projectSplit":
-            return <SplitModule key={module._key} module={module} />;
+            return (
+              <SplitModule
+                key={module._key}
+                module={module}
+                documentId={documentId}
+              />
+            );
           case "projectMetrics":
             return <MetricsModule key={module._key} module={module} />;
           case "projectProcess":
@@ -47,6 +62,7 @@ export function ProjectModules({
                 key={module._key}
                 module={module}
                 caseStudyPath={caseStudyPath}
+                documentId={documentId}
               />
             );
           case "projectCta":

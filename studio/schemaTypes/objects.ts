@@ -34,13 +34,15 @@ export const mediaAsset = defineType({
       name: "image",
       type: "image",
       options: { hotspot: true },
+      description:
+        "Sanity CDN image. Hotspot/crop apply on the site. Prefer this over Blob URL when you need focal crop.",
     }),
     defineField({
       name: "blobUrl",
       title: "Blob URL or site path",
       type: "url",
       description:
-        "Vercel Blob https URL, or a site-relative path like /images/cover.jpg or /experiences/…. Relative paths are allowed.",
+        "Vercel Blob https URL, or a site-relative path like /images/cover.jpg or /experiences/…. Relative paths are allowed. Display width/fit apply; Sanity hotspot/crop do not.",
       validation: (Rule) =>
         Rule.uri({
           allowRelative: true,
@@ -48,6 +50,55 @@ export const mediaAsset = defineType({
         }),
     }),
     defineField({ name: "alt", type: "string", validation: (r) => r.required() }),
+    defineField({
+      name: "displayWidth",
+      title: "Display width",
+      type: "string",
+      description: "Relative width inside the module or hero frame.",
+      options: {
+        list: [
+          { title: "Full", value: "full" },
+          { title: "Wide", value: "wide" },
+          { title: "Half", value: "half" },
+          { title: "Third", value: "third" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "full",
+    }),
+    defineField({
+      name: "aspectRatio",
+      title: "Aspect ratio",
+      type: "string",
+      description:
+        "Frame ratio on the site. Auto keeps the layout default (or natural size in masonry).",
+      options: {
+        list: [
+          { title: "Auto", value: "auto" },
+          { title: "16:9", value: "16/9" },
+          { title: "4:3", value: "4/3" },
+          { title: "3:2", value: "3/2" },
+          { title: "1:1", value: "1/1" },
+          { title: "9:16", value: "9/16" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "auto",
+    }),
+    defineField({
+      name: "objectFit",
+      title: "Object fit",
+      type: "string",
+      description: "How the image fills its frame.",
+      options: {
+        list: [
+          { title: "Cover (crop to fill)", value: "cover" },
+          { title: "Contain (letterbox)", value: "contain" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "cover",
+    }),
   ],
 });
 

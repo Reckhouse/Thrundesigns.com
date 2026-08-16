@@ -6,12 +6,26 @@ import {
   loadCreationsByIds,
   type StoredCreation,
 } from "@/lib/creations/store";
-import { resolveMediaAlt, resolveMediaUrl } from "@/lib/media";
+import {
+  mediaAspectRatioClass,
+  mediaDisplayWidthClass,
+  mediaObjectFitClass,
+  resolveAspectRatio,
+  resolveDisplayWidth,
+  resolveMediaAlt,
+  resolveMediaObjectPosition,
+  resolveMediaUrl,
+  resolveObjectFit,
+  type MediaAssetValue,
+} from "@/lib/media";
+import { projectMediaDataAttribute } from "@/lib/sanity-data-attribute";
+import { cn } from "@/lib/utils";
 import type { FeaturedCreationValue } from "@/types/three-experience";
 
 type FeaturedCreationsGalleryProps = {
   items?: FeaturedCreationValue[] | null;
   caseStudyPath: string;
+  documentId?: string | null;
 };
 
 type GalleryItem = {
@@ -24,6 +38,11 @@ type GalleryItem = {
   imageAlt: string;
   href: string;
   order: number;
+  thumbnail?: MediaAssetValue;
+  widthClass: string;
+  aspectClass: string;
+  fitClass: string;
+  objectPosition?: string;
 };
 
 function buildGalleryItems(
@@ -38,7 +57,14 @@ function buildGalleryItems(
     const creationId = item.creationId?.trim();
     if (!creationId) return;
     const match = byId.get(creationId);
-    const overrideSrc = resolveMediaUrl(item.thumbnail, 900);
+    const aspect = resolveAspectRatio(item.thumbnail);
+    const fit = resolveObjectFit(item.thumbnail);
+    const width = resolveDisplayWidth(item.thumbnail);
+    const overrideSrc = resolveMediaUrl(item.thumbnail, {
+      width: 900,
+      aspectRatio: aspect,
+      objectFit: fit,
+    });
     const imageSrc = overrideSrc || match?.meta.thumbnailUrl || null;
     items.push({
       key: item._key || creationId,
@@ -56,6 +82,11 @@ function buildGalleryItems(
       ),
       href: `/creation/${creationId}?from=${encodeURIComponent(caseStudyPath)}`,
       order: typeof item.order === "number" ? item.order : index,
+      thumbnail: item.thumbnail,
+      widthClass: mediaDisplayWidthClass(width),
+      aspectClass: mediaAspectRatioClass(aspect, "aspect-[9/16]") || "aspect-[9/16]",
+      fitClass: mediaObjectFitClass(fit),
+      objectPosition: resolveMediaObjectPosition(item.thumbnail),
     });
   });
 
@@ -65,6 +96,7 @@ function buildGalleryItems(
 export async function FeaturedCreationsGallery({
   items,
   caseStudyPath,
+  documentId,
 }: FeaturedCreationsGalleryProps) {
   if (!items?.length) return null;
 
@@ -95,14 +127,34 @@ export async function FeaturedCreationsGallery({
           <li key={item.key} className="flex flex-col gap-4">
             <Link
               href={item.href}
-              className="group relative block aspect-[9/16] overflow-hidden bg-bg-raised"
+              className={cn(
+                "group relative block overflow-hidden bg-bg-raised",
+                item.widthClass,
+                item.aspectClass,
+              )}
+              data-sanity={
+                item.key
+                  ? projectMediaDataAttribute({
+                      documentId,
+                      path: `featuredCreations[_key=="${item.key}"].thumbnail`,
+                    })
+                  : undefined
+              }
             >
               {item.imageSrc ? (
                 <Image
                   src={item.imageSrc}
                   alt={item.imageAlt}
                   fill
-                  className="object-cover transition-opacity duration-500 group-hover:opacity-90"
+                  className={cn(
+                    item.fitClass,
+                    "transition-opacity duration-500 group-hover:opacity-90",
+                  )}
+                  style={
+                    item.objectPosition
+                      ? { objectPosition: item.objectPosition }
+                      : undefined
+                  }
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
               ) : (
