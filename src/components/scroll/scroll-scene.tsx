@@ -40,6 +40,34 @@ export function useScrollScene() {
   return useContext(ScrollSceneContext);
 }
 
+function findNextScene(root: HTMLElement): HTMLElement | null {
+  const matchIn = (node: Element | null): HTMLElement | null => {
+    if (!(node instanceof HTMLElement)) return null;
+    if (node.hasAttribute("data-scroll-scene")) return node;
+    return node.querySelector<HTMLElement>("[data-scroll-scene]");
+  };
+
+  let sibling: Element | null = root.nextElementSibling;
+  while (sibling) {
+    const hit = matchIn(sibling);
+    if (hit) return hit;
+    sibling = sibling.nextElementSibling;
+  }
+
+  // Climb wrappers (e.g. ProjectModules <div>) within the story root.
+  let parent = root.parentElement;
+  while (parent && !parent.hasAttribute("data-scroll-story")) {
+    sibling = parent.nextElementSibling;
+    while (sibling) {
+      const hit = matchIn(sibling);
+      if (hit) return hit;
+      sibling = sibling.nextElementSibling;
+    }
+    parent = parent.parentElement;
+  }
+  return null;
+}
+
 type ScrollSceneProps = {
   children: ReactNode;
   className?: string;
@@ -119,36 +147,18 @@ export function ScrollScene({
         },
       });
 
-      // Pin until the next scene reaches the top so handoffs overlap
-      // (pinSpacing: false avoids blank post-exit gaps in document flow).
-      let sibling: Element | null = root.nextElementSibling;
-      let nextTrigger: HTMLElement | null = null;
-      while (sibling) {
-        if (
-          sibling instanceof HTMLElement &&
-          sibling.hasAttribute("data-scroll-scene")
-        ) {
-          nextTrigger = sibling;
-          break;
-        }
-        const nested =
-          sibling instanceof HTMLElement
-            ? sibling.querySelector<HTMLElement>("[data-scroll-scene]")
-            : null;
-        if (nested) {
-          nextTrigger = nested;
-          break;
-        }
-        sibling = sibling.nextElementSibling;
-      }
+      const nextTrigger = findNextScene(root);
+      const pinSpan = getPinSpan({ soft: soft || !fillViewport });
+      // Full viewport homepage plates morph out into the next beat.
+      // Compact module beats stay enter-only so content never ends invisible.
+      const morphExit = Boolean(nextTrigger) && fillViewport;
 
-      const pinSpan = getPinSpan({ soft });
       const exitTl = gsap.timeline({
         defaults: { ease: scrollStoryEase },
         scrollTrigger: {
           trigger: root,
           start: "top top",
-          ...(nextTrigger
+          ...(nextTrigger && fillViewport
             ? {
                 endTrigger: nextTrigger,
                 end: "top top",
@@ -166,9 +176,13 @@ export function ScrollScene({
         },
       });
 
-      // Hold through most of the overlap, then exit into the next beat.
-      exitTl.to({}, { duration: 0.55 });
-      applyExit(exitTl, plate, transition, exitTl.duration());
+      if (morphExit) {
+        exitTl.to({}, { duration: 0.55 });
+        applyExit(exitTl, plate, transition, exitTl.duration());
+      } else {
+        // Hold visible through the short pin window.
+        exitTl.to({}, { duration: 1 });
+      }
 
       refresh();
 
@@ -180,7 +194,7 @@ export function ScrollScene({
       };
     },
     {
-      dependencies: [active, soft, transition, refresh],
+      dependencies: [active, soft, transition, refresh, fillViewport],
       revertOnUpdate: true,
     },
   );
