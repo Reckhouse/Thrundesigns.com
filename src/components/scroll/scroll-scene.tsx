@@ -202,8 +202,10 @@ export function ScrollScene({
                 pinSpacing: false,
               }
             : {
+                // Short soft pins must not inflate document height — that
+                // creates multi-screen black voids under short covers.
                 end: `+=${pinSpan}`,
-                pinSpacing: true,
+                pinSpacing: false,
               }),
           pin: true,
           scrub: true,
