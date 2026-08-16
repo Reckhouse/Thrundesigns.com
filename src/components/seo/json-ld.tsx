@@ -25,7 +25,7 @@ export function SiteJsonLd() {
           "@id": `${base}/#organization`,
           name: "Thrun Design Co.",
           url: base,
-          logo: `${base}/brand/logo-mark.svg`,
+          logo: `${base}/brand/logo-mark.png`,
           description:
             "Strategic brand systems, websites, marketing audits, and print & digital assets for founders and owners.",
         },
