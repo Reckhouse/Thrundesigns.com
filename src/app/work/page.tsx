@@ -66,7 +66,12 @@ export default async function WorkIndexPage() {
         <SiteHeader nav={settings?.nav} />
         <main className="flex-1">
           <ScrollStoryRoot>
-            <ScrollScene transition="wipe-up" soft ariaLabel="Concept studies">
+            <ScrollScene
+              transition="wipe-up"
+              soft
+              fillViewport={false}
+              ariaLabel="Concept studies"
+            >
               <header className="relative flex min-h-[72svh] flex-col justify-end pb-16 pt-[144px] md:min-h-[78svh] md:pb-20 md:pt-[156px] lg:min-h-[84svh] lg:pb-24 lg:pt-[172px]">
                 <div className="mx-auto w-full max-w-[1440px] px-5 md:px-10 lg:px-[74px]">
                   <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold drop-shadow-[0_2px_18px_rgba(12,13,12,0.75)]">

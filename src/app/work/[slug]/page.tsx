@@ -210,7 +210,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
       <main className="flex-1 pt-[120px] md:pt-[136px] lg:pt-[152px]">
         <ScrollStoryRoot>
           <article>
-            <ScrollScene transition="wipe-up" soft ariaLabel="Project cover">
+            <ScrollScene
+              transition="wipe-up"
+              soft
+              fillViewport={false}
+              ariaLabel="Project cover"
+            >
               <section className="border-b border-line">
                 <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-16 md:px-10 lg:grid-cols-[1fr_1.2fr] lg:px-[74px]">
                   <div>
