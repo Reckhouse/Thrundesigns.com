@@ -17,10 +17,19 @@ import {
 import { resolveCounterspaceCoverSrc } from "@/lib/counterspace-media";
 import { defaultHomeContent } from "@/lib/default-content";
 import {
+  mediaAspectRatioClass,
+  mediaDisplayWidthClass,
+  mediaObjectFitClass,
+  resolveAspectRatio,
+  resolveDisplayWidth,
   resolveMediaAlt,
+  resolveMediaObjectPosition,
   resolveMediaUrl,
+  resolveObjectFit,
   type MediaAssetValue,
 } from "@/lib/media";
+import { projectMediaDataAttribute } from "@/lib/sanity-data-attribute";
+import { cn } from "@/lib/utils";
 import { urlFor } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
@@ -140,14 +149,36 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   if (!project) notFound();
 
+  const coverAspect = resolveAspectRatio(project.cover);
+  const coverFit = resolveObjectFit(project.cover);
+  const coverWidth = resolveDisplayWidth(project.cover);
   const imageSrc = resolveCounterspaceCoverSrc(
     slug,
     resolveControlledChaosCoverSrc(
       slug,
-      resolveMediaUrl(project.cover) || coverFallback(slug),
+      resolveMediaUrl(project.cover, {
+        width: 1600,
+        aspectRatio: coverAspect,
+        objectFit: coverFit,
+      }) || coverFallback(slug),
     ),
   );
   const isPosterCover = isControlledChaosSlug(slug);
+  const coverObjectPosition = resolveMediaObjectPosition(project.cover);
+  const coverFrameClass = isPosterCover
+    ? cn(
+        "relative mx-auto w-full overflow-hidden bg-bg-raised sm:max-w-[360px] lg:ml-auto lg:mr-0 lg:max-w-[400px]",
+        mediaDisplayWidthClass(coverWidth),
+        mediaAspectRatioClass(coverAspect, "aspect-[9/16] max-w-[320px]"),
+      )
+    : cn(
+        "relative overflow-hidden bg-bg-raised",
+        mediaDisplayWidthClass(coverWidth),
+        mediaAspectRatioClass(
+          coverAspect,
+          "min-h-[420px] lg:min-h-[620px]",
+        ),
+      );
   const primaryMapped = project.primaryExperience
     ? mapSanityExperienceConfig(project.primaryExperience)
     : null;
@@ -199,19 +230,28 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 ) : null}
               </div>
               {/* Poster case studies use a 9:16 frame so the cover fills
-                  without pillarboxing. Other projects keep the wide hero box. */}
+                  without pillarboxing. Other projects keep the wide hero box.
+                  CMS displayWidth / aspectRatio / objectFit override defaults. */}
               <div
-                className={
-                  isPosterCover
-                    ? "relative mx-auto aspect-[9/16] w-full max-w-[320px] overflow-hidden bg-bg-raised sm:max-w-[360px] lg:ml-auto lg:mr-0 lg:max-w-[400px]"
-                    : "relative min-h-[420px] overflow-hidden bg-bg-raised lg:min-h-[620px]"
-                }
+                className={coverFrameClass}
+                data-sanity={projectMediaDataAttribute({
+                  documentId: project._id,
+                  path: "cover",
+                })}
               >
                 <Image
                   src={imageSrc}
                   alt={resolveMediaAlt(project.cover, project.title || "Project")}
                   fill
-                  className="object-cover object-center"
+                  className={cn(
+                    mediaObjectFitClass(coverFit),
+                    !coverObjectPosition && "object-center",
+                  )}
+                  style={
+                    coverObjectPosition
+                      ? { objectPosition: coverObjectPosition }
+                      : undefined
+                  }
                   sizes={
                     isPosterCover
                       ? "(max-width: 1024px) 360px, 400px"
@@ -225,10 +265,12 @@ export default async function ProjectDetailPage({ params }: PageProps) {
           <ProjectModules
             modules={project.modules}
             caseStudyPath={`/work/${slug}`}
+            documentId={project._id}
           />
           <FeaturedCreationsGallery
             items={project.featuredCreations}
             caseStudyPath={`/work/${slug}`}
+            documentId={project._id}
           />
         </article>
       </main>

@@ -106,7 +106,10 @@ export const projectBySlugQuery = defineQuery(`
     cover{
       alt,
       blobUrl,
-      image
+      image,
+      displayWidth,
+      aspectRatio,
+      objectFit
     },
     seo{
       title,
@@ -118,7 +121,10 @@ export const projectBySlugQuery = defineQuery(`
       posterImage{
         alt,
         blobUrl,
-        image
+        image,
+        displayWidth,
+        aspectRatio,
+        objectFit
       },
       fallbackVideo{
         asset->{
@@ -139,7 +145,10 @@ export const projectBySlugQuery = defineQuery(`
       thumbnail{
         alt,
         blobUrl,
-        image
+        image,
+        displayWidth,
+        aspectRatio,
+        objectFit
       }
     },
     modules[]{
@@ -147,9 +156,13 @@ export const projectBySlugQuery = defineQuery(`
       _type == "projectGallery" => {
         ...,
         items[]{
+          _key,
           alt,
           blobUrl,
-          image
+          image,
+          displayWidth,
+          aspectRatio,
+          objectFit
         }
       },
       _type == "projectSplit" => {
@@ -157,7 +170,10 @@ export const projectBySlugQuery = defineQuery(`
         media{
           alt,
           blobUrl,
-          image
+          image,
+          displayWidth,
+          aspectRatio,
+          objectFit
         }
       },
       _type == "projectVideo" => {
@@ -165,7 +181,10 @@ export const projectBySlugQuery = defineQuery(`
         poster{
           alt,
           blobUrl,
-          image
+          image,
+          displayWidth,
+          aspectRatio,
+          objectFit
         }
       },
       _type == "projectThreeExperience" => {
@@ -173,7 +192,10 @@ export const projectBySlugQuery = defineQuery(`
         posterImage{
           alt,
           blobUrl,
-          image
+          image,
+          displayWidth,
+          aspectRatio,
+          objectFit
         },
         fallbackVideo{
           asset->{

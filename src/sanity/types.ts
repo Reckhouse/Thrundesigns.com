@@ -262,6 +262,9 @@ export type MediaAsset = {
   };
   blobUrl?: string;
   alt: string;
+  displayWidth?: "full" | "wide" | "half" | "third";
+  aspectRatio?: "auto" | "16/9" | "4/3" | "3/2" | "1/1" | "9/16";
+  objectFit?: "cover" | "contain";
 };
 
 export type Slug = {
@@ -833,7 +836,7 @@ export type ProjectsQueryResult = Array<{
 
 // Source: ../src/sanity/lib/queries.ts
 // Variable: projectBySlugQuery
-// Query: *[_type == "project" && slug.current == $slug][0]{    _id,    title,    slug,    industry,    services,    workCategory,    summary,    cover{      alt,      blobUrl,      image    },    seo{      title,      description,      ogImage    },    primaryExperience{      ...,      posterImage{        alt,        blobUrl,        image      },      fallbackVideo{        asset->{          url,          originalFilename,          mimeType,          size        }      }    },    featuredCreations[]{      _key,      creationId,      displayTitle,      shortDescription,      curatorNote,      order,      thumbnail{        alt,        blobUrl,        image      }    },    modules[]{      ...,      _type == "projectGallery" => {        ...,        items[]{          alt,          blobUrl,          image        }      },      _type == "projectSplit" => {        ...,        media{          alt,          blobUrl,          image        }      },      _type == "projectVideo" => {        ...,        poster{          alt,          blobUrl,          image        }      },      _type == "projectThreeExperience" => {        ...,        posterImage{          alt,          blobUrl,          image        },        fallbackVideo{          asset->{            url,            originalFilename,            mimeType,            size          }        }      }    },    // Legacy fields kept for one-time migration tooling    gallery,    body  }
+// Query: *[_type == "project" && slug.current == $slug][0]{    _id,    title,    slug,    industry,    services,    workCategory,    summary,    cover{      alt,      blobUrl,      image,      displayWidth,      aspectRatio,      objectFit    },    seo{      title,      description,      ogImage    },    primaryExperience{      ...,      posterImage{        alt,        blobUrl,        image,        displayWidth,        aspectRatio,        objectFit      },      fallbackVideo{        asset->{          url,          originalFilename,          mimeType,          size        }      }    },    featuredCreations[]{      _key,      creationId,      displayTitle,      shortDescription,      curatorNote,      order,      thumbnail{        alt,        blobUrl,        image,        displayWidth,        aspectRatio,        objectFit      }    },    modules[]{      ...,      _type == "projectGallery" => {        ...,        items[]{          _key,          alt,          blobUrl,          image,          displayWidth,          aspectRatio,          objectFit        }      },      _type == "projectSplit" => {        ...,        media{          alt,          blobUrl,          image,          displayWidth,          aspectRatio,          objectFit        }      },      _type == "projectVideo" => {        ...,        poster{          alt,          blobUrl,          image,          displayWidth,          aspectRatio,          objectFit        }      },      _type == "projectThreeExperience" => {        ...,        posterImage{          alt,          blobUrl,          image,          displayWidth,          aspectRatio,          objectFit        },        fallbackVideo{          asset->{            url,            originalFilename,            mimeType,            size          }        }      }    },    // Legacy fields kept for one-time migration tooling    gallery,    body  }
 export type ProjectBySlugQueryResult = {
   _id: string;
   title: string;
@@ -852,6 +855,9 @@ export type ProjectBySlugQueryResult = {
       crop?: SanityImageCrop;
       _type: "image";
     } | null;
+    displayWidth: "full" | "half" | "third" | "wide" | null;
+    aspectRatio: "1/1" | "16/9" | "3/2" | "4/3" | "9/16" | "auto" | null;
+    objectFit: "contain" | "cover" | null;
   } | null;
   seo: {
     title: string | null;
@@ -913,6 +919,9 @@ export type ProjectBySlugQueryResult = {
         crop?: SanityImageCrop;
         _type: "image";
       } | null;
+      displayWidth: "full" | "half" | "third" | "wide" | null;
+      aspectRatio: "1/1" | "16/9" | "3/2" | "4/3" | "9/16" | "auto" | null;
+      objectFit: "contain" | "cover" | null;
     };
     fallbackVideo: {
       asset: {
@@ -951,6 +960,9 @@ export type ProjectBySlugQueryResult = {
         crop?: SanityImageCrop;
         _type: "image";
       } | null;
+      displayWidth: "full" | "half" | "third" | "wide" | null;
+      aspectRatio: "1/1" | "16/9" | "3/2" | "4/3" | "9/16" | "auto" | null;
+      objectFit: "contain" | "cover" | null;
     } | null;
   }> | null;
   modules: Array<
@@ -977,6 +989,7 @@ export type ProjectBySlugQueryResult = {
         _type: "projectGallery";
         layout: "fullBleed" | "grid" | "masonry";
         items: Array<{
+          _key: string;
           alt: string;
           blobUrl: string | null;
           image: {
@@ -986,6 +999,9 @@ export type ProjectBySlugQueryResult = {
             crop?: SanityImageCrop;
             _type: "image";
           } | null;
+          displayWidth: "full" | "half" | "third" | "wide" | null;
+          aspectRatio: "1/1" | "16/9" | "3/2" | "4/3" | "9/16" | "auto" | null;
+          objectFit: "contain" | "cover" | null;
         }>;
         caption?: string;
       }
@@ -1055,6 +1071,9 @@ export type ProjectBySlugQueryResult = {
             crop?: SanityImageCrop;
             _type: "image";
           } | null;
+          displayWidth: "full" | "half" | "third" | "wide" | null;
+          aspectRatio: "1/1" | "16/9" | "3/2" | "4/3" | "9/16" | "auto" | null;
+          objectFit: "contain" | "cover" | null;
         };
         body: Array<{
           children?: Array<{
@@ -1125,6 +1144,9 @@ export type ProjectBySlugQueryResult = {
             crop?: SanityImageCrop;
             _type: "image";
           } | null;
+          displayWidth: "full" | "half" | "third" | "wide" | null;
+          aspectRatio: "1/1" | "16/9" | "3/2" | "4/3" | "9/16" | "auto" | null;
+          objectFit: "contain" | "cover" | null;
         };
         fallbackVideo: {
           asset: {
@@ -1160,6 +1182,9 @@ export type ProjectBySlugQueryResult = {
             crop?: SanityImageCrop;
             _type: "image";
           } | null;
+          displayWidth: "full" | "half" | "third" | "wide" | null;
+          aspectRatio: "1/1" | "16/9" | "3/2" | "4/3" | "9/16" | "auto" | null;
+          objectFit: "contain" | "cover" | null;
         } | null;
         caption?: string;
       }
@@ -1275,7 +1300,7 @@ declare module "@sanity/client" {
     '\n  *[_type == "processStep"] | order(order asc){\n    _id,\n    number,\n    title,\n    copy\n  }\n': ProcessStepsQueryResult;
     '\n  *[_type == "project" && featured == true] | order(order asc){\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    workCategory,\n    summary,\n    cover\n  }\n': FeaturedProjectsQueryResult;
     '\n  *[_type == "project"] | order(order asc){\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    workCategory,\n    summary,\n    cover\n  }\n': ProjectsQueryResult;
-    '\n  *[_type == "project" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    workCategory,\n    summary,\n    cover{\n      alt,\n      blobUrl,\n      image\n    },\n    seo{\n      title,\n      description,\n      ogImage\n    },\n    primaryExperience{\n      ...,\n      posterImage{\n        alt,\n        blobUrl,\n        image\n      },\n      fallbackVideo{\n        asset->{\n          url,\n          originalFilename,\n          mimeType,\n          size\n        }\n      }\n    },\n    featuredCreations[]{\n      _key,\n      creationId,\n      displayTitle,\n      shortDescription,\n      curatorNote,\n      order,\n      thumbnail{\n        alt,\n        blobUrl,\n        image\n      }\n    },\n    modules[]{\n      ...,\n      _type == "projectGallery" => {\n        ...,\n        items[]{\n          alt,\n          blobUrl,\n          image\n        }\n      },\n      _type == "projectSplit" => {\n        ...,\n        media{\n          alt,\n          blobUrl,\n          image\n        }\n      },\n      _type == "projectVideo" => {\n        ...,\n        poster{\n          alt,\n          blobUrl,\n          image\n        }\n      },\n      _type == "projectThreeExperience" => {\n        ...,\n        posterImage{\n          alt,\n          blobUrl,\n          image\n        },\n        fallbackVideo{\n          asset->{\n            url,\n            originalFilename,\n            mimeType,\n            size\n          }\n        }\n      }\n    },\n    // Legacy fields kept for one-time migration tooling\n    gallery,\n    body\n  }\n': ProjectBySlugQueryResult;
+    '\n  *[_type == "project" && slug.current == $slug][0]{\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    workCategory,\n    summary,\n    cover{\n      alt,\n      blobUrl,\n      image,\n      displayWidth,\n      aspectRatio,\n      objectFit\n    },\n    seo{\n      title,\n      description,\n      ogImage\n    },\n    primaryExperience{\n      ...,\n      posterImage{\n        alt,\n        blobUrl,\n        image,\n        displayWidth,\n        aspectRatio,\n        objectFit\n      },\n      fallbackVideo{\n        asset->{\n          url,\n          originalFilename,\n          mimeType,\n          size\n        }\n      }\n    },\n    featuredCreations[]{\n      _key,\n      creationId,\n      displayTitle,\n      shortDescription,\n      curatorNote,\n      order,\n      thumbnail{\n        alt,\n        blobUrl,\n        image,\n        displayWidth,\n        aspectRatio,\n        objectFit\n      }\n    },\n    modules[]{\n      ...,\n      _type == "projectGallery" => {\n        ...,\n        items[]{\n          _key,\n          alt,\n          blobUrl,\n          image,\n          displayWidth,\n          aspectRatio,\n          objectFit\n        }\n      },\n      _type == "projectSplit" => {\n        ...,\n        media{\n          alt,\n          blobUrl,\n          image,\n          displayWidth,\n          aspectRatio,\n          objectFit\n        }\n      },\n      _type == "projectVideo" => {\n        ...,\n        poster{\n          alt,\n          blobUrl,\n          image,\n          displayWidth,\n          aspectRatio,\n          objectFit\n        }\n      },\n      _type == "projectThreeExperience" => {\n        ...,\n        posterImage{\n          alt,\n          blobUrl,\n          image,\n          displayWidth,\n          aspectRatio,\n          objectFit\n        },\n        fallbackVideo{\n          asset->{\n            url,\n            originalFilename,\n            mimeType,\n            size\n          }\n        }\n      }\n    },\n    // Legacy fields kept for one-time migration tooling\n    gallery,\n    body\n  }\n': ProjectBySlugQueryResult;
     '\n  *[_type == "quoteForm" && _id == "quoteForm"][0]{\n    eyebrow,\n    headline,\n    support,\n    stepLabels,\n    successHeading,\n    successBody,\n    submitLabel,\n    nameField{ label, placeholder, helperText },\n    emailField{ label, placeholder, helperText },\n    companyField{ label, placeholder, helperText },\n    projectTypeField{ label, placeholder, helperText },\n    budgetField{ label, placeholder, helperText },\n    timelineField{ label, placeholder, helperText },\n    messageField{ label, placeholder, helperText },\n    attachmentsField{ label, placeholder, helperText },\n    projectTypes[]{\n      value,\n      label,\n      enabled,\n      service->{\n        _id,\n        title,\n        "slug": slug.current,\n        summary,\n        icon\n      }\n    },\n    budgetRanges[]{ value, label, enabled },\n    timelines[]{ value, label, enabled },\n    seo\n  }\n': QuoteFormQueryResult;
   }
 }
