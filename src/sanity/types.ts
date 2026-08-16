@@ -262,7 +262,7 @@ export type MediaAsset = {
   };
   blobUrl?: string;
   alt: string;
-  displayWidth?: "full" | "wide" | "half" | "third";
+  displayWidth?: "full" | "wide" | "half" | "third" | "scroll";
   aspectRatio?: "auto" | "16/9" | "4/3" | "3/2" | "1/1" | "9/16";
   objectFit?: "cover" | "contain";
 };

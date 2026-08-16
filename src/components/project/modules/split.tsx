@@ -1,10 +1,8 @@
-import Image from "next/image";
 import { ModuleShell } from "@/components/project/module-shell";
 import { ProjectPortableText } from "@/components/project/portable-text";
+import { ProjectMediaFrame } from "@/components/project/project-media-frame";
 import {
-  mediaAspectRatioClass,
-  mediaDisplayWidthClass,
-  mediaObjectFitClass,
+  isScrollableDisplay,
   resolveAspectRatio,
   resolveDisplayWidth,
   resolveMediaAlt,
@@ -25,11 +23,12 @@ type SplitModuleProps = {
 };
 
 export function SplitModule({ module, documentId }: SplitModuleProps) {
-  const aspect = resolveAspectRatio(module.media);
+  const displayWidth = resolveDisplayWidth(module.media);
+  const scrollable = isScrollableDisplay(displayWidth);
+  const aspect = scrollable ? "auto" : resolveAspectRatio(module.media);
   const fit = resolveObjectFit(module.media);
-  const width = resolveDisplayWidth(module.media);
   const src = resolveMediaUrl(module.media, {
-    width: 1600,
+    width: scrollable ? 1400 : 1600,
     aspectRatio: aspect,
     objectFit: fit,
   });
@@ -44,37 +43,31 @@ export function SplitModule({ module, documentId }: SplitModuleProps) {
         className={cn(
           "grid items-center gap-10 lg:grid-cols-2 lg:gap-16",
           mediaRight && "[&>*:first-child]:lg:order-2",
+          scrollable && "lg:grid-cols-1",
         )}
       >
         {src ? (
-          <div
-            className={cn(
-              "relative overflow-hidden bg-bg-raised",
-              mediaDisplayWidthClass(width),
-              mediaAspectRatioClass(aspect, "aspect-[4/3]"),
-            )}
-            data-sanity={projectMediaDataAttribute({
+          <ProjectMediaFrame
+            src={src}
+            alt={resolveMediaAlt(module.media, "Project visual")}
+            displayWidth={displayWidth}
+            aspectRatio={aspect}
+            objectFit={fit}
+            objectPosition={objectPosition}
+            aspectFallback="aspect-[4/3]"
+            sizes={
+              scrollable
+                ? "(max-width: 1024px) 100vw, 1024px"
+                : "(max-width: 1024px) 100vw, 50vw"
+            }
+            dataSanity={projectMediaDataAttribute({
               documentId,
               path: moduleMediaPath(module._key, "media"),
             })}
-          >
-            <Image
-              src={src}
-              alt={resolveMediaAlt(module.media, "Project visual")}
-              fill
-              className={mediaObjectFitClass(fit)}
-              style={
-                objectPosition ? { objectPosition } : undefined
-              }
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
+          />
         ) : (
           <div
-            className={cn(
-              "bg-bg-raised",
-              mediaAspectRatioClass(aspect, "aspect-[4/3]"),
-            )}
+            className="aspect-[4/3] bg-bg-raised"
             aria-hidden
           />
         )}

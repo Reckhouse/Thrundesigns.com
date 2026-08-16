@@ -58,13 +58,15 @@ export const mediaAsset = defineType({
       name: "displayWidth",
       title: "Display width",
       type: "string",
-      description: "Relative width inside the module or hero frame.",
+      description:
+        "Relative width inside the module or hero frame. Scrollable page uses a fixed-height viewport so tall webpage screenshots can be scrolled in place.",
       options: {
         list: [
           { title: "Full", value: "full" },
           { title: "Wide", value: "wide" },
           { title: "Half", value: "half" },
           { title: "Third", value: "third" },
+          { title: "Scrollable page", value: "scroll" },
         ],
         layout: "radio",
       },

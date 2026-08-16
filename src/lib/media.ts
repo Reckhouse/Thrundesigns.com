@@ -2,7 +2,14 @@ import { stegaClean } from "@sanity/client/stega";
 import type { SanityImageSource } from "@sanity/image-url";
 import { urlFor } from "@/sanity/lib/image";
 
-export type MediaDisplayWidth = "full" | "wide" | "half" | "third";
+import { cn } from "@/lib/utils";
+
+export type MediaDisplayWidth =
+  | "full"
+  | "wide"
+  | "half"
+  | "third"
+  | "scroll";
 export type MediaAspectRatio =
   | "auto"
   | "16/9"
@@ -21,6 +28,14 @@ export type MediaAssetValue = {
   aspectRatio?: MediaAspectRatio | string | null;
   objectFit?: MediaObjectFit | string | null;
 } | null | undefined;
+
+const DISPLAY_WIDTHS = [
+  "full",
+  "wide",
+  "half",
+  "third",
+  "scroll",
+] as const satisfies readonly MediaDisplayWidth[];
 
 type ResolveMediaUrlOptions = {
   width?: number;
@@ -49,12 +64,19 @@ export function resolveDisplayWidth(
   media: MediaAssetValue,
 ): MediaDisplayWidth {
   return (
-    cleanEnum(media?.displayWidth ?? undefined, [
-      "full",
-      "wide",
-      "half",
-      "third",
-    ] as const) || "full"
+    cleanEnum(media?.displayWidth ?? undefined, DISPLAY_WIDTHS) || "full"
+  );
+}
+
+/** Tall webpage / UI screenshots shown inside a fixed-height scroll viewport. */
+export function isScrollableDisplay(
+  width: MediaDisplayWidth | string | null | undefined,
+): boolean {
+  return (
+    cleanEnum(
+      typeof width === "string" ? width : undefined,
+      DISPLAY_WIDTHS,
+    ) === "scroll"
   );
 }
 
@@ -162,7 +184,9 @@ export function mediaDisplayWidthClass(
   width: MediaDisplayWidth,
   options?: { fullBleed?: boolean },
 ): string {
-  if (options?.fullBleed && width === "full") return "w-full";
+  if (options?.fullBleed && (width === "full" || width === "scroll")) {
+    return "w-full";
+  }
   switch (width) {
     case "wide":
       return "mx-auto w-full max-w-5xl";
@@ -170,10 +194,23 @@ export function mediaDisplayWidthClass(
       return "mx-auto w-full max-w-xl md:max-w-[50%]";
     case "third":
       return "mx-auto w-full max-w-md md:max-w-[33.333%]";
+    case "scroll":
+      // Browser-viewport frame for full-page screenshots.
+      return "mx-auto w-full max-w-5xl";
     case "full":
     default:
       return "w-full";
   }
+}
+
+/** Outer frame for scrollable page screenshots (fixed viewport, image scrolls). */
+export function mediaScrollFrameClass(
+  options?: { fullBleed?: boolean },
+): string {
+  return cn(
+    "relative max-h-[min(70svh,720px)] overflow-x-hidden overflow-y-auto overscroll-y-contain bg-bg-raised",
+    mediaDisplayWidthClass("scroll", options),
+  );
 }
 
 export function mediaAspectRatioClass(
