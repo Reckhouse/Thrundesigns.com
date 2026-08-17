@@ -162,17 +162,6 @@ function fitScale(root: THREE.Object3D, target = 1.55) {
   return target / maxDim;
 }
 
-function normalizeTexture(texture: THREE.Texture, colorSpace?: THREE.ColorSpace) {
-  if (texture.repeat.x > 2 || texture.repeat.y > 2) {
-    texture.repeat.set(1, 1);
-    texture.offset.set(0, 0);
-  }
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  if (colorSpace) texture.colorSpace = colorSpace;
-  texture.needsUpdate = true;
-}
-
 function prepareMaterials(root: THREE.Object3D) {
   root.traverse((obj) => {
     const mesh = obj as THREE.Mesh;
@@ -187,12 +176,23 @@ function prepareMaterials(root: THREE.Object3D) {
       ) {
         continue;
       }
-      material.envMapIntensity = 0.85;
-      if (material.map) normalizeTexture(material.map, THREE.SRGBColorSpace);
-      if (material.normalMap) normalizeTexture(material.normalMap);
-      if (material.roughnessMap) normalizeTexture(material.roughnessMap);
-      if (material.metalnessMap) normalizeTexture(material.metalnessMap);
-      if (material.aoMap) normalizeTexture(material.aoMap);
+      material.envMapIntensity = 0.7;
+      // Keep KHR_texture_transform (gltfpack 12-bit UV dequant). Stripping
+      // repeat/offset zooms into a corner of the albedo.
+      const maps = [
+        material.map,
+        material.normalMap,
+        material.roughnessMap,
+        material.metalnessMap,
+        material.aoMap,
+      ];
+      for (const texture of maps) {
+        if (!texture) continue;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        texture.needsUpdate = true;
+      }
+      if (material.map) material.map.colorSpace = THREE.SRGBColorSpace;
       material.needsUpdate = true;
     }
   });
@@ -274,10 +274,9 @@ export function ModelStageCanvas({ models }: { models: StageModel[] }) {
       camera={{ position: [0, 0.35, 7.2], fov: 32, near: 0.1, far: 40 }}
     >
       <StudioEnvironment />
-      <ambientLight intensity={0.22} />
-      <hemisphereLight color="#f3eee6" groundColor="#1b1b1b" intensity={0.4} />
-      <directionalLight position={[4, 8, 6]} intensity={1.05} />
-      <directionalLight position={[-5, 2, -3]} intensity={0.28} />
+      <ambientLight intensity={0.12} />
+      <directionalLight position={[4, 8, 6]} intensity={0.55} />
+      <directionalLight position={[-5, 2, -3]} intensity={0.18} />
       <Suspense fallback={null}>
         {models.map((model, index) => (
           <RotatingModel
