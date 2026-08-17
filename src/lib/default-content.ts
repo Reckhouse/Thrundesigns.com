@@ -179,6 +179,20 @@ export const defaultHomeContent = {
       },
     },
     {
+      _id: "project-juniper-stone-web",
+      title: "Juniper & Stone Coffee Co.",
+      slug: { current: "juniper-and-stone-website" },
+      industry: "Specialty coffee · Colorado Springs",
+      services: "Website design · Ecommerce UX · Design system",
+      workCategory: "web-design",
+      summary:
+        "A place-rooted ecommerce site for Juniper & Stone — long-scroll homepage, seasonal shop, and product detail frames that extend the brand into digital.",
+      cover: {
+        blobUrl: "/images/juniper-stone-web/homepage-scroll.png",
+        alt: "Juniper & Stone Coffee Co. homepage scroll design",
+      },
+    },
+    {
       _id: "project-northline",
       title: "Northline Advisory",
       slug: { current: "northline-advisory" },

@@ -68,6 +68,9 @@ type ProjectDoc = Partial<
 };
 
 function coverFallback(slug: string) {
+  if (slug === "juniper-and-stone-website") {
+    return "/images/juniper-stone-web/homepage-scroll.png";
+  }
   if (slug === "juniper-and-stone-coffee") {
     return "/images/juniper-stone/cup-mockup.png";
   }
