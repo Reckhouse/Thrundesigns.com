@@ -82,7 +82,7 @@ export const project = defineType({
       type: "string",
       group: "identity",
       description:
-        "Homepage marquee row and /work section. Empty categories are hidden.",
+        "/work section grouping. Empty categories are hidden on the work index.",
       options: {
         list: [
           { title: "Animation Studies", value: "animation-studies" },
@@ -102,9 +102,12 @@ export const project = defineType({
     defineField({ name: "cover", type: "mediaAsset", group: "identity" }),
     defineField({
       name: "featured",
+      title: "Homepage featured",
       type: "boolean",
       group: "identity",
-      initialValue: true,
+      description:
+        "Show this project in the homepage work marquee. The /work index still lists all projects by category.",
+      initialValue: false,
     }),
     defineField({ name: "order", type: "number", group: "identity" }),
     defineField({
