@@ -7,7 +7,7 @@ Implemented in [`src/lib/security-headers.ts`](../../src/lib/security-headers.ts
 | Directive | Why |
 |-----------|-----|
 | `default-src 'self'` | Deny-by-default |
-| `script-src 'self' 'unsafe-inline' 'unsafe-eval' challenges.cloudflare.com` | Next hydration + Turnstile. Tighten with nonces later |
+| `script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' challenges.cloudflare.com` | Next hydration + Turnstile + Basis/Meshopt WASM. Tighten with nonces later |
 | `style-src 'self' 'unsafe-inline'` | Tailwind / runtime styles |
 | `img-src ... cdn.sanity.io *.public.blob.vercel-storage.com data: blob:` | CMS posters, Blob media, canvas exports |
 | `media-src ... blob: Sanity/Blob` | Fallback videos + future recordings |

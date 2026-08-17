@@ -1,9 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import { resolveFileUrl } from "@/lib/file-asset";
 import type { SanityFileValue } from "@/types/three-experience";
 import { SceneSection } from "@/components/site/scene-section";
+import { ModelStageErrorBoundary } from "@/components/sections/model-stage-error-boundary";
 
 const ModelStageCanvas = dynamic(
   () =>
@@ -24,6 +26,9 @@ type ModelStageSectionProps = {
 };
 
 export function ModelStageSection({ models }: ModelStageSectionProps) {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
+
   const entries = (models ?? [])
     .map((item, index) => {
       const url = resolveFileUrl(item.file ?? null);
@@ -34,6 +39,19 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
       };
     })
     .filter((item): item is { url: string; label: string } => Boolean(item));
+
+  useEffect(() => {
+    const node = stageRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) setActive(true);
+      },
+      { rootMargin: "200px 0px", threshold: 0.05 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   const aria = entries.length
     ? `Rotating 3D models: ${entries.map((item) => item.label).join(", ")}`
@@ -47,8 +65,15 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
       ariaLabel={aria}
       className="border-b-0"
     >
-      <div className="relative h-[58svh] min-h-[320px] w-full md:h-[68svh]">
-        <ModelStageCanvas models={entries} />
+      <div
+        ref={stageRef}
+        className="relative h-[58svh] min-h-[320px] w-full md:h-[68svh]"
+      >
+        {active ? (
+          <ModelStageErrorBoundary>
+            <ModelStageCanvas models={entries} />
+          </ModelStageErrorBoundary>
+        ) : null}
       </div>
     </SceneSection>
   );

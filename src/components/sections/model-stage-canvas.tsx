@@ -1,15 +1,39 @@
 "use client";
 
 import { Suspense, useLayoutEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Center, useGLTF } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
 import * as THREE from "three";
+import { KTX2Loader, type GLTFLoader } from "three-stdlib";
 
 type StageModel = {
   url: string;
   label: string;
 };
+
+let ktx2Loader: KTX2Loader | null = null;
+
+function getKtx2Loader(renderer: THREE.WebGLRenderer) {
+  if (!ktx2Loader) {
+    ktx2Loader = new KTX2Loader().setTranscoderPath("/basis/");
+  }
+  ktx2Loader.detectSupport(renderer);
+  return ktx2Loader;
+}
+
+function fitToHeight(root: THREE.Object3D, target = 1.55) {
+  const box = new THREE.Box3();
+  root.updateWorldMatrix(true, true);
+  root.traverse((obj) => {
+    const mesh = obj as THREE.Mesh;
+    if (mesh.isMesh && mesh.geometry) box.expandByObject(mesh);
+  });
+  if (box.isEmpty()) return;
+  const size = box.getSize(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z, 0.0001);
+  root.scale.multiplyScalar(target / maxDim);
+}
 
 function RotatingModel({
   url,
@@ -20,15 +44,21 @@ function RotatingModel({
   x: number;
   reduce: boolean;
 }) {
-  const { scene } = useGLTF(url);
+  const renderer = useThree((state) => state.gl);
   const group = useRef<THREE.Group>(null);
+  const { scene } = useGLTF(
+    url,
+    false,
+    true,
+    (loader) => {
+      const gltfLoader = loader as GLTFLoader;
+      gltfLoader.setKTX2Loader(getKtx2Loader(renderer));
+    },
+  );
   const clone = useMemo(() => scene.clone(true), [scene]);
 
   useLayoutEffect(() => {
-    const box = new THREE.Box3().setFromObject(clone);
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z, 0.0001);
-    clone.scale.setScalar(1.6 / maxDim);
+    fitToHeight(clone);
   }, [clone]);
 
   useFrame((_, delta) => {
@@ -57,8 +87,8 @@ export function ModelStageCanvas({ models }: { models: StageModel[] }) {
   return (
     <Canvas
       className="h-full w-full"
-      dpr={[1, 1.6]}
-      gl={{ alpha: true, antialias: true }}
+      dpr={[1, 1.25]}
+      gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       camera={{ position: [0, 0.35, 7.2], fov: 32, near: 0.1, far: 40 }}
     >
       <ambientLight intensity={0.7} />
