@@ -8,7 +8,6 @@ import {
   WorkCategoryMarquee,
   type WorkMarqueeProject,
 } from "@/components/sections/work-category-marquee";
-import { groupProjectsByWorkCategory } from "@/lib/work-categories";
 
 type WorkSectionProps = {
   eyebrow?: string | null;
@@ -23,8 +22,6 @@ export function WorkSection({
   intro,
   projects,
 }: WorkSectionProps) {
-  const rows = groupProjectsByWorkCategory(projects);
-
   return (
     <SceneSection id="work" tone="plate" reveal="wipe-left">
       <div className="mx-auto w-full max-w-[1440px] px-5 pt-16 md:px-10 md:pt-24 lg:px-[74px] lg:pt-28">
@@ -47,16 +44,9 @@ export function WorkSection({
         </Reveal>
       </div>
 
-      {rows.length > 0 ? (
-        <div className="mt-12 flex w-full flex-col gap-10 pb-16 md:mt-14 md:gap-12 md:pb-24 lg:pb-28">
-          {rows.map((row, index) => (
-            <WorkCategoryMarquee
-              key={row.key}
-              label={row.label}
-              projects={row.projects}
-              durationSeconds={36 + index * 8}
-            />
-          ))}
+      {projects.length > 0 ? (
+        <div className="mt-12 w-full pb-16 md:mt-14 md:pb-24 lg:pb-28">
+          <WorkCategoryMarquee projects={projects} durationSeconds={40} />
         </div>
       ) : (
         <p className="mx-auto w-full max-w-[1440px] px-5 pb-16 font-sans text-[15px] text-fg-muted md:px-10 md:pb-24 lg:px-[74px] lg:pb-28">
