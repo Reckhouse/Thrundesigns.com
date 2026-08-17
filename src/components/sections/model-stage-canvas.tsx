@@ -1,7 +1,13 @@
 "use client";
 
 import { Suspense, useLayoutEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
+import {
+  Canvas,
+  useFrame,
+  useLoader,
+  useThree,
+  type ThreeEvent,
+} from "@react-three/fiber";
 import { Center } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
 import * as THREE from "three";
@@ -149,13 +155,18 @@ function registerBasisuBufferPlugin(loader: GLTFLoader) {
   }));
 }
 
-function fitScale(root: THREE.Object3D, target = 1.55) {
+function measureMeshBox(root: THREE.Object3D) {
   const box = new THREE.Box3();
   root.updateWorldMatrix(true, true);
   root.traverse((obj) => {
     const mesh = obj as THREE.Mesh;
     if (mesh.isMesh && mesh.geometry) box.expandByObject(mesh);
   });
+  return box;
+}
+
+function fitScale(root: THREE.Object3D, target = 1.55) {
+  const box = measureMeshBox(root);
   if (box.isEmpty()) return 1;
   const size = box.getSize(new THREE.Vector3());
   const maxDim = Math.max(size.x, size.y, size.z, 0.0001);
@@ -219,6 +230,12 @@ function StudioEnvironment() {
   return <primitive object={env.map} attach="environment" />;
 }
 
+function disableMeshRaycast(root: THREE.Object3D) {
+  root.traverse((obj) => {
+    obj.raycast = () => {};
+  });
+}
+
 function RotatingModel({
   url,
   x,
@@ -230,20 +247,70 @@ function RotatingModel({
 }) {
   const renderer = useThree((state) => state.gl);
   const group = useRef<THREE.Group>(null);
+  const motion = useRef({
+    falling: false,
+    velocity: new THREE.Vector3(),
+    spin: new THREE.Vector3(),
+  });
   const gltf = useLoader(GLTFLoader, url, (loader) => {
     loader.setMeshoptDecoder(MeshoptDecoder);
     loader.setKTX2Loader(getKtx2Loader(renderer));
     registerBasisuBufferPlugin(loader);
   });
   const scale = useMemo(() => fitScale(gltf.scene), [gltf.scene]);
+  const hitSize = useMemo(() => {
+    const size = measureMeshBox(gltf.scene).getSize(new THREE.Vector3());
+    if (size.lengthSq() === 0) size.set(1, 1, 1);
+    size.multiplyScalar(1.08);
+    return size;
+  }, [gltf.scene]);
 
   useLayoutEffect(() => {
     prepareMaterials(gltf.scene);
+    disableMeshRaycast(gltf.scene);
   }, [gltf.scene]);
 
+  const knockOff = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation();
+    event.nativeEvent.preventDefault();
+    if (event.button !== 0 && event.button !== 2) return;
+    const node = group.current;
+    const state = motion.current;
+    if (!node || state.falling) return;
+    state.falling = true;
+    const away = event.point.clone().sub(node.getWorldPosition(new THREE.Vector3()));
+    away.y = 0;
+    if (away.lengthSq() < 0.0001) away.set(x >= 0 ? 1 : -1, 0, 0.2);
+    away.normalize();
+    state.velocity.set(
+      away.x * (2.4 + Math.random() * 1.4),
+      reduce ? 0.4 : 2.6 + Math.random() * 1.1,
+      away.z * (1.2 + Math.random()) - 0.8,
+    );
+    state.spin.set(
+      (Math.random() - 0.5) * (reduce ? 1.2 : 6),
+      (Math.random() - 0.5) * (reduce ? 1.6 : 8),
+      (Math.random() - 0.5) * (reduce ? 1.2 : 5),
+    );
+  };
+
   useFrame((_, delta) => {
-    if (reduce || !group.current) return;
-    group.current.rotation.y += delta * 0.32;
+    const node = group.current;
+    if (!node) return;
+    const state = motion.current;
+    if (!state.falling) {
+      if (!reduce) node.rotation.y += delta * 0.32;
+      return;
+    }
+    const dt = Math.min(delta, 0.05);
+    state.velocity.y -= 18 * dt;
+    node.position.x += state.velocity.x * dt;
+    node.position.y += state.velocity.y * dt;
+    node.position.z += state.velocity.z * dt;
+    node.rotation.x += state.spin.x * dt;
+    node.rotation.y += state.spin.y * dt;
+    node.rotation.z += state.spin.z * dt;
+    if (node.position.y < -14) node.visible = false;
   });
 
   return (
@@ -253,6 +320,15 @@ function RotatingModel({
           <primitive object={gltf.scene} />
         </group>
       </Center>
+      <mesh onPointerDown={knockOff} onContextMenu={knockOff}>
+        <boxGeometry args={[hitSize.x, hitSize.y, hitSize.z]} />
+        <meshBasicMaterial
+          transparent
+          opacity={0}
+          depthWrite={false}
+          depthTest={false}
+        />
+      </mesh>
     </group>
   );
 }
