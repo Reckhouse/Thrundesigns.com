@@ -28,7 +28,8 @@ const VERCEL = "https://vercel.live https://*.vercel.app";
  * - media-src — Sanity/Blob fallback videos + blob: recordings from experiences
  * - font-src — self + data (next/font)
  * - connect-src — Live Content API, Blob, Turnstile, Upstash via server only
- *   (browser may hit Sanity CDN / presentation endpoints)
+ *   (browser may hit Sanity CDN / presentation endpoints); blob: for KTX2
+ *   transcode round-trips if a loader still uses object URLs
  * - worker-src — Three.js / experience workers + blob workers
  * - frame-src — Turnstile + optional Vimeo/YouTube already used in project video
  * - object-src 'none' — no plugins
@@ -44,7 +45,7 @@ export function buildContentSecurityPolicy(): string {
     `img-src 'self' data: blob: ${SANITY_IMG} ${BLOB}`,
     `media-src 'self' blob: ${SANITY_IMG} ${BLOB}`,
     `font-src 'self' data:`,
-    `connect-src 'self' ${SANITY_API} ${SANITY_IMG} ${BLOB} ${TURNSTILE} ${VERCEL} ${SANITY_STUDIO} https://*.upstash.io`,
+    `connect-src 'self' blob: ${SANITY_API} ${SANITY_IMG} ${BLOB} ${TURNSTILE} ${VERCEL} ${SANITY_STUDIO} https://*.upstash.io`,
     `worker-src 'self' blob:`,
     `child-src 'self' blob:`,
     `frame-src 'self' ${TURNSTILE} https://www.youtube-nocookie.com https://player.vimeo.com ${SANITY_STUDIO}`,

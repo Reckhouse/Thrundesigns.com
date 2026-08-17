@@ -11,7 +11,7 @@ Implemented in [`src/lib/security-headers.ts`](../../src/lib/security-headers.ts
 | `style-src 'self' 'unsafe-inline'` | Tailwind / runtime styles |
 | `img-src ... cdn.sanity.io *.public.blob.vercel-storage.com data: blob:` | CMS posters, Blob media, canvas exports |
 | `media-src ... blob: Sanity/Blob` | Fallback videos + future recordings |
-| `connect-src` Sanity API/CDN, Blob, Turnstile, Vercel, Studio, Upstash | Live Content, Presentation, uploads |
+| `connect-src` Sanity API/CDN, Blob, Turnstile, Vercel, Studio, Upstash, `blob:` | Live Content, Presentation, uploads, KTX2 object-URL fetches |
 | `worker-src 'self' blob:` | Experience workers / WASM bridges |
 | `frame-src` Turnstile, YouTube-nocookie, Vimeo, Studio | Existing embeds + auth widgets |
 | `frame-ancestors 'self' thrundesign.sanity.studio www.sanity.io admin.sanity.io` | Presentation Tool preview iframe |
