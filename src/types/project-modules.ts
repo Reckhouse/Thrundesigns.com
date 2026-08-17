@@ -1,6 +1,9 @@
 import type { PortableTextBlock } from "@portabletext/types";
 import type { MediaAssetValue } from "@/lib/media";
-import type { ThreeExperienceBlockValue } from "@/types/three-experience";
+import type {
+  SanityFileValue,
+  ThreeExperienceBlockValue,
+} from "@/types/three-experience";
 
 type ModuleBase = {
   _key: string;
@@ -59,6 +62,7 @@ export type ProjectQuoteModule = ModuleBase & {
 
 export type ProjectVideoModule = ModuleBase & {
   _type: "projectVideo";
+  file?: SanityFileValue;
   url?: string | null;
   poster?: MediaAssetValue;
   caption?: string | null;
