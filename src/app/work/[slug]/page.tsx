@@ -68,6 +68,12 @@ type ProjectDoc = Partial<
 };
 
 function coverFallback(slug: string) {
+  if (slug === "hollowbeam-website") {
+    return "/images/hollowbeam/homepage-full.png";
+  }
+  if (slug === "hollowbeam") {
+    return "/images/hollowbeam/logo-lockups.png";
+  }
   if (slug === "juniper-and-stone-website") {
     return "/images/juniper-stone-web/homepage-scroll.png";
   }
