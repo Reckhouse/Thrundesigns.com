@@ -21,7 +21,8 @@ const VERCEL = "https://vercel.live https://*.vercel.app";
  * Reasons per directive:
  * - default-src 'self' — deny by default
  * - script-src — Next bundles + Turnstile widget; 'unsafe-inline' retained for
- *   Next/React hydration until nonce wiring lands
+ *   Next/React hydration until nonce wiring lands; 'wasm-unsafe-eval' for
+ *   KTX2/Basis and Meshopt GLB transcoders
  * - style-src — Tailwind/runtime styles require 'unsafe-inline' today
  * - img-src — Sanity CDN, Vercel Blob posters/thumbnails, data/blob for canvases
  * - media-src — Sanity/Blob fallback videos + blob: recordings from experiences
@@ -38,7 +39,7 @@ const VERCEL = "https://vercel.live https://*.vercel.app";
 export function buildContentSecurityPolicy(): string {
   return [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${TURNSTILE}`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' ${TURNSTILE}`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: blob: ${SANITY_IMG} ${BLOB}`,
     `media-src 'self' blob: ${SANITY_IMG} ${BLOB}`,
