@@ -44,6 +44,18 @@ export const homePageQuery = defineQuery(`
     },
     whyThrun,
     finalCta,
+    modelStage[]{
+      _key,
+      label,
+      file{
+        asset->{
+          url,
+          originalFilename,
+          mimeType,
+          size
+        }
+      }
+    },
     seo
   }
 `);

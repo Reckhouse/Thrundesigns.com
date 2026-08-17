@@ -356,6 +356,16 @@ export type HomePage = {
     primaryCta?: Cta;
     secondaryCta?: Cta;
   };
+  modelStage?: Array<{
+    file: {
+      asset?: SanityFileAssetReference;
+      media?: unknown;
+      _type: "file";
+    };
+    label?: string;
+    _type: "homepageModel";
+    _key: string;
+  }>;
   seo?: Seo;
 };
 
@@ -721,7 +731,7 @@ export type SiteSettingsQueryResult = {
 
 // Source: ../src/sanity/lib/queries.ts
 // Variable: homePageQuery
-// Query: *[_type == "homePage"][0]{    hero{      eyebrow,      headline,      support,      primaryCta,      secondaryCta,      servicesMeta,      image    },    servicesIntro,    processIntro,    workIntro,    artifact{      eyebrow,      heading,      intro,      items[]{ label, detail },      footnote,      ctaLabel,      ctaHref    },    engage{      heading,      steps[]{ title, copy },      replyHeading,      replyPoints    },    whyThrun,    finalCta,    seo  }
+// Query: *[_type == "homePage"][0]{    hero{      eyebrow,      headline,      support,      primaryCta,      secondaryCta,      servicesMeta,      image    },    servicesIntro,    processIntro,    workIntro,    artifact{      eyebrow,      heading,      intro,      items[]{ label, detail },      footnote,      ctaLabel,      ctaHref    },    engage{      heading,      steps[]{ title, copy },      replyHeading,      replyPoints    },    whyThrun,    finalCta,    modelStage[]{      _key,      label,      file{        asset->{          url,          originalFilename,          mimeType,          size        }      }    },    seo  }
 export type HomePageQueryResult = {
   hero: {
     eyebrow: string | null;
@@ -786,6 +796,18 @@ export type HomePageQueryResult = {
     primaryCta?: Cta;
     secondaryCta?: Cta;
   } | null;
+  modelStage: Array<{
+    _key: string;
+    label: string | null;
+    file: {
+      asset: {
+        url: string;
+        originalFilename: string | null;
+        mimeType: string;
+        size: number;
+      } | null;
+    };
+  }> | null;
   seo: Seo | null;
 } | null;
 
@@ -1308,7 +1330,7 @@ import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
     '\n  *[_type == "siteSettings"][0]{\n    title,\n    tagline,\n    nav[]{ label, href },\n    footerColumns[]{\n      heading,\n      links[]{ label, href }\n    },\n    seo\n  }\n': SiteSettingsQueryResult;
-    '\n  *[_type == "homePage"][0]{\n    hero{\n      eyebrow,\n      headline,\n      support,\n      primaryCta,\n      secondaryCta,\n      servicesMeta,\n      image\n    },\n    servicesIntro,\n    processIntro,\n    workIntro,\n    artifact{\n      eyebrow,\n      heading,\n      intro,\n      items[]{ label, detail },\n      footnote,\n      ctaLabel,\n      ctaHref\n    },\n    engage{\n      heading,\n      steps[]{ title, copy },\n      replyHeading,\n      replyPoints\n    },\n    whyThrun,\n    finalCta,\n    seo\n  }\n': HomePageQueryResult;
+    '\n  *[_type == "homePage"][0]{\n    hero{\n      eyebrow,\n      headline,\n      support,\n      primaryCta,\n      secondaryCta,\n      servicesMeta,\n      image\n    },\n    servicesIntro,\n    processIntro,\n    workIntro,\n    artifact{\n      eyebrow,\n      heading,\n      intro,\n      items[]{ label, detail },\n      footnote,\n      ctaLabel,\n      ctaHref\n    },\n    engage{\n      heading,\n      steps[]{ title, copy },\n      replyHeading,\n      replyPoints\n    },\n    whyThrun,\n    finalCta,\n    modelStage[]{\n      _key,\n      label,\n      file{\n        asset->{\n          url,\n          originalFilename,\n          mimeType,\n          size\n        }\n      }\n    },\n    seo\n  }\n': HomePageQueryResult;
     '\n  *[_type == "service"] | order(order asc){\n    _id,\n    title,\n    slug,\n    icon,\n    summary,\n    linkLabel\n  }\n': ServicesQueryResult;
     '\n  *[_type == "processStep"] | order(order asc){\n    _id,\n    number,\n    title,\n    copy\n  }\n': ProcessStepsQueryResult;
     '\n  *[_type == "project" && featured == true] | order(order asc){\n    _id,\n    title,\n    slug,\n    industry,\n    services,\n    workCategory,\n    summary,\n    cover\n  }\n': FeaturedProjectsQueryResult;
