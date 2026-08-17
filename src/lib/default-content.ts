@@ -193,6 +193,34 @@ export const defaultHomeContent = {
       },
     },
     {
+      _id: "project-hollowbeam",
+      title: "Hollowbeam",
+      slug: { current: "hollowbeam" },
+      industry: "Architectural furniture · Concept",
+      services: "Brand identity · Visual system · UI foundations",
+      workCategory: "branding-strategy",
+      summary:
+        "A modular furniture brand built around a hollow-beam H — lockups, palette, and UI foundations for spaces that change.",
+      cover: {
+        blobUrl: "/images/hollowbeam/logo-lockups.png",
+        alt: "Hollowbeam logo lockups and color palette",
+      },
+    },
+    {
+      _id: "project-hollowbeam-website",
+      title: "Hollowbeam",
+      slug: { current: "hollowbeam-website" },
+      industry: "Architectural furniture · Concept",
+      services: "Website design · Product configurator · Ecommerce UX",
+      workCategory: "web-design",
+      summary:
+        "Ecommerce and configurator UX for Hollowbeam — homepage, HB-S1 product detail, and a 2D system builder.",
+      cover: {
+        blobUrl: "/images/hollowbeam/homepage-full.png",
+        alt: "Hollowbeam homepage design Room to Change",
+      },
+    },
+    {
       _id: "project-northline",
       title: "Northline Advisory",
       slug: { current: "northline-advisory" },
