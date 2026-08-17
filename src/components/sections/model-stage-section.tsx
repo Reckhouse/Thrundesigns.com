@@ -54,7 +54,7 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
   }, []);
 
   const aria = entries.length
-    ? `Rotating 3D models: ${entries.map((item) => item.label).join(", ")}`
+    ? `Rotating 3D models: ${entries.map((item) => item.label).join(", ")}. Click a model to knock it off the stage.`
     : "3D model stage";
 
   return (
@@ -67,7 +67,8 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
     >
       <div
         ref={stageRef}
-        className="relative h-[58svh] min-h-[320px] w-full md:h-[68svh]"
+        className="relative h-[58svh] min-h-[320px] w-full cursor-pointer md:h-[68svh]"
+        onContextMenu={(event) => event.preventDefault()}
       >
         {active ? (
           <ModelStageErrorBoundary>
