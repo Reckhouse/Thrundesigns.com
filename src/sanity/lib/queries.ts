@@ -178,6 +178,14 @@ export const projectBySlugQuery = defineQuery(`
       },
       _type == "projectVideo" => {
         ...,
+        file{
+          asset->{
+            url,
+            originalFilename,
+            mimeType,
+            size
+          }
+        },
         poster{
           alt,
           blobUrl,
