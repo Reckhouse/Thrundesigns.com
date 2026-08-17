@@ -142,6 +142,49 @@ export const homePage = defineType({
         defineField({ name: "secondaryCta", type: "cta" }),
       ],
     }),
+    defineField({
+      name: "modelStage",
+      title: "3D model stage",
+      description:
+        "GLB models shown in a blank rotating row under the final CTA. Drag to reorder. Leave empty for an empty Three.js stage.",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "homepageModel",
+          title: "GLB model",
+          fields: [
+            defineField({
+              name: "file",
+              title: "GLB file",
+              type: "file",
+              options: {
+                accept: ".glb,.gltf,model/gltf-binary,model/gltf+json",
+              },
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "label",
+              title: "Label",
+              type: "string",
+              description: "Accessible name (e.g. “Cup mockup”).",
+            }),
+          ],
+          preview: {
+            select: {
+              title: "label",
+              filename: "file.asset.originalFilename",
+            },
+            prepare({ title, filename }) {
+              return {
+                title: title || filename || "GLB model",
+                subtitle: filename && title ? filename : "Homepage 3D stage",
+              };
+            },
+          },
+        },
+      ],
+    }),
     defineField({ name: "seo", type: "seo" }),
   ],
   preview: {

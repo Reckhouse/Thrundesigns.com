@@ -7,6 +7,10 @@ import { ArtifactSection } from "@/components/sections/artifact-section";
 import { EngageSection } from "@/components/sections/engage-section";
 import { WhySection } from "@/components/sections/why-section";
 import { FinalCtaSection } from "@/components/sections/final-cta-section";
+import {
+  ModelStageSection,
+  type HomepageModelItem,
+} from "@/components/sections/model-stage-section";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { MountainScene } from "@/components/site/mountain-scene";
@@ -269,6 +273,12 @@ export default async function HomePage() {
             copy={home.finalCta?.copy}
             primaryCta={home.finalCta?.primaryCta}
             secondaryCta={home.finalCta?.secondaryCta}
+          />
+          <ModelStageSection
+            models={asArray<HomepageModelItem>(
+              (cmsHome as { modelStage?: HomepageModelItem[] } | null)
+                ?.modelStage,
+            )}
           />
         </main>
         <SiteFooter tagline={settings?.tagline} />
