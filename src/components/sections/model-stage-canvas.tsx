@@ -5,7 +5,8 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Center, useGLTF } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
 import * as THREE from "three";
-import { KTX2Loader, type GLTFLoader } from "three-stdlib";
+import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 
 type StageModel = {
   url: string;
@@ -18,21 +19,84 @@ function getKtx2Loader(renderer: THREE.WebGLRenderer) {
   if (!ktx2Loader) {
     ktx2Loader = new KTX2Loader().setTranscoderPath("/basis/");
   }
-  ktx2Loader.detectSupport(renderer);
+  try {
+    ktx2Loader.detectSupport(renderer);
+  } catch {
+    const gl = renderer.getContext();
+    ktx2Loader.workerConfig = {
+      astcSupported: Boolean(gl.getExtension("WEBGL_compressed_texture_astc")),
+      astcHDRSupported: false,
+      etc1Supported: Boolean(gl.getExtension("WEBGL_compressed_texture_etc1")),
+      etc2Supported: Boolean(gl.getExtension("WEBGL_compressed_texture_etc")),
+      dxtSupported: Boolean(gl.getExtension("WEBGL_compressed_texture_s3tc")),
+      bptcSupported: Boolean(gl.getExtension("EXT_texture_compression_bptc")),
+      pvrtcSupported: Boolean(
+        gl.getExtension("WEBGL_compressed_texture_pvrtc") ||
+          gl.getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc"),
+      ),
+    };
+  }
   return ktx2Loader;
 }
 
-function fitToHeight(root: THREE.Object3D, target = 1.55) {
+function fitScale(root: THREE.Object3D, target = 1.55) {
   const box = new THREE.Box3();
   root.updateWorldMatrix(true, true);
   root.traverse((obj) => {
     const mesh = obj as THREE.Mesh;
     if (mesh.isMesh && mesh.geometry) box.expandByObject(mesh);
   });
-  if (box.isEmpty()) return;
+  if (box.isEmpty()) return 1;
   const size = box.getSize(new THREE.Vector3());
   const maxDim = Math.max(size.x, size.y, size.z, 0.0001);
-  root.scale.multiplyScalar(target / maxDim);
+  return target / maxDim;
+}
+
+function prepareMaterials(root: THREE.Object3D) {
+  root.traverse((obj) => {
+    const mesh = obj as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const materials = Array.isArray(mesh.material)
+      ? mesh.material
+      : [mesh.material];
+    for (const material of materials) {
+      if (
+        !(material instanceof THREE.MeshStandardMaterial) &&
+        !(material instanceof THREE.MeshPhysicalMaterial)
+      ) {
+        continue;
+      }
+      material.envMapIntensity = 1.2;
+      if (material.map) {
+        material.map.colorSpace = THREE.SRGBColorSpace;
+        material.map.wrapS = THREE.RepeatWrapping;
+        material.map.wrapT = THREE.RepeatWrapping;
+        material.map.needsUpdate = true;
+      }
+      material.needsUpdate = true;
+    }
+  });
+}
+
+function StudioEnvironment() {
+  const renderer = useThree((state) => state.gl);
+  const env = useMemo(() => {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const room = new RoomEnvironment();
+    const map = pmrem.fromScene(room, 0.04).texture;
+    room.dispose();
+    return { map, pmrem };
+  }, [renderer]);
+
+  useLayoutEffect(() => {
+    const { map, pmrem } = env;
+    return () => {
+      map.dispose();
+      pmrem.dispose();
+    };
+  }, [env]);
+
+  return <primitive object={env.map} attach="environment" />;
 }
 
 function RotatingModel({
@@ -46,20 +110,18 @@ function RotatingModel({
 }) {
   const renderer = useThree((state) => state.gl);
   const group = useRef<THREE.Group>(null);
-  const { scene } = useGLTF(
-    url,
-    false,
-    true,
-    (loader) => {
-      const gltfLoader = loader as GLTFLoader;
-      gltfLoader.setKTX2Loader(getKtx2Loader(renderer));
-    },
-  );
-  const clone = useMemo(() => scene.clone(true), [scene]);
+  const { scene } = useGLTF(url, false, true, (loader) => {
+    loader.setKTX2Loader(
+      getKtx2Loader(renderer) as unknown as Parameters<
+        typeof loader.setKTX2Loader
+      >[0],
+    );
+  });
+  const scale = useMemo(() => fitScale(scene), [scene]);
 
   useLayoutEffect(() => {
-    fitToHeight(clone);
-  }, [clone]);
+    prepareMaterials(scene);
+  }, [scene]);
 
   useFrame((_, delta) => {
     if (reduce || !group.current) return;
@@ -67,9 +129,11 @@ function RotatingModel({
   });
 
   return (
-    <group ref={group} position={[x, 0, 0]}>
+    <group ref={group} position={[x, 0, 0]} scale={scale}>
       <Center>
-        <primitive object={clone} />
+        <group>
+          <primitive object={scene} />
+        </group>
       </Center>
     </group>
   );
@@ -91,9 +155,11 @@ export function ModelStageCanvas({ models }: { models: StageModel[] }) {
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       camera={{ position: [0, 0.35, 7.2], fov: 32, near: 0.1, far: 40 }}
     >
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[4, 8, 6]} intensity={1.15} />
-      <directionalLight position={[-5, 2, -3]} intensity={0.35} />
+      <StudioEnvironment />
+      <ambientLight intensity={0.28} />
+      <hemisphereLight color="#f3eee6" groundColor="#1b1b1b" intensity={0.55} />
+      <directionalLight position={[4, 8, 6]} intensity={1.35} />
+      <directionalLight position={[-5, 2, -3]} intensity={0.4} />
       <Suspense fallback={null}>
         {models.map((model, index) => (
           <RotatingModel
