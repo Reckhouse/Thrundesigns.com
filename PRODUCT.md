@@ -38,11 +38,10 @@ Visitors evaluate the studio from a marketing site (homepage, work, process) and
 - Marketing routes: home, work index, project detail, quote
 - Content managed in Sanity CMS (`fbuy6kak` / `production`)
 - Quote submissions with optional Vercel Blob attachments
-- Production URL for now: `https://thrundesigns-com.vercel.app` (custom domain deferred)
+- Production URL: `https://www.thrundesigns.com` (apex `thrundesigns.com` redirects to www)
 
 **Undecided / open**
 
-- Custom production domain (`thrundesign.com`) not purchased yet
 - Accessibility standard beyond baseline good practice not specified
 
 ## Brand Commitments

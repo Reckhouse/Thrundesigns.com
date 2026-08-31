@@ -9,14 +9,10 @@ import {
   verifyAttachmentSessionCookie,
 } from "@/lib/quote/attachment-session";
 import { logQuoteSecurity } from "@/lib/quote/security-log";
+import { getSiteUrl } from "@/lib/site-url";
 
 function siteOrigin(): string {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "https://thrundesigns-com.vercel.app")
-  ).replace(/\/$/, "");
+  return getSiteUrl();
 }
 
 export async function GET(request: Request) {

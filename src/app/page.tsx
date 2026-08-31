@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { SanityImageSource } from "@sanity/image-url";
 import { HeroSection } from "@/components/sections/hero-section";
 import { ServicesSection } from "@/components/sections/services-section";
 import { ProcessSection } from "@/components/sections/process-section";
@@ -19,6 +20,11 @@ import { resolveControlledChaosCardSrc } from "@/lib/controlled-chaos-media";
 import { resolveCounterspaceCardSrc } from "@/lib/counterspace-media";
 import { defaultHomeContent } from "@/lib/default-content";
 import { resolveMediaUrl } from "@/lib/media";
+import {
+  SITE_NAME,
+  buildPageMetadata,
+  seoImageUrl,
+} from "@/lib/seo";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
   featuredProjectsQuery,
@@ -36,24 +42,33 @@ export async function generateMetadata(): Promise<Metadata> {
     query: homePageQuery,
     stega: false,
   }).catch(() => ({ data: null }));
-  const seo = (data as { seo?: { title?: string; description?: string } } | null)
-    ?.seo;
+  const seo = (
+    data as {
+      seo?: {
+        title?: string;
+        description?: string;
+        ogImage?: SanityImageSource | null;
+      };
+    } | null
+  )?.seo;
   const hero = (data as { hero?: { headline?: string; support?: string } } | null)
     ?.hero;
+  const title = seo?.title || SITE_NAME;
+  const description =
+    seo?.description ||
+    hero?.support ||
+    defaultHomeContent.home.hero.support;
+  const imageUrl = seoImageUrl(seo?.ogImage);
+
   return {
-    title: seo?.title || undefined,
-    description:
-      seo?.description ||
-      hero?.support ||
-      defaultHomeContent.home.hero.support,
-    alternates: { canonical: "/" },
-    openGraph: {
-      title: seo?.title || hero?.headline || "Thrun Design Co.",
-      description:
-        seo?.description ||
-        hero?.support ||
-        defaultHomeContent.home.hero.support,
-    },
+    ...buildPageMetadata({
+      title,
+      description,
+      path: "/",
+      imageUrl,
+    }),
+    // Keep the root title as the bare site name (no "%s · Site" wrapping).
+    title: seo?.title ? title : { absolute: SITE_NAME },
   };
 }
 

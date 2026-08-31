@@ -2,7 +2,7 @@
 
 Dark editorial marketing site for Thrun Design Co.
 
-**Production:** https://thrundesigns-com.vercel.app  
+**Production:** https://www.thrundesigns.com  
 **Studio:** https://thrundesign.sanity.studio
 
 ## Stack
@@ -134,7 +134,7 @@ success to the client.
 
 Using the Vercel production domain for now (no custom domain):
 
-https://thrundesigns-com.vercel.app
+https://www.thrundesigns.com
 
 Merge the site PR into `main` so that URL serves the full app (not the
 scaffold initial commit). Custom domain `thrundesign.com` can be added later.
@@ -196,7 +196,7 @@ Quote files stay in the private Blob store. Operators get short-lived signed URL
 Studio env (public site URL only — never put the secret in Studio):
 
 ```bash
-SANITY_STUDIO_SITE_URL=https://thrundesigns-com.vercel.app
+SANITY_STUDIO_SITE_URL=https://www.thrundesigns.com
 ```
 
 `QUOTE_ATTACHMENT_SECRET` (min 16 chars) defaults to `QUOTE_FORM_SECRET` when unset.

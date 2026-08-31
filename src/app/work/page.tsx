@@ -9,18 +9,19 @@ import { resolveControlledChaosCardSrc } from "@/lib/controlled-chaos-media";
 import { resolveCounterspaceCardSrc } from "@/lib/counterspace-media";
 import { defaultHomeContent } from "@/lib/default-content";
 import { resolveMediaUrl } from "@/lib/media";
+import { buildPageMetadata } from "@/lib/seo";
 import { sanityFetch } from "@/sanity/lib/live";
 import { projectsQuery, siteSettingsQuery } from "@/sanity/lib/queries";
 
 /** Keep the work index fresh when projects are added in Sanity. */
 export const revalidate = 30;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Concept studies",
   description:
     "Concept projects from Thrun Design Co.: speculative studies until real client work replaces them.",
-  alternates: { canonical: "/work" },
-};
+  path: "/work",
+});
 
 function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];

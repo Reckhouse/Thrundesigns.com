@@ -27,18 +27,24 @@ export function Eyebrow({ children, className }: EyebrowProps) {
 type SectionHeadingProps = {
   children: React.ReactNode;
   className?: string;
+  /** Use `h1` for page heroes; defaults to `h2` for section titles. */
+  as?: "h1" | "h2";
 };
 
-export function SectionHeading({ children, className }: SectionHeadingProps) {
+export function SectionHeading({
+  children,
+  className,
+  as: Tag = "h2",
+}: SectionHeadingProps) {
   return (
-    <h2
+    <Tag
       className={cn(
         "text-balance font-display text-[clamp(1.85rem,4vw,3.5rem)] leading-[1.08] tracking-[-0.02em] text-fg",
         className,
       )}
     >
       {children}
-    </h2>
+    </Tag>
   );
 }
 

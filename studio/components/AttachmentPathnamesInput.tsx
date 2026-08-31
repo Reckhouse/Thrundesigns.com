@@ -5,7 +5,7 @@ import { Button, Card, Flex, Stack, Text, TextInput } from "@sanity/ui";
 function siteUrl(): string {
   return (
     process.env.SANITY_STUDIO_SITE_URL ||
-    "https://thrundesigns-com.vercel.app"
+    "https://www.thrundesigns.com"
   ).replace(/\/$/, "");
 }
 

@@ -48,6 +48,7 @@ export type QuoteFormConfig = {
   seo?: {
     title?: string | null;
     description?: string | null;
+    ogImage?: unknown | null;
   } | null;
 };
 

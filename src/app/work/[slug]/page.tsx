@@ -2,6 +2,7 @@ import { ExperienceLaunchLink } from "@/components/experiences/ExperienceLaunchL
 import { FeaturedCreationsGallery } from "@/components/project/featured-creations-gallery";
 import { ProjectMediaFrame } from "@/components/project/project-media-frame";
 import { ProjectModules } from "@/components/project/project-modules";
+import { ProjectJsonLd } from "@/components/seo/json-ld";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { Eyebrow, SectionHeading } from "@/components/site/primitives";
@@ -28,6 +29,7 @@ import {
 } from "@/lib/media";
 import { projectMediaDataAttribute } from "@/lib/sanity-data-attribute";
 import { cn } from "@/lib/utils";
+import { buildPageMetadata } from "@/lib/seo";
 import { urlFor } from "@/sanity/lib/image";
 import { sanityFetch } from "@/sanity/lib/live";
 import {
@@ -124,15 +126,14 @@ export async function generateMetadata({
     ogImage = resolveMediaUrl(cms?.cover, 1200) || undefined;
   }
 
-  return {
+  return buildPageMetadata({
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
-    },
-  };
+    path: `/work/${slug}`,
+    imageUrl: ogImage,
+    imageAlt: title,
+    type: "article",
+  });
 }
 
 export default async function ProjectDetailPage({ params }: PageProps) {
@@ -213,6 +214,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   return (
     <>
+      <ProjectJsonLd
+        title={project.title || "Project"}
+        description={
+          project.summary ||
+          project.services ||
+          "Case study from Thrun Design Co."
+        }
+        path={`/work/${slug}`}
+        imageUrl={imageSrc}
+      />
       <SiteHeader nav={settings?.nav} />
       <main className="flex-1 pt-[120px] md:pt-[136px] lg:pt-[152px]">
         <article>
@@ -226,7 +237,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                   ← Back to work
                 </Link>
                 <Eyebrow className="mt-8">{project.industry}</Eyebrow>
-                <SectionHeading className="mt-4">{project.title}</SectionHeading>
+                <SectionHeading as="h1" className="mt-4">{project.title}</SectionHeading>
                 <p className="mt-6 font-sans text-[15px] text-fg-muted">
                   {project.services}
                 </p>

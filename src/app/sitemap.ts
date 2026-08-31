@@ -27,11 +27,42 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${base}/`, lastModified: now },
-    { url: `${base}/work`, lastModified: now },
-    { url: `${base}/quote`, lastModified: now },
-    { url: `${base}/lab/controlled-chaos`, lastModified: now },
-    { url: `${base}/lab/living-engraving`, lastModified: now },
+    {
+      url: `${base}/`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: `${base}/work`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${base}/quote`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${base}/lab/controlled-chaos`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${base}/lab/living-engraving`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${base}/lab/counterspace`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
   ];
 
   const projectRoutes: MetadataRoute.Sitemap = projects
@@ -41,6 +72,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: project._updatedAt
         ? new Date(project._updatedAt)
         : now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
     }));
 
   return [...staticRoutes, ...projectRoutes];

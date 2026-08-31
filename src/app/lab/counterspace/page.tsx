@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { LabExperienceClient } from "@/app/lab/counterspace/lab-experience-client";
 import { parseCounterspaceLabConfig } from "@/experiences/counterspace/parseLabSearchParams";
@@ -8,15 +9,11 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export const metadata: Metadata = {
-  title: "Counterspace Field Laboratory",
-  description:
-    "Interactive speculative geometry sandbox — signed emitters, four vector-field operators, and inspectable equilibrium from Thrun Design Co.",
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Counterspace Field Laboratory',
+  description: 'Interactive speculative geometry sandbox — signed emitters, four vector-field operators, and inspectable equilibrium from Thrun Design Co.',
+  path: '/lab/counterspace',
+});
 
 export default async function CounterspaceLabPage({
   searchParams,
