@@ -42,6 +42,8 @@ function allowedOrigins(): string[] {
   if (vercel) origins.add(`https://${vercel}`);
   const vercelUrl = process.env.VERCEL_URL;
   if (vercelUrl) origins.add(`https://${vercelUrl}`);
+  origins.add("https://www.thrundesigns.com");
+  origins.add("https://thrundesigns.com");
   origins.add("https://thrundesigns-com.vercel.app");
   if (process.env.NODE_ENV !== "production") {
     origins.add("http://localhost:3000");
@@ -54,7 +56,13 @@ function isAllowedHost(hostname: string): boolean {
   if (hostname === "localhost" || hostname === "127.0.0.1") {
     return process.env.NODE_ENV !== "production";
   }
-  if (hostname === "thrundesigns-com.vercel.app") return true;
+  if (
+    hostname === "www.thrundesigns.com" ||
+    hostname === "thrundesigns.com" ||
+    hostname === "thrundesigns-com.vercel.app"
+  ) {
+    return true;
+  }
   // Vercel preview deployments for this project
   if (
     hostname.endsWith(".vercel.app") &&

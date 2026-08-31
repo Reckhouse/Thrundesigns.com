@@ -49,7 +49,12 @@ export const siteSettings = defineType({
         },
       ],
     }),
-    defineField({ name: "seo", type: "seo" }),
+    defineField({
+      name: "seo",
+      type: "seo",
+      description:
+        "Optional sitewide SEO defaults. Most pages prefer their own SEO fields; homepage falls back to hero copy when blank.",
+    }),
   ],
   preview: {
     prepare: () => ({ title: "Site settings" }),

@@ -11,7 +11,7 @@ const dataset = process.env.SANITY_STUDIO_DATASET || "production";
 const previewOrigin =
   process.env.SANITY_STUDIO_PREVIEW_ORIGIN ||
   process.env.SANITY_STUDIO_SITE_URL ||
-  "https://thrundesigns-com.vercel.app";
+  "https://www.thrundesigns.com";
 
 export default defineConfig({
   name: "thrundesign",

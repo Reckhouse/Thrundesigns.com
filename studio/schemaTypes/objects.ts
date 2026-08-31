@@ -15,13 +15,28 @@ export const seo = defineType({
   name: "seo",
   title: "SEO",
   type: "object",
+  description:
+    "Optional overrides for search and social previews. Leave blank to use the page title, summary, cover image, or site defaults.",
   fields: [
-    defineField({ name: "title", type: "string" }),
-    defineField({ name: "description", type: "text", rows: 3 }),
+    defineField({
+      name: "title",
+      type: "string",
+      description:
+        "Browser tab / search title. Keep under ~60 characters. Blank = page or site default.",
+    }),
+    defineField({
+      name: "description",
+      type: "text",
+      rows: 3,
+      description:
+        "Meta description for search snippets (~150–160 characters). Blank = summary or site default.",
+    }),
     defineField({
       name: "ogImage",
       type: "image",
       options: { hotspot: true },
+      description:
+        "Open Graph / Twitter share image (1200×630 ideal). Blank = cover image or site default.",
     }),
   ],
 });
