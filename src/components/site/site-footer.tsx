@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { stegaClean } from "@sanity/client/stega";
 import { BrandLogo } from "@/components/icons/brand-logo";
+import { FooterLegalLinks } from "@/components/site/footer-legal-links";
 
 const defaultColumns = [
   {
@@ -85,9 +86,12 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 border-t border-line px-6 py-6 font-mono text-caption uppercase tracking-[0.12em] text-fg-muted md:flex-row md:items-center md:justify-between md:px-10 lg:px-[74px]">
-        <p>© {new Date().getFullYear()} Thrun Design Co.</p>
-        <p>Brand systems for growing businesses</p>
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 border-t border-line px-6 py-6 md:px-10 lg:px-[74px]">
+        <div className="flex flex-col gap-3 font-mono text-caption uppercase tracking-[0.12em] text-fg-muted md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} Thrun Design Co.</p>
+          <p>Brand systems for growing businesses</p>
+        </div>
+        <FooterLegalLinks />
       </div>
     </footer>
   );
