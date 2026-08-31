@@ -10,10 +10,16 @@ type PageProps = {
 };
 
 export const metadata: Metadata = buildPageMetadata({
-  title: 'Controlled Chaos Poster Lab',
-  description: 'Fullscreen interactive poster lab from Thrun Design Co. — a Three.js experience case study.',
-  path: '/lab/controlled-chaos',
+  title: "Controlled Chaos Poster Lab",
+  description:
+    "Fullscreen interactive poster lab from Thrun Design Co. — a Three.js experience case study.",
+  path: "/lab/controlled-chaos",
+  // Experience tools: keep linked from the case study, but do not index thin lab shells.
+  noIndex: true,
 });
+
+/** Public lab shells can be cached at the edge; personalization uses client fetch. */
+export const revalidate = 300;
 
 export default async function ControlledChaosLabPage({
   searchParams,

@@ -21,7 +21,8 @@ import { resolveCounterspaceCardSrc } from "@/lib/counterspace-media";
 import { defaultHomeContent } from "@/lib/default-content";
 import { resolveMediaUrl } from "@/lib/media";
 import {
-  SITE_NAME,
+  DEFAULT_DESCRIPTION,
+  HOME_PAGE_TITLE,
   buildPageMetadata,
   seoImageUrl,
 } from "@/lib/seo";
@@ -51,13 +52,10 @@ export async function generateMetadata(): Promise<Metadata> {
       };
     } | null
   )?.seo;
-  const hero = (data as { hero?: { headline?: string; support?: string } } | null)
-    ?.hero;
-  const title = seo?.title || SITE_NAME;
-  const description =
-    seo?.description ||
-    hero?.support ||
-    defaultHomeContent.home.hero.support;
+  // Prefer CMS SEO when set; otherwise use the audit-recommended defaults so
+  // server HTML and the root layout description stay identical.
+  const title = seo?.title?.trim() || HOME_PAGE_TITLE;
+  const description = seo?.description?.trim() || DEFAULT_DESCRIPTION;
   const imageUrl = seoImageUrl(seo?.ogImage);
 
   return {
@@ -67,8 +65,8 @@ export async function generateMetadata(): Promise<Metadata> {
       path: "/",
       imageUrl,
     }),
-    // Keep the root title as the bare site name (no "%s · Site" wrapping).
-    title: seo?.title ? title : { absolute: SITE_NAME },
+    // Absolute title preserves the "|" brand form (template uses "·").
+    title: { absolute: title },
   };
 }
 

@@ -24,10 +24,10 @@ import {
 import { useState } from "react";
 
 const defaultNav = [
-  { label: "Services", href: "/#services" },
+  { label: "Services", href: "/services/brand-identity" },
   { label: "Work", href: "/work" },
   { label: "Process", href: "/#process" },
-  { label: "Why Thrun", href: "/#about" },
+  { label: "About", href: "/about" },
 ];
 
 type SiteHeaderProps = {

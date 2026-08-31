@@ -2,10 +2,15 @@ import { ExperienceLaunchLink } from "@/components/experiences/ExperienceLaunchL
 import { FeaturedCreationsGallery } from "@/components/project/featured-creations-gallery";
 import { ProjectMediaFrame } from "@/components/project/project-media-frame";
 import { ProjectModules } from "@/components/project/project-modules";
+import { ProjectContinueSection } from "@/components/project/project-continue-section";
 import { ProjectJsonLd } from "@/components/seo/json-ld";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { Eyebrow, SectionHeading } from "@/components/site/primitives";
+import {
+  relatedProjectsForSlug,
+  serviceContextForProject,
+} from "@/lib/related-projects";
 import { mapSanityExperienceConfig } from "@/experiences/mapSanityExperienceConfig";
 import { withLabReturnPath } from "@/experiences/controlled-chaos/parseLabSearchParams";
 import {
@@ -48,6 +53,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+/** Public case studies are cacheable portfolio content (ISR). */
+export const revalidate = 60;
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
@@ -67,6 +75,7 @@ type ProjectDoc = Partial<
   modules?: ProjectModule[] | null;
   primaryExperience?: ThreeExperienceBlockValue | null;
   featuredCreations?: FeaturedCreationValue[] | null;
+  workCategory?: string | null;
 };
 
 function coverFallback(slug: string) {
@@ -212,6 +221,24 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         }
       : null;
 
+  const service = serviceContextForProject({
+    services: project.services,
+    workCategory: project.workCategory || fallback?.workCategory,
+  });
+  const related = relatedProjectsForSlug(
+    slug,
+    defaultHomeContent.projects.map((item) => ({
+      slug: item.slug.current,
+      title: item.title,
+      summary: item.summary,
+      industry: item.industry,
+      services: item.services,
+      workCategory: item.workCategory,
+      imageSrc: item.cover?.blobUrl || null,
+      imageAlt: item.cover?.alt || item.title,
+    })),
+  );
+
   return (
     <>
       <ProjectJsonLd
@@ -324,6 +351,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             caseStudyPath={`/work/${slug}`}
             documentId={project._id}
           />
+          <ProjectContinueSection service={service} related={related} />
         </article>
       </main>
       <SiteFooter

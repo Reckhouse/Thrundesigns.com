@@ -25,6 +25,7 @@ import {
   projectTypeFromServiceIcon,
   quoteHrefForProjectType,
 } from "@/lib/quote/project-type";
+import { getServiceByIcon } from "@/lib/services";
 
 type Service = {
   _id: string;
@@ -110,11 +111,25 @@ export function ServicesSection({
                         {service.summary}
                       </CardDescription>
                     </CardContent>
-                    <CardFooter className="border-line/70 bg-transparent">
+                    <CardFooter className="flex flex-col items-start gap-3 border-line/70 bg-transparent">
+                      <TextLink
+                        href={
+                          getServiceByIcon(service.icon)
+                            ? `/services/${getServiceByIcon(service.icon)!.slug}`
+                            : quoteHrefForProjectType(
+                                projectTypeFromServiceIcon(service.icon),
+                              )
+                        }
+                      >
+                        {getServiceByIcon(service.icon)
+                          ? `Explore ${getServiceByIcon(service.icon)!.shortTitle.toLowerCase()}`
+                          : service.linkLabel || "Request a quote"}
+                      </TextLink>
                       <TextLink
                         href={quoteHrefForProjectType(
                           projectTypeFromServiceIcon(service.icon),
                         )}
+                        className="text-fg-muted"
                       >
                         {service.linkLabel || "Request a quote"}
                       </TextLink>

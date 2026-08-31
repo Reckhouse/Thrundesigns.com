@@ -6,19 +6,19 @@ const defaultColumns = [
   {
     heading: "Explore",
     links: [
-      { label: "Services", href: "/#services" },
+      { label: "Services", href: "/services/brand-identity" },
       { label: "Concept studies", href: "/work" },
+      { label: "About", href: "/about" },
       { label: "Process", href: "/#process" },
-      { label: "Why Thrun", href: "/#about" },
     ],
   },
   {
     heading: "Services",
     links: [
-      { label: "Brand & system architecture", href: "/#services" },
-      { label: "Web design & maintenance", href: "/#services" },
-      { label: "Business marketing audits", href: "/#services" },
-      { label: "Print & digital assets", href: "/#services" },
+      { label: "Brand identity", href: "/services/brand-identity" },
+      { label: "Web design", href: "/services/web-design" },
+      { label: "Marketing audit", href: "/services/marketing-audit" },
+      { label: "Print & digital", href: "/services/print-digital" },
     ],
   },
   {

@@ -182,7 +182,7 @@ export function WorkCategoryMarquee({
               />
             ))}
           </div>
-          <div className="flex gap-4" aria-hidden>
+          <div className="flex gap-4" aria-hidden inert>
             {loopSource.map((project, index) => (
               <MarqueeCard
                 key={`${project._id}-b-${index}`}

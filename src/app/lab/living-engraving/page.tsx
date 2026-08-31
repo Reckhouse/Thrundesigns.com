@@ -10,10 +10,14 @@ type PageProps = {
 };
 
 export const metadata: Metadata = buildPageMetadata({
-  title: 'Living Engraving',
-  description: 'Interactive horse-head particle cameo — the Living Engraving Three.js experience from Thrun Design Co.',
-  path: '/lab/living-engraving',
+  title: "Living Engraving",
+  description:
+    "Interactive horse-head particle cameo — the Living Engraving Three.js experience from Thrun Design Co.",
+  path: "/lab/living-engraving",
+  noIndex: true,
 });
+
+export const revalidate = 300;
 
 export default async function LivingEngravingLabPage({
   searchParams,

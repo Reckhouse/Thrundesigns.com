@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getSiteUrl } from "@/lib/site-url";
+import { SERVICES } from "@/lib/services";
 import { client } from "@/sanity/lib/client";
 
 type ProjectSlug = {
@@ -8,9 +9,12 @@ type ProjectSlug = {
   _updatedAt?: string | null;
 };
 
+/**
+ * Sitemap lastmod should reflect meaningful content updates—not deploy time.
+ * Static marketing pages omit lastModified unless we have a real content date.
+ */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = getSiteUrl();
-  const now = new Date();
 
   let projects: ProjectSlug[] = [];
   try {
@@ -27,53 +31,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: `${base}/`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${base}/work`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${base}/quote`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${base}/lab/controlled-chaos`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${base}/lab/living-engraving`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${base}/lab/counterspace`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
+    { url: `${base}/` },
+    { url: `${base}/work` },
+    { url: `${base}/about` },
+    { url: `${base}/quote` },
+    ...SERVICES.map((service) => ({
+      url: `${base}/services/${service.slug}`,
+    })),
   ];
 
   const projectRoutes: MetadataRoute.Sitemap = projects
     .filter((project) => Boolean(project.slug))
     .map((project) => ({
       url: `${base}/work/${project.slug}`,
-      lastModified: project._updatedAt
-        ? new Date(project._updatedAt)
-        : now,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
+      ...(project._updatedAt
+        ? { lastModified: new Date(project._updatedAt) }
+        : {}),
     }));
 
   return [...staticRoutes, ...projectRoutes];
