@@ -10,10 +10,14 @@ type PageProps = {
 };
 
 export const metadata: Metadata = buildPageMetadata({
-  title: 'Counterspace Field Laboratory',
-  description: 'Interactive speculative geometry sandbox — signed emitters, four vector-field operators, and inspectable equilibrium from Thrun Design Co.',
-  path: '/lab/counterspace',
+  title: "Counterspace Field Laboratory",
+  description:
+    "Interactive speculative geometry sandbox — signed emitters, four vector-field operators, and inspectable equilibrium from Thrun Design Co.",
+  path: "/lab/counterspace",
+  noIndex: true,
 });
+
+export const revalidate = 300;
 
 export default async function CounterspaceLabPage({
   searchParams,

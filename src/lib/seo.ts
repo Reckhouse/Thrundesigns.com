@@ -6,14 +6,19 @@ import { getSiteUrl } from "@/lib/site-url";
 
 export const SITE_NAME = "Thrun Design Co.";
 
+/** Default meta description — keep identical in layout + homepage generateMetadata. */
 export const DEFAULT_DESCRIPTION =
-  "Strategic brand systems, websites, marketing audits, and print & digital assets for founders and owners facing a rebrand, launch, or outdated site.";
+  "Thrun Design Co. builds brand systems, websites, marketing audits, and campaign assets for founders and owners ready to move forward.";
+
+/** Homepage document title (absolute — includes brand; do not wrap with template). */
+export const HOME_PAGE_TITLE =
+  "Brand & Web Design for Growing Businesses | Thrun Design Co.";
 
 export const DEFAULT_OG_IMAGE = {
-  url: "/images/hero-mountain.jpg",
-  width: 2400,
-  height: 1350,
-  alt: "Snow-capped mountain ridge under a pale dawn sky",
+  url: "/opengraph-image",
+  width: 1200,
+  height: 630,
+  alt: "Thrun Design Co. — brand & web design for growing businesses",
 } as const;
 
 type BuildPageMetadataInput = {
@@ -27,7 +32,9 @@ type BuildPageMetadataInput = {
   imageWidth?: number;
   imageHeight?: number;
   type?: "website" | "article";
+  /** When true, emit robots noindex. Follow defaults to true unless `noFollow`. */
   noIndex?: boolean;
+  noFollow?: boolean;
 };
 
 /**
@@ -57,11 +64,19 @@ export function normalizePageTitle(
   return stripped;
 }
 
-/** Absolute URL for a site-relative path. */
+/** Absolute URL for a site-relative path (root keeps a trailing slash). */
 export function absoluteUrl(path = "/"): string {
   const base = getSiteUrl();
   if (!path || path === "/") return `${base}/`;
-  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${normalized}`;
+}
+
+/** Absolute URL for schema/OG image values that may already be absolute. */
+export function absoluteAssetUrl(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
+  if (/^https?:\/\//i.test(url)) return url;
+  return absoluteUrl(url.startsWith("/") ? url : `/${url}`);
 }
 
 /** Build a 1200×630 Sanity CDN URL for Open Graph when an image is present. */
@@ -91,25 +106,34 @@ export function buildPageMetadata({
   imageHeight = 630,
   type = "website",
   noIndex = false,
+  noFollow = false,
 }: BuildPageMetadataInput): Metadata {
   const canonical = path.startsWith("/") ? path : `/${path}`;
   const url = absoluteUrl(canonical);
   const pageTitle = normalizePageTitle(title);
   const openGraphTitle =
     typeof pageTitle === "string" ? `${pageTitle} · ${SITE_NAME}` : pageTitle.absolute;
-  const image = imageUrl
-    ? {
-        url: imageUrl,
-        width: imageWidth,
-        height: imageHeight,
-        alt: imageAlt || (typeof pageTitle === "string" ? pageTitle : openGraphTitle),
-      }
-    : { ...DEFAULT_OG_IMAGE };
+  const resolvedImageUrl = absoluteAssetUrl(imageUrl) || DEFAULT_OG_IMAGE.url;
+  const image = {
+    url: resolvedImageUrl,
+    width: imageUrl ? imageWidth : DEFAULT_OG_IMAGE.width,
+    height: imageUrl ? imageHeight : DEFAULT_OG_IMAGE.height,
+    alt:
+      imageAlt ||
+      (imageUrl
+        ? typeof pageTitle === "string"
+          ? pageTitle
+          : openGraphTitle
+        : DEFAULT_OG_IMAGE.alt),
+  };
 
   return {
     title: pageTitle,
     description,
-    alternates: { canonical },
+    alternates: {
+      // Root uses trailing slash to match the live URL and sitemap.
+      canonical: canonical === "/" ? absoluteUrl("/") : canonical,
+    },
     openGraph: {
       type,
       locale: "en_US",
@@ -123,10 +147,15 @@ export function buildPageMetadata({
       card: "summary_large_image",
       title: openGraphTitle,
       description,
-      images: [typeof image.url === "string" ? image.url : DEFAULT_OG_IMAGE.url],
+      images: [resolvedImageUrl],
     },
-    ...(noIndex
-      ? { robots: { index: false, follow: false } }
+    ...(noIndex || noFollow
+      ? {
+          robots: {
+            index: !noIndex,
+            follow: !noFollow,
+          },
+        }
       : {}),
   };
 }

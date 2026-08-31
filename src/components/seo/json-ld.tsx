@@ -1,5 +1,10 @@
 import { getSiteUrl } from "@/lib/site-url";
-import { DEFAULT_DESCRIPTION, SITE_NAME, absoluteUrl } from "@/lib/seo";
+import {
+  DEFAULT_DESCRIPTION,
+  SITE_NAME,
+  absoluteAssetUrl,
+  absoluteUrl,
+} from "@/lib/seo";
 
 type JsonLdProps = {
   data: Record<string, unknown> | Record<string, unknown>[];
@@ -88,6 +93,7 @@ export function ProjectJsonLd({
 }: ProjectJsonLdProps) {
   const base = getSiteUrl();
   const url = absoluteUrl(path);
+  const absoluteImage = absoluteAssetUrl(imageUrl);
 
   return (
     <JsonLd
@@ -99,7 +105,7 @@ export function ProjectJsonLd({
           name: title,
           description,
           url,
-          ...(imageUrl ? { image: imageUrl } : {}),
+          ...(absoluteImage ? { image: absoluteImage } : {}),
           ...(dateModified ? { dateModified } : {}),
           author: { "@id": `${base}/#organization` },
           creator: { "@id": `${base}/#organization` },
