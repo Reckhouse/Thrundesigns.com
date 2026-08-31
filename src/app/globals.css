@@ -59,6 +59,14 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Editorial type ramp — prefer these over ad-hoc text-[Npx] */
+  --text-caption: 0.625rem; /* 10px — dense meta / legal */
+  --text-caption--line-height: 1.4;
+  --text-label: 0.6875rem; /* 11px — mono eyebrows, nav, buttons */
+  --text-label--line-height: 1.4;
+  --text-body: 0.9375rem; /* 15px — compact body on dark surfaces */
+  --text-body--line-height: 1.6;
 }
 
 :root {
@@ -116,11 +124,26 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-transparent;
   }
 
   html {
-    @apply scroll-smooth;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   body {
@@ -132,6 +155,7 @@
     color: var(--fg);
   }
 
+  /* Single focus recipe for marketing + forms */
   :focus-visible {
     outline: 2px solid var(--gold);
     outline-offset: 3px;

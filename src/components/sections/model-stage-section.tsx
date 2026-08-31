@@ -25,9 +25,15 @@ type ModelStageSectionProps = {
   models?: HomepageModelItem[] | null;
 };
 
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function ModelStageSection({ models }: ModelStageSectionProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   const entries = (models ?? [])
     .map((item, index) => {
@@ -41,6 +47,15 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
     .filter((item): item is { url: string; label: string } => Boolean(item));
 
   useEffect(() => {
+    setReducedMotion(prefersReducedMotion());
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReducedMotion(media.matches);
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
     const node = stageRef.current;
     if (!node) return;
     const observer = new IntersectionObserver(
@@ -51,7 +66,7 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  }, [reducedMotion]);
 
   const aria = entries.length
     ? `Rotating 3D models: ${entries.map((item) => item.label).join(", ")}. Click a model to knock it off the stage.`
@@ -70,7 +85,19 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
         className="relative h-[58svh] min-h-[320px] w-full cursor-pointer md:h-[68svh]"
         onContextMenu={(event) => event.preventDefault()}
       >
-        {active ? (
+        {reducedMotion ? (
+          <div className="flex h-full flex-col items-center justify-center gap-4 border border-line bg-bg-raised px-6 text-center">
+            <p className="font-mono text-label uppercase tracking-[0.14em] text-gold">
+              3D stage
+            </p>
+            <p className="max-w-[36ch] text-pretty font-sans text-body text-fg-muted">
+              Interactive models are paused because reduced motion is preferred.
+              {entries.length
+                ? ` Featured pieces: ${entries.map((item) => item.label).join(", ")}.`
+                : null}
+            </p>
+          </div>
+        ) : active ? (
           <ModelStageErrorBoundary>
             <ModelStageCanvas models={entries} />
           </ModelStageErrorBoundary>

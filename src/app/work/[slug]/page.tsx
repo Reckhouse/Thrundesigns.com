@@ -232,16 +232,16 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               <div>
                 <Link
                   href="/work"
-                  className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted hover:text-gold"
+                  className="font-mono text-label uppercase tracking-[0.14em] text-fg-muted hover:text-gold"
                 >
                   ← Back to work
                 </Link>
                 <Eyebrow className="mt-8">{project.industry}</Eyebrow>
                 <SectionHeading as="h1" className="mt-4">{project.title}</SectionHeading>
-                <p className="mt-6 font-sans text-[15px] text-fg-muted">
+                <p className="mt-6 font-sans text-body text-fg-muted">
                   {project.services}
                 </p>
-                <p className="mt-8 max-w-md font-sans text-[15px] leading-7 text-fg-muted">
+                <p className="mt-8 max-w-md font-sans text-body leading-7 text-fg-muted">
                   {project.summary ||
                     "A focused case study exploring brand systems, digital presence, and production-ready visual language."}
                 </p>

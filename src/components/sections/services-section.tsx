@@ -61,14 +61,14 @@ export function ServicesSection({
         <Reveal variant="left">
           <Badge
             variant="outline"
-            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
+            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-caption uppercase tracking-[0.16em] text-gold"
           >
             Offer
           </Badge>
           <ClipHeading className="mt-5 text-balance font-display text-[clamp(1.85rem,4vw,3.5rem)] leading-[1.08] tracking-[-0.02em] text-fg">
             {heading || "Four ways we steady a growing brand."}
           </ClipHeading>
-          <p className="mt-6 max-w-[42ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8 md:text-base">
+          <p className="mt-6 max-w-[42ch] text-pretty font-sans text-body leading-7 text-fg-muted md:mt-8 md:text-base">
             {intro ||
               "From the system that holds your identity together to the site you maintain and the materials your team ships every week."}
           </p>
@@ -99,7 +99,7 @@ export function ServicesSection({
                     <CardHeader className="gap-5 border-b border-line/70 pt-7">
                       <div className="flex items-center justify-between">
                         <Icon className="size-11 text-gold" />
-                        <span className="font-mono text-[11px] text-fg-muted">
+                        <span className="font-mono text-label text-fg-muted">
                           0{index + 1}
                         </span>
                       </div>

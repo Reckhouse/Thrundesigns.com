@@ -174,7 +174,7 @@ export function ThreeExperienceSection({
           </SectionHeading>
         ) : null}
         {description ? (
-          <p className="mt-5 max-w-xl font-sans text-[15px] leading-7 text-fg-muted">
+          <p className="mt-5 max-w-xl font-sans text-body leading-7 text-fg-muted">
             {description}
           </p>
         ) : null}
@@ -243,7 +243,7 @@ export function ThreeExperienceSection({
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-bg-deep/90 to-transparent p-6 md:p-8">
                 <p
                   role="status"
-                  className="max-w-md font-sans text-[14px] text-fg"
+                  className="max-w-md font-sans text-sm text-fg"
                 >
                   The interactive version is temporarily unavailable. The case
                   study content above still explains the project.
@@ -255,7 +255,7 @@ export function ThreeExperienceSection({
       ) : (
         <div
           role="status"
-          className="border border-line bg-bg-raised px-6 py-10 font-sans text-[15px] text-fg-muted"
+          className="border border-line bg-bg-raised px-6 py-10 font-sans text-body text-fg-muted"
         >
           Interactive experience poster is missing, so the embed cannot be shown.
         </div>

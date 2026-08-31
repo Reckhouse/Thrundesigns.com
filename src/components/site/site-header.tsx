@@ -109,7 +109,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
           <Magnetic strength={0.2}>
             <Button
               asChild
-              className="group relative inline-flex h-12 overflow-hidden rounded-none bg-gold px-3.5 font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bronze hover:text-fg focus-visible:ring-2 focus-visible:ring-gold sm:h-[52px] sm:px-5 sm:text-[12px]"
+              className="group relative inline-flex h-12 overflow-hidden rounded-none bg-gold px-3.5 font-mono text-label font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bronze hover:text-fg focus-visible:ring-2 focus-visible:ring-gold sm:h-[52px] sm:px-5 sm:text-xs"
             >
               <Link href="/quote">
                 <span
@@ -128,7 +128,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
           <Sheet>
             <SheetTrigger
               className={cn(
-                "inline-flex h-12 items-center justify-center border border-line px-3 font-mono text-[12px] uppercase tracking-[0.14em] text-fg transition-colors hover:border-gold hover:text-gold sm:px-4 lg:hidden",
+                "inline-flex h-12 items-center justify-center border border-line px-3 font-mono text-xs uppercase tracking-[0.14em] text-fg transition-colors hover:border-gold hover:text-gold sm:px-4 lg:hidden",
               )}
             >
               Menu
@@ -150,7 +150,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
                 ))}
                 <Link
                   href="/quote"
-                  className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 bg-gold px-4 py-3 font-mono text-[12px] uppercase tracking-[0.12em] text-ink hover:bg-bronze hover:text-fg"
+                  className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 bg-gold px-4 py-3 font-mono text-xs uppercase tracking-[0.12em] text-ink hover:bg-bronze hover:text-fg"
                 >
                   Request a quote
                   <ArrowUpRight className="size-3.5" aria-hidden />

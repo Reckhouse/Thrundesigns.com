@@ -70,15 +70,15 @@ export default async function CreationPage({
     if (loaded.status === 404 || loaded.status === 400) notFound();
     return (
       <div className="mx-auto flex min-h-[60vh] w-full max-w-[720px] flex-col items-start justify-center gap-4 px-6 py-16">
-        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+        <p className="font-mono text-label uppercase tracking-[0.14em] text-gold">
           Creation unavailable
         </p>
-        <p className="font-sans text-[15px] leading-7 text-fg">
+        <p className="font-sans text-body leading-7 text-fg">
           {loaded.message}
         </p>
         <Link
           href="/work"
-          className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted hover:text-gold"
+          className="font-mono text-label uppercase tracking-[0.14em] text-fg-muted hover:text-gold"
         >
           ← Back to work
         </Link>
@@ -123,7 +123,7 @@ export default async function CreationPage({
       <header className="border-b border-line">
         <div className="mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between gap-4 px-6 md:px-10 lg:px-[74px]">
           <div className="min-w-0">
-            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+            <p className="font-mono text-label uppercase tracking-[0.14em] text-gold">
               Saved creation
             </p>
             <h1 className="truncate font-display text-[1.15rem] leading-tight tracking-[-0.02em]">
@@ -133,7 +133,7 @@ export default async function CreationPage({
           <nav className="flex shrink-0 items-center gap-5">
             <Link
               href={caseStudyHref}
-              className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted transition-colors hover:text-gold"
+              className="font-mono text-label uppercase tracking-[0.14em] text-fg-muted transition-colors hover:text-gold"
             >
               ← Case study
             </Link>
@@ -155,7 +155,7 @@ export default async function CreationPage({
           </div>
         ) : null}
 
-        <p className="max-w-xl font-sans text-[15px] leading-7 text-fg-muted">
+        <p className="max-w-xl font-sans text-body leading-7 text-fg-muted">
           This page replays a saved poster creation. Visitor phrases and private
           assets are not indexed for search.
         </p>
@@ -171,7 +171,7 @@ export default async function CreationPage({
         ) : (
           <div
             role="alert"
-            className="border border-line bg-bg-raised p-6 font-sans text-[15px] text-fg"
+            className="border border-line bg-bg-raised p-6 font-sans text-body text-fg"
           >
             {embed.message}
           </div>

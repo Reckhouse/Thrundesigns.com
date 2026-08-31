@@ -43,14 +43,14 @@ export function ArtifactSection({
         <Reveal variant="left">
           <Badge
             variant="outline"
-            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
+            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-caption uppercase tracking-[0.16em] text-gold"
           >
             {eyebrow || "Sample lens"}
           </Badge>
           <ClipHeading className="mt-5 text-balance font-display text-[clamp(1.85rem,4vw,3.25rem)] leading-[1.08] tracking-[-0.02em] text-fg">
             {heading || "What a marketing audit actually looks for."}
           </ClipHeading>
-          <p className="mt-6 max-w-[42ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:mt-8 md:text-base">
+          <p className="mt-6 max-w-[42ch] text-pretty font-sans text-body leading-7 text-fg-muted md:mt-8 md:text-base">
             {intro ||
               "Not a case study and not invented metrics: a plain excerpt of the questions we bring to a first review so you can judge the fit before you quote."}
           </p>
@@ -71,7 +71,7 @@ export function ArtifactSection({
           {list.map((item, index) => (
             <StaggerItem key={`${item.label}-${index}`} variant="up">
               <div className="grid gap-3 border-b border-line px-5 py-6 last:border-b-0 md:grid-cols-[auto_1fr] md:gap-8 md:px-7 md:py-7">
-                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+                <span className="font-mono text-label uppercase tracking-[0.14em] text-gold">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
@@ -79,7 +79,7 @@ export function ArtifactSection({
                     {item.label}
                   </p>
                   {item.detail ? (
-                    <p className="mt-2 max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+                    <p className="mt-2 max-w-[52ch] text-pretty font-sans text-body leading-7 text-fg-muted">
                       {item.detail}
                     </p>
                   ) : null}
@@ -88,7 +88,7 @@ export function ArtifactSection({
             </StaggerItem>
           ))}
           {footnote ? (
-            <p className="border-t border-line px-5 py-4 font-mono text-[10px] uppercase tracking-[0.14em] text-fg-muted md:px-7">
+            <p className="border-t border-line px-5 py-4 font-mono text-caption uppercase tracking-[0.14em] text-fg-muted md:px-7">
               {footnote}
             </p>
           ) : null}

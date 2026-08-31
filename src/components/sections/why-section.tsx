@@ -92,7 +92,7 @@ export function WhySection({
                   }}
                 >
                   <span className="mt-2 size-1.5 shrink-0 bg-gold" aria-hidden />
-                  <p className="font-sans text-[15px] leading-6 text-fg">
+                  <p className="font-sans text-body leading-6 text-fg">
                     {item}
                   </p>
                 </motion.li>
@@ -135,12 +135,12 @@ export function WhySection({
                     }}
                   >
                     <span
-                      className="font-mono text-[12px] text-gold"
+                      className="font-mono text-xs text-gold"
                       aria-hidden
                     >
                       {item.num}
                     </span>
-                    <p className="font-sans text-[15px] leading-6 text-fg-muted">
+                    <p className="font-sans text-body leading-6 text-fg-muted">
                       {item.label}
                     </p>
                   </motion.li>

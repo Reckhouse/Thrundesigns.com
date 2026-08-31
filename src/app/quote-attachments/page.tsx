@@ -23,7 +23,7 @@ export default async function QuoteAttachmentsPage({
       </p>
 
       {pathname ? (
-        <p className="mt-4 break-all font-mono text-[11px] text-fg-muted">
+        <p className="mt-4 break-all font-mono text-label text-fg-muted">
           {pathname}
         </p>
       ) : null}
@@ -41,7 +41,7 @@ export default async function QuoteAttachmentsPage({
       >
         <input type="hidden" name="pathname" value={pathname} />
         <label className="block space-y-2">
-          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+          <span className="font-mono text-label uppercase tracking-[0.14em] text-gold">
             Operator secret
           </span>
           <input

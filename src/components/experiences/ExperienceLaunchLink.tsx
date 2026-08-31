@@ -36,8 +36,8 @@ export function ExperienceLaunchLink({
       }
       className={cn(
         resolved === "button"
-          ? "group inline-flex h-[52px] items-center gap-2 border border-gold/65 bg-transparent px-[18px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:bg-gold/10 hover:text-gold"
-          : "font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted transition-colors hover:text-gold",
+          ? "group inline-flex h-[52px] items-center gap-2 border border-gold/65 bg-transparent px-[18px] font-mono text-label font-medium uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:bg-gold/10 hover:text-gold"
+          : "font-mono text-label uppercase tracking-[0.14em] text-fg-muted transition-colors hover:text-gold",
         className,
       )}
     >

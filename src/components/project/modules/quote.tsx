@@ -11,7 +11,7 @@ export function QuoteModule({ module }: { module: ProjectQuoteModule }) {
           “{module.quote}”
         </blockquote>
         {module.attribution || module.role ? (
-          <figcaption className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-fg-muted">
+          <figcaption className="mt-6 font-mono text-label uppercase tracking-[0.16em] text-fg-muted">
             {[module.attribution, module.role].filter(Boolean).join(" · ")}
           </figcaption>
         ) : null}

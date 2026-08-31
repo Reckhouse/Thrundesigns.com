@@ -29,11 +29,21 @@ typography:
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.6
+  body-compact:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, sans-serif"
+    fontSize: "0.9375rem"
+    fontWeight: 400
+    lineHeight: 1.6
   label:
     fontFamily: "IBM Plex Mono, ui-monospace, monospace"
     fontSize: "0.6875rem"
     fontWeight: 500
     letterSpacing: "0.14em"
+  caption:
+    fontFamily: "IBM Plex Mono, ui-monospace, monospace"
+    fontSize: "0.625rem"
+    fontWeight: 500
+    letterSpacing: "0.12em"
 rounded:
   none: "0px"
 spacing:
@@ -47,6 +57,7 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.none}"
     padding: "12px 16px"
+    height: "44px"
     typography: "{typography.label}"
   button-primary-hover:
     backgroundColor: "{colors.bronze}"
@@ -58,10 +69,12 @@ components:
   nav-link:
     textColor: "{colors.fg}"
     typography: "{typography.label}"
+    height: "44px"
   input-field:
     backgroundColor: "{colors.bg-raised}"
     textColor: "{colors.fg}"
     rounded: "{rounded.none}"
+    height: "44px"
 ---
 
 # Design System: Thrun Design Co.
@@ -80,25 +93,28 @@ Density is editorial, not dashboard. Sections breathe with large vertical rhythm
 - Zero border-radius; hairline rules instead of cards-as-decoration
 - Persuasion path always ends at the quote request
 
+**Source of truth:** CSS custom properties in `src/app/globals.css` (and Tailwind `@theme` aliases). Keep this document aligned with those values.
+
 ## Colors
 
-A warm-dark editorial palette: charcoal grounds, parchment text, and a single metallic gold voice.
+A warm-dark editorial palette: charcoal grounds, parchment text, and a single metallic gold voice. Values match `globals.css`.
 
 ### Primary
-- **Editorial Gold** (#c59a53): Primary actions, brand emphasis in the hero, hover accents on mono nav. Use sparingly so rarity signals importance.
+- **Editorial Gold** (#d4af6a): Primary actions, brand emphasis in the hero, hover accents on mono nav. Use sparingly so rarity signals importance.
 
 ### Secondary
-- **Deep Bronze** (#7a5d2f): Hover/pressed companion to gold; secondary accent without competing.
+- **Deep Bronze** (#8a6a38): Hover/pressed companion to gold; secondary accent without competing.
 
 ### Neutral
-- **Void Charcoal** (#090b0d): Page background (`bg`).
-- **Raised Charcoal** (#111417): Elevated strips, sheets, popovers (`bg-raised`).
-- **Surface Charcoal** (#15191c): Contained modules (`surface`).
-- **Cream Ink** (#f3f1eb): Primary text (`fg`).
-- **Muted Parchment** (#b3aea4): Supporting copy (`fg-muted`).
-- **Contrast Cream** (#eeeae1): High-contrast panels (e.g. Why Thrun invert).
-- **Near Ink** (#121416): Text on gold buttons (`ink`).
-- **Hairline Graphite** (#2b3033): Borders and rules (`line`).
+- **Void Charcoal** (#0c0d0c): Page background (`bg-deep`).
+- **Base Charcoal** (#171816): Primary field (`bg`).
+- **Raised Charcoal** (#1c1e1b): Elevated strips, sheets, popovers (`bg-raised`).
+- **Surface Charcoal** (#222522): Contained modules (`surface`).
+- **Cream Ink** (#f4f1e9): Primary text (`fg`).
+- **Muted Parchment** (#c7c2b8): Supporting copy (`fg-muted`).
+- **Contrast Cream** (#ebe7df): High-contrast panels (e.g. Why Thrun invert).
+- **Near Ink** (#171816): Text on gold buttons (`ink`).
+- **Hairline** (`rgba(255,255,255,0.18)`): Borders and rules (`line`).
 
 ### Named Rules
 **The One Gold Rule.** Gold appears on primary CTAs, brand lockup emphasis, and selective hover — never as a wash, gradient field, or decorative glow.
@@ -113,12 +129,14 @@ A warm-dark editorial palette: charcoal grounds, parchment text, and a single me
 
 **Character:** Serif display carries editorial authority; Plex Sans keeps founder-facing body copy plain; mono uppercase labels act as quiet section instruments, not loud badges.
 
-### Hierarchy
-- **Display** (Libre, ~clamp large, tight leading): Hero brand and page-defining headlines.
+### Hierarchy / ramp (use utilities, not ad-hoc `text-[Npx]`)
+- **Display** (Libre, clamp large, tight leading): Hero brand and page-defining headlines.
 - **Headline** (Libre): Section titles.
 - **Title** (Libre or Plex medium): Card/service titles.
-- **Body** (Plex Sans, ~16px, 1.6): Support copy; keep ~65–75ch where possible.
-- **Label** (Plex Mono, ~11px, uppercase, 0.14em tracking): Nav, eyebrows, meta lines, button labels.
+- **Body** (`text-base` / 16px, 1.6): Primary reading measure ~65–75ch.
+- **Body compact** (`text-body` / 15px): Dense marketing paragraphs on dark surfaces.
+- **Label** (`text-label` / 11px mono, uppercase, 0.14em): Nav, eyebrows, meta, button labels.
+- **Caption** (`text-caption` / 10px mono): Legal/helper meta only.
 
 ### Named Rules
 **The Brand-First Display Rule.** On branded first viewports, the Thrun name/lockup must compete with — not surrender to — the headline.
@@ -145,6 +163,7 @@ Flat by default. Depth comes from tonal steps (bg → bg-raised → surface) and
 
 ### Buttons
 - **Shape:** Sharp rectangle (0 radius).
+- **Size:** Default control height 44px (`h-11`) for touch.
 - **Primary:** Gold fill, ink text, mono uppercase label; hover → bronze / cream text.
 - **Ghost / outline:** Transparent or hairline border on charcoal; gold hover text where appropriate.
 
@@ -152,13 +171,21 @@ Flat by default. Depth comes from tonal steps (bg → bg-raised → surface) and
 Default: no cards. When a module needs enclosure (services, process), use surface tone + hairline border — no shadow, no radius. Prefer open editorial stacking over card grids when interaction does not require a container.
 
 ### Inputs / Fields
-Charcoal raised field, hairline border, sharp corners. Focus uses gold ring. Errors sit inline near the field in plain language.
+Charcoal raised field, hairline border, sharp corners, **min-height 44px**. Focus uses a gold outline (global `:focus-visible`). Errors sit inline near the field in plain language.
 
 ### Navigation
-Mono uppercase links on charcoal. Desktop: horizontal; mobile: sheet from the right. Primary quote CTA always visible (shortens to “Quote” on small screens).
+Mono uppercase links on charcoal with **min-height 44px** hit areas. Desktop: horizontal; mobile: sheet from the right. Primary quote CTA always visible (shortens to “Quote” on small screens).
 
 ### Signature: PrecisionMark
 A quiet geometric craft mark used sparingly (e.g. final CTA). Do not stamp every section.
+
+### Lab surfaces
+`/lab/*` routes (e.g. Counterspace) may use intentional alternate palettes. Do not leak those tokens into marketing CSS variables.
+
+## Motion & accessibility
+
+- Honor `prefers-reduced-motion`: disable smooth scrolling, marquees, and the homepage WebGL model stage (show a static notice instead).
+- Keep a single gold `:focus-visible` outline across marketing and forms.
 
 ## Do's and Don'ts
 
@@ -167,9 +194,11 @@ A quiet geometric craft mark used sparingly (e.g. final CTA). Do not stamp every
 - **Do** label concept portfolio work as concepts — never as shipped client proof.
 - **Do** push the persuasion path toward `/quote` with clear reply expectations.
 - **Do** preserve Libre + Plex + zero radius as the identity triad.
+- **Do** use `text-caption` / `text-label` / `text-body` instead of one-off pixel sizes.
 
 ### Don't:
 - **Don't** invent testimonials, metrics, logos, or awards.
 - **Don't** use purple gradients, glow, soft UI pills, or dashboard chrome on marketing surfaces.
 - **Don't** fill the first viewport with stats, schedules, or secondary promos.
 - **Don't** present inset hero media cards — hero imagery stays full-bleed / edge-dominant.
+- **Don't** bake the brand name into CMS SEO titles (the layout template already appends `· Thrun Design Co.`).

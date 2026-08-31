@@ -34,16 +34,16 @@ export class ExperienceErrorBoundary extends Component<
           role="alert"
           className="flex min-h-[50vh] flex-col items-start justify-center gap-4 border border-line bg-bg-raised p-8"
         >
-          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+          <p className="font-mono text-label uppercase tracking-[0.14em] text-gold">
             Experience error
           </p>
-          <p className="max-w-lg font-sans text-[15px] leading-7 text-fg">
+          <p className="max-w-lg font-sans text-body leading-7 text-fg">
             The interactive lab failed to render. You can return to the case
             study or reload this page.
           </p>
           <button
             type="button"
-            className="inline-flex h-[44px] items-center border border-line px-4 font-mono text-[11px] uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:text-gold"
+            className="inline-flex h-[44px] items-center border border-line px-4 font-mono text-label uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:text-gold"
             onClick={() => this.setState({ error: null })}
           >
             Try again

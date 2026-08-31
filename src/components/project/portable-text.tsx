@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const components: PortableTextComponents = {
   block: {
     normal: ({ children }) => (
-      <p className="font-sans text-[15px] leading-7 text-fg-muted">{children}</p>
+      <p className="font-sans text-body leading-7 text-fg-muted">{children}</p>
     ),
     h3: ({ children }) => (
       <h3 className="mt-10 font-display text-[clamp(1.35rem,2.4vw,1.85rem)] leading-tight tracking-[-0.02em] text-fg first:mt-0">
@@ -28,12 +28,12 @@ const components: PortableTextComponents = {
   },
   list: {
     bullet: ({ children }) => (
-      <ul className="mt-4 list-disc space-y-2 pl-5 font-sans text-[15px] leading-7 text-fg-muted marker:text-gold">
+      <ul className="mt-4 list-disc space-y-2 pl-5 font-sans text-body leading-7 text-fg-muted marker:text-gold">
         {children}
       </ul>
     ),
     number: ({ children }) => (
-      <ol className="mt-4 list-decimal space-y-2 pl-5 font-sans text-[15px] leading-7 text-fg-muted marker:text-gold">
+      <ol className="mt-4 list-decimal space-y-2 pl-5 font-sans text-body leading-7 text-fg-muted marker:text-gold">
         {children}
       </ol>
     ),

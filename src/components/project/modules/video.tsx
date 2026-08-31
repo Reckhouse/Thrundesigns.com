@@ -27,7 +27,7 @@ export function VideoModule({ module }: { module: ProjectVideoModule }) {
           />
         </div>
         {module.caption ? (
-          <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted">
+          <p className="mt-4 font-mono text-label uppercase tracking-[0.14em] text-fg-muted">
             {module.caption}
           </p>
         ) : null}
@@ -51,7 +51,7 @@ export function VideoModule({ module }: { module: ProjectVideoModule }) {
         />
       </div>
       {module.caption ? (
-        <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted">
+        <p className="mt-4 font-mono text-label uppercase tracking-[0.14em] text-fg-muted">
           {module.caption}
         </p>
       ) : null}

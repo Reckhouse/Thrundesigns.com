@@ -56,14 +56,14 @@ export function EngageSection({
         <Reveal variant="left">
           <Badge
             variant="outline"
-            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
+            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-caption uppercase tracking-[0.16em] text-gold"
           >
             Engagement
           </Badge>
           <ClipHeading className="mt-5 max-w-lg text-balance font-display text-[clamp(1.75rem,3.5vw,2.65rem)] leading-[1.1] tracking-[-0.02em] text-fg">
             {heading || "How we engage, and what you’ll get in a reply."}
           </ClipHeading>
-          <p className="mt-6 max-w-[48ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted md:text-base">
+          <p className="mt-6 max-w-[48ch] text-pretty font-sans text-body leading-7 text-fg-muted md:text-base">
             No invented case studies required. This is the real first step with
             Thrun Design Co.
           </p>
@@ -76,7 +76,7 @@ export function EngageSection({
           <StaggerItem variant="left">
             <Card className="editorial-panel border-line bg-bg-raised/95 py-0">
               <CardHeader className="border-b border-line pt-6">
-                <CardTitle className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+                <CardTitle className="font-mono text-label uppercase tracking-[0.14em] text-gold">
                   How we engage
                 </CardTitle>
               </CardHeader>
@@ -93,8 +93,8 @@ export function EngageSection({
                       value={`step-${index}`}
                       className="border-line"
                     >
-                      <AccordionTrigger className="py-4 text-left font-sans text-[15px] font-medium text-fg hover:no-underline hover:text-gold [&[data-state=open]]:text-gold">
-                        <span className="mr-3 font-mono text-[12px] text-gold">
+                      <AccordionTrigger className="py-4 text-left font-sans text-body font-medium text-fg hover:no-underline hover:text-gold [&[data-state=open]]:text-gold">
+                        <span className="mr-3 font-mono text-xs text-gold">
                           0{index + 1}
                         </span>
                         {step.title}
@@ -112,7 +112,7 @@ export function EngageSection({
           <StaggerItem variant="scale">
             <Card className="editorial-panel border-line bg-bg-raised/95 py-0">
               <CardHeader className="border-b border-line pt-6">
-                <CardTitle className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+                <CardTitle className="font-mono text-label uppercase tracking-[0.14em] text-gold">
                   {replyHeading || "What’s in a reply"}
                 </CardTitle>
               </CardHeader>
@@ -124,7 +124,7 @@ export function EngageSection({
                         className="mt-2 size-1.5 shrink-0 bg-gold"
                         aria-hidden
                       />
-                      <p className="font-sans text-[15px] leading-6 text-fg-muted">
+                      <p className="font-sans text-body leading-6 text-fg-muted">
                         {point}
                       </p>
                     </li>

@@ -98,7 +98,7 @@ function MarqueeCard({
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-deep/85 via-transparent to-transparent" />
           </div>
           <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
+            <p className="font-mono text-caption uppercase tracking-[0.14em] text-gold">
               {project.industry}
             </p>
             <p className="mt-1 truncate font-display text-[1.05rem] leading-tight text-fg">
@@ -112,7 +112,7 @@ function MarqueeCard({
           side="top"
           className="w-72 rounded-none border-line bg-bg-raised p-4 text-fg shadow-none"
         >
-          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-gold">
+          <p className="font-mono text-caption uppercase tracking-[0.14em] text-gold">
             Concept study
           </p>
           <p className="mt-2 font-display text-lg text-fg">{project.title}</p>
@@ -147,7 +147,7 @@ export function WorkCategoryMarquee({
     return (
       <div className="flex w-full flex-col gap-4">
         {label ? (
-          <p className="px-5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold md:px-10 lg:px-[74px]">
+          <p className="px-5 font-mono text-label uppercase tracking-[0.16em] text-gold md:px-10 lg:px-[74px]">
             {label}
           </p>
         ) : null}
@@ -163,7 +163,7 @@ export function WorkCategoryMarquee({
   return (
     <div className="group/marquee flex w-full flex-col gap-4">
       {label ? (
-        <p className="px-5 font-mono text-[11px] uppercase tracking-[0.16em] text-gold md:px-10 lg:px-[74px]">
+        <p className="px-5 font-mono text-label uppercase tracking-[0.16em] text-gold md:px-10 lg:px-[74px]">
           {label}
         </p>
       ) : null}

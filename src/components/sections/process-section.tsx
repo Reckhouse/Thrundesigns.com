@@ -44,7 +44,7 @@ export function ProcessSection({ heading, steps }: ProcessSectionProps) {
             <div>
               <Badge
                 variant="outline"
-                className="rounded-none border-gold/50 bg-bg-deep/40 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-gold"
+                className="rounded-none border-gold/50 bg-bg-deep/40 px-2.5 py-1 font-mono text-caption uppercase tracking-[0.16em] text-gold"
               >
                 Process
               </Badge>
@@ -91,7 +91,7 @@ export function ProcessSection({ heading, steps }: ProcessSectionProps) {
                         ease: motionTokens.easeOut,
                       }}
                     />
-                    <p className="font-mono text-[12px] text-gold">
+                    <p className="font-mono text-xs text-gold">
                       {step.number}
                     </p>
                     <h3 className="mt-4 font-display text-2xl text-fg">
