@@ -1,0 +1,35 @@
+"use client";
+
+import { Analytics } from "@vercel/analytics/next";
+import { useEffect, useState } from "react";
+import { CookieConsentBanner } from "@/components/site/cookie-consent-banner";
+import {
+  COOKIE_CONSENT_EVENT,
+  readCookieConsent,
+  type CookieConsentValue,
+} from "@/lib/cookie-consent";
+
+/** Loads Vercel Analytics only after the visitor accepts optional cookies. */
+export function ConsentAwareAnalytics() {
+  const [consent, setConsent] = useState<CookieConsentValue | null>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    setConsent(readCookieConsent());
+    setReady(true);
+    const onOpen = () => setConsent(null);
+    window.addEventListener(COOKIE_CONSENT_EVENT, onOpen);
+    return () => window.removeEventListener(COOKIE_CONSENT_EVENT, onOpen);
+  }, []);
+
+  if (!ready) return null;
+
+  return (
+    <>
+      {consent === "accepted" ? <Analytics /> : null}
+      {consent === null ? (
+        <CookieConsentBanner onConsentChange={setConsent} />
+      ) : null}
+    </>
+  );
+}

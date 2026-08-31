@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Libre_Baskerville } from "next/font/google";
 import { draftMode } from "next/headers";
 import { VisualEditing } from "next-sanity/visual-editing";
-import { Analytics } from "@vercel/analytics/next";
 import { DisableDraftMode } from "@/components/sanity/disable-draft-mode";
+import { ConsentAwareAnalytics } from "@/components/site/consent-aware-analytics";
 import { SiteJsonLd } from "@/components/seo/json-ld";
 import { SanityLive } from "@/sanity/lib/live";
 import { ScrollProgress } from "@/components/site/scroll-progress";
@@ -119,7 +119,7 @@ export default async function RootLayout({
             <VisualEditing />
           </>
         ) : null}
-        <Analytics />
+        <ConsentAwareAnalytics />
       </body>
     </html>
   );
