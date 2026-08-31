@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import type { SanityImageSource } from "@sanity/image-url";
+import { buildPageMetadata, seoImageUrl } from "@/lib/seo";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { QuoteForm } from "@/components/quote/quote-form";
@@ -27,14 +29,17 @@ async function loadQuoteFormConfig(options?: {
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await loadQuoteFormConfig({ stega: false });
-  return {
-    title: config.seo?.title || "Request a quote",
-    description:
-      config.seo?.description ||
-      config.support ||
-      "Tell us what you're building.",
-    alternates: { canonical: "/quote" },
-  };
+  const title = config.seo?.title || "Request a quote";
+  const description =
+    config.seo?.description ||
+    config.support ||
+    "Tell us what you're building.";
+  return buildPageMetadata({
+    title,
+    description,
+    path: "/quote",
+    imageUrl: seoImageUrl(config.seo?.ogImage as SanityImageSource | null | undefined),
+  });
 }
 
 type QuotePageProps = {

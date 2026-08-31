@@ -180,7 +180,7 @@ export function QuoteForm({
             {config.eyebrow}
           </p>
         ) : null}
-        <SectionHeading className="text-balance">
+        <SectionHeading as="h1" className="text-balance">
           {config.headline}
         </SectionHeading>
         <p className="mt-6 max-w-[42ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">

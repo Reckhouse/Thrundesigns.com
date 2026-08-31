@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { LabExperienceClient } from "@/app/lab/living-engraving/lab-experience-client";
 import { parseLivingEngravingLabConfig } from "@/experiences/living-engraving/parseLabSearchParams";
@@ -8,15 +9,11 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export const metadata: Metadata = {
-  title: "Living Engraving",
-  description:
-    "Interactive horse-head particle cameo — the Living Engraving Three.js experience from Thrun Design Co.",
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Living Engraving',
+  description: 'Interactive horse-head particle cameo — the Living Engraving Three.js experience from Thrun Design Co.',
+  path: '/lab/living-engraving',
+});
 
 export default async function LivingEngravingLabPage({
   searchParams,

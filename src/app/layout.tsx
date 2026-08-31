@@ -6,6 +6,11 @@ import { DisableDraftMode } from "@/components/sanity/disable-draft-mode";
 import { SiteJsonLd } from "@/components/seo/json-ld";
 import { SanityLive } from "@/sanity/lib/live";
 import { ScrollProgress } from "@/components/site/scroll-progress";
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_IMAGE,
+  SITE_NAME,
+} from "@/lib/seo";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
@@ -32,44 +37,61 @@ const plexMono = IBM_Plex_Mono({
 
 const siteUrl = getSiteUrl();
 
+/**
+ * Site-wide defaults only. Do not set `alternates.canonical` here — a root
+ * canonical of `/` can leak onto child routes that omit their own.
+ * Each public page sets its canonical via `buildPageMetadata` or local metadata.
+ */
 export const metadata: Metadata = {
   title: {
-    default: "Thrun Design Co.",
-    template: "%s · Thrun Design Co.",
+    default: SITE_NAME,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    "Strategic brand systems, websites, marketing audits, and print & digital assets for founders and owners facing a rebrand, launch, or outdated site.",
+  description: DEFAULT_DESCRIPTION,
   metadataBase: new URL(siteUrl),
-  alternates: {
-    canonical: "/",
-  },
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: siteUrl }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: "design",
+  keywords: [
+    "brand identity",
+    "brand strategy",
+    "web design",
+    "marketing audit",
+    "print design",
+    "Thrun Design Co.",
+  ],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: siteUrl,
-    siteName: "Thrun Design Co.",
-    title: "Thrun Design Co.",
-    description:
-      "Strategic brand systems, websites, marketing audits, and print & digital assets for founders and owners.",
-    images: [
-      {
-        url: "/images/hero-mountain.jpg",
-        width: 1600,
-        height: 1000,
-        alt: "Snow-capped mountain ridge under a pale dawn sky",
-      },
-    ],
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Thrun Design Co.",
-    description:
-      "Strategic brand systems, websites, marketing audits, and print & digital assets for founders and owners.",
-    images: ["/images/hero-mountain.jpg"],
+    title: SITE_NAME,
+    description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE.url],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
 };
 

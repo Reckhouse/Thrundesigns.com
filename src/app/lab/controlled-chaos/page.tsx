@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { LabExperienceClient } from "@/app/lab/controlled-chaos/lab-experience-client";
 import { parseControlledChaosLabConfig } from "@/experiences/controlled-chaos/parseLabSearchParams";
@@ -8,15 +9,11 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export const metadata: Metadata = {
-  title: "Controlled Chaos Poster Lab",
-  description:
-    "Fullscreen interactive poster lab from Thrun Design Co. — a Three.js experience case study.",
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Controlled Chaos Poster Lab',
+  description: 'Fullscreen interactive poster lab from Thrun Design Co. — a Three.js experience case study.',
+  path: '/lab/controlled-chaos',
+});
 
 export default async function ControlledChaosLabPage({
   searchParams,
