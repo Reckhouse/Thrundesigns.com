@@ -90,7 +90,7 @@ export function HeroSection({
             </motion.h1>
 
             <motion.p
-              className="mt-6 max-w-[46ch] text-pretty font-sans text-[15px] leading-7 text-fg md:mt-7 md:text-base md:leading-7 md:text-fg/95"
+              className="mt-6 max-w-[46ch] text-pretty font-sans text-body leading-7 text-fg md:mt-7 md:text-base md:leading-7 md:text-fg/95"
               {...item(0.34)}
             >
               {support ||
@@ -115,7 +115,7 @@ export function HeroSection({
 
             {servicesMeta ? (
               <motion.p
-                className="mt-10 border-t border-line/70 pt-5 font-mono text-[10px] uppercase tracking-[0.16em] text-fg-muted md:mt-12 md:pt-6"
+                className="mt-10 border-t border-line/70 pt-5 font-mono text-caption uppercase tracking-[0.16em] text-fg-muted md:mt-12 md:pt-6"
                 {...item(0.54)}
               >
                 {servicesMeta}
@@ -137,7 +137,7 @@ export function HeroSection({
           animate={{ opacity: 1 }}
           transition={{ delay: 1.1, duration: 0.8 }}
         >
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-fg-muted">
+          <span className="font-mono text-caption uppercase tracking-[0.18em] text-fg-muted">
             Scroll
           </span>
           {!reduce ? (

@@ -28,10 +28,10 @@ export function NavLink({
     <Link
       href={href}
       className={cn(
-        "group relative inline-flex items-center font-mono font-medium uppercase text-fg",
+        "group relative inline-flex min-h-11 items-center font-mono font-medium uppercase text-fg",
         size === "header" &&
-          "text-[12px] tracking-[0.16em] lg:text-[13px] lg:tracking-[0.17em]",
-        size === "sheet" && "text-sm tracking-[0.14em]",
+          "text-label tracking-[0.16em] lg:text-sm lg:tracking-[0.17em]",
+        size === "sheet" && "min-h-12 text-sm tracking-[0.14em]",
         className,
       )}
     >

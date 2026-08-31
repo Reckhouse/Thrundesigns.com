@@ -59,7 +59,7 @@ export function FinalCtaSection({
             <SectionHeading className="max-w-3xl text-balance drop-shadow-[0_2px_20px_rgba(12,13,12,0.45)]">
               {heading || "Tell us where the brand needs to go next."}
             </SectionHeading>
-            <p className="mt-6 max-w-[60ch] text-pretty font-sans text-[15px] leading-7 text-fg md:mt-8 md:text-base md:text-fg/95">
+            <p className="mt-6 max-w-[60ch] text-pretty font-sans text-body leading-7 text-fg md:mt-8 md:text-base md:text-fg/95">
               {copy ||
                 "Share a short brief about your business, audience, and goal. We’ll reply within a few business days with scope options and clear next steps. No pressure, no invented promises."}
             </p>

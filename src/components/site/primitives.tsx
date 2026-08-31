@@ -15,7 +15,7 @@ export function Eyebrow({ children, className }: EyebrowProps) {
   return (
     <p
       className={cn(
-        "font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-gold",
+        "font-mono text-label font-medium uppercase tracking-[0.16em] text-gold",
         className,
       )}
     >
@@ -59,7 +59,7 @@ export function TextLink({ href, children, className }: TextLinkProps) {
     <Link
       href={href}
       className={cn(
-        "group inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-fg transition-colors hover:text-gold",
+        "group inline-flex items-center gap-2 font-mono text-label uppercase tracking-[0.14em] text-fg transition-colors hover:text-gold",
         className,
       )}
     >
@@ -93,7 +93,7 @@ export function PrimaryButtonLink({
     <Link
       href={href}
       className={cn(
-        "group relative inline-flex h-[52px] items-center gap-2 overflow-hidden bg-gold px-[18px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bronze hover:text-fg",
+        "group relative inline-flex h-[52px] items-center gap-2 overflow-hidden bg-gold px-[18px] font-mono text-label font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-bronze hover:text-fg",
         className,
       )}
     >
@@ -132,7 +132,7 @@ export function SecondaryButtonLink({
     <Link
       href={href}
       className={cn(
-        "group inline-flex h-[52px] items-center gap-2 border border-gold/65 bg-transparent px-[18px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:bg-gold/10 hover:text-gold",
+        "group inline-flex h-[52px] items-center gap-2 border border-gold/65 bg-transparent px-[18px] font-mono text-label font-medium uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:bg-gold/10 hover:text-gold",
         className,
       )}
     >

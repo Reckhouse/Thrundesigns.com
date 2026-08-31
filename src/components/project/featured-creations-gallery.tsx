@@ -116,7 +116,7 @@ export async function FeaturedCreationsGallery({
         <SectionHeading className="mt-4 text-[clamp(1.5rem,3vw,2.25rem)]">
           Selected outcomes
         </SectionHeading>
-        <p className="mt-5 font-sans text-[15px] leading-7 text-fg-muted">
+        <p className="mt-5 font-sans text-body leading-7 text-fg-muted">
           Curated saves from the interactive lab. Full creation data lives in
           the application store — Sanity only references these IDs.
         </p>
@@ -159,7 +159,7 @@ export async function FeaturedCreationsGallery({
                 />
               ) : (
                 <div className="flex h-full items-end p-5">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-fg-muted">
+                  <p className="font-mono text-label uppercase tracking-[0.14em] text-fg-muted">
                     No thumbnail
                   </p>
                 </div>
@@ -173,12 +173,12 @@ export async function FeaturedCreationsGallery({
                 {item.title}
               </Link>
               {item.description ? (
-                <p className="mt-2 font-sans text-[14px] leading-6 text-fg-muted">
+                <p className="mt-2 font-sans text-sm leading-6 text-fg-muted">
                   {item.description}
                 </p>
               ) : null}
               {item.curatorNote ? (
-                <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+                <p className="mt-3 font-mono text-label uppercase tracking-[0.14em] text-gold">
                   {item.curatorNote}
                 </p>
               ) : null}

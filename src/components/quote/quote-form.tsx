@@ -176,21 +176,21 @@ export function QuoteForm({
     <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-12 md:gap-12 md:px-10 md:py-16 lg:grid-cols-[1fr_1fr] lg:px-[74px]">
       <div>
         {config.eyebrow ? (
-          <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+          <p className="mb-3 font-mono text-label uppercase tracking-[0.14em] text-gold">
             {config.eyebrow}
           </p>
         ) : null}
         <SectionHeading as="h1" className="text-balance">
           {config.headline}
         </SectionHeading>
-        <p className="mt-6 max-w-[42ch] text-pretty font-sans text-[15px] leading-7 text-fg-muted">
+        <p className="mt-6 max-w-[42ch] text-pretty font-sans text-body leading-7 text-fg-muted">
           {config.support}
         </p>
         <ol className="mt-8 flex flex-wrap gap-x-4 gap-y-2 md:mt-10">
           {config.stepLabels.map((label, index) => (
             <li
               key={`${label}-${index}`}
-              className={`font-mono text-[11px] uppercase tracking-[0.14em] ${
+              className={`font-mono text-label uppercase tracking-[0.14em] ${
                 index === step ? "text-gold" : "text-fg-muted"
               }`}
             >
@@ -279,7 +279,7 @@ export function QuoteForm({
                   error={form.formState.errors.projectType?.message}
                 >
                   <select
-                    className="flex h-9 w-full rounded-none border border-line bg-bg px-3 text-sm text-fg"
+                    className="flex h-11 min-h-11 w-full rounded-none border border-line bg-bg px-3 text-sm text-fg"
                     {...form.register("projectType")}
                   >
                     <option value="">Select</option>
@@ -296,7 +296,7 @@ export function QuoteForm({
                   error={form.formState.errors.budget?.message}
                 >
                   <select
-                    className="flex h-9 w-full rounded-none border border-line bg-bg px-3 text-sm text-fg"
+                    className="flex h-11 min-h-11 w-full rounded-none border border-line bg-bg px-3 text-sm text-fg"
                     {...form.register("budget")}
                   >
                     <option value="">Select</option>
@@ -313,7 +313,7 @@ export function QuoteForm({
                   error={form.formState.errors.timeline?.message}
                 >
                   <select
-                    className="flex h-9 w-full rounded-none border border-line bg-bg px-3 text-sm text-fg"
+                    className="flex h-11 min-h-11 w-full rounded-none border border-line bg-bg px-3 text-sm text-fg"
                     {...form.register("timeline")}
                   >
                     <option value="">Select</option>
@@ -351,7 +351,7 @@ export function QuoteForm({
                     type="file"
                     multiple
                     accept="image/jpeg,image/png,image/webp,application/pdf"
-                    className="rounded-none border-line bg-bg file:mr-3 file:border-0 file:bg-gold file:px-3 file:py-1 file:font-mono file:text-[10px] file:uppercase file:text-ink"
+                    className="rounded-none border-line bg-bg file:mr-3 file:border-0 file:bg-gold file:px-3 file:py-1 file:font-mono file:text-caption file:uppercase file:text-ink"
                     onChange={(event) => setFiles(event.target.files)}
                   />
                 </Field>
@@ -453,7 +453,7 @@ function Field({
     <div className="space-y-2">
       <Label
         htmlFor={id}
-        className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold"
+        className="font-mono text-label uppercase tracking-[0.14em] text-gold"
       >
         {label}
       </Label>
@@ -466,7 +466,7 @@ function Field({
         </p>
       ) : null}
       {helperText ? (
-        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-fg-muted">
+        <p className="font-mono text-caption uppercase tracking-[0.12em] text-fg-muted">
           {helperText}
         </p>
       ) : null}

@@ -30,6 +30,33 @@ type BuildPageMetadataInput = {
   noIndex?: boolean;
 };
 
+/**
+ * Normalize CMS/page titles so the root `%s · Site` template only appends once.
+ * Strips trailing `| Site`, `· Site`, `- Site` suffixes; uses absolute when the
+ * brand is already embedded mid-title.
+ */
+export function normalizePageTitle(
+  title: string,
+): string | { absolute: string } {
+  const trimmed = title.trim();
+  if (!trimmed || trimmed === SITE_NAME) {
+    return { absolute: SITE_NAME };
+  }
+
+  const escaped = SITE_NAME.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const stripped = trimmed
+    .replace(new RegExp(`\\s*[|·\\-]\\s*${escaped}\\s*$`, "i"), "")
+    .trim();
+
+  if (!stripped || stripped === SITE_NAME) {
+    return { absolute: SITE_NAME };
+  }
+  if (new RegExp(escaped, "i").test(stripped)) {
+    return { absolute: stripped };
+  }
+  return stripped;
+}
+
 /** Absolute URL for a site-relative path. */
 export function absoluteUrl(path = "/"): string {
   const base = getSiteUrl();
@@ -67,17 +94,20 @@ export function buildPageMetadata({
 }: BuildPageMetadataInput): Metadata {
   const canonical = path.startsWith("/") ? path : `/${path}`;
   const url = absoluteUrl(canonical);
+  const pageTitle = normalizePageTitle(title);
+  const openGraphTitle =
+    typeof pageTitle === "string" ? `${pageTitle} · ${SITE_NAME}` : pageTitle.absolute;
   const image = imageUrl
     ? {
         url: imageUrl,
         width: imageWidth,
         height: imageHeight,
-        alt: imageAlt || title,
+        alt: imageAlt || (typeof pageTitle === "string" ? pageTitle : openGraphTitle),
       }
     : { ...DEFAULT_OG_IMAGE };
 
   return {
-    title,
+    title: pageTitle,
     description,
     alternates: { canonical },
     openGraph: {
@@ -85,13 +115,13 @@ export function buildPageMetadata({
       locale: "en_US",
       url,
       siteName: SITE_NAME,
-      title,
+      title: openGraphTitle,
       description,
       images: [image],
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: openGraphTitle,
       description,
       images: [typeof image.url === "string" ? image.url : DEFAULT_OG_IMAGE.url],
     },

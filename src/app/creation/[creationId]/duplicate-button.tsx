@@ -39,12 +39,12 @@ export function DuplicateCreationButton({
               setPending(false);
             });
         }}
-        className="inline-flex h-[44px] items-center border border-line px-4 font-mono text-[11px] uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:text-gold disabled:opacity-50"
+        className="inline-flex h-[44px] items-center border border-line px-4 font-mono text-label uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:text-gold disabled:opacity-50"
       >
         {pending ? "Duplicating…" : "Duplicate this version"}
       </button>
       {error ? (
-        <p role="alert" className="font-sans text-[13px] text-fg-muted">
+        <p role="alert" className="font-sans text-sm text-fg-muted">
           {error}
         </p>
       ) : null}

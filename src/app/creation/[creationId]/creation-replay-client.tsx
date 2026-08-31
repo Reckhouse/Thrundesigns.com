@@ -70,7 +70,7 @@ export function CreationReplayClient({
   if (error) {
     return (
       <div role="alert" className="border border-line bg-bg-raised p-8">
-        <p className="font-sans text-[15px] text-fg">{error}</p>
+        <p className="font-sans text-body text-fg">{error}</p>
       </div>
     );
   }
@@ -81,7 +81,7 @@ export function CreationReplayClient({
         className="flex min-h-[420px] items-center justify-center border border-line bg-bg-raised"
         aria-live="polite"
       >
-        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+        <p className="font-mono text-label uppercase tracking-[0.14em] text-gold">
           Loading replay…
         </p>
       </div>

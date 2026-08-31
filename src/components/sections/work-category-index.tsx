@@ -18,7 +18,7 @@ export function WorkCategoryIndex({ projects }: WorkCategoryIndexProps) {
 
   if (rows.length === 0) {
     return (
-      <p className="mx-auto max-w-[1440px] px-5 py-16 font-sans text-[15px] text-fg drop-shadow-[0_2px_16px_rgba(12,13,12,0.85)] md:px-10 lg:px-[74px]">
+      <p className="mx-auto max-w-[1440px] px-5 py-16 font-sans text-body text-fg drop-shadow-[0_2px_16px_rgba(12,13,12,0.85)] md:px-10 lg:px-[74px]">
         No concept studies are published yet.
       </p>
     );
@@ -30,7 +30,7 @@ export function WorkCategoryIndex({ projects }: WorkCategoryIndexProps) {
         <section key={row.key} aria-labelledby={`work-cat-${row.key}`}>
           <h2
             id={`work-cat-${row.key}`}
-            className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold drop-shadow-[0_2px_16px_rgba(12,13,12,0.8)]"
+            className="font-mono text-label uppercase tracking-[0.16em] text-gold drop-shadow-[0_2px_16px_rgba(12,13,12,0.8)]"
           >
             {row.label}
           </h2>
@@ -70,7 +70,7 @@ export function WorkCategoryIndex({ projects }: WorkCategoryIndexProps) {
                     </AspectRatio>
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg-deep/80 via-transparent to-transparent" />
                   </Link>
-                  <p className="mt-5 font-mono text-[11px] uppercase tracking-[0.14em] text-gold">
+                  <p className="mt-5 font-mono text-label uppercase tracking-[0.14em] text-gold">
                     {project.industry}
                   </p>
                   <h3 className="mt-3 font-display text-[26px] leading-8 text-fg">

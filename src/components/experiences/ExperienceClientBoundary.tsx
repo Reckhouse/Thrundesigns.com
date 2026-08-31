@@ -188,7 +188,7 @@ export function ExperienceClientBoundary({
             {state === "error" ? (
               <p
                 role="alert"
-                className="max-w-md font-sans text-[14px] leading-6 text-fg"
+                className="max-w-md font-sans text-sm leading-6 text-fg"
               >
                 {errorMessage || "Interactive experience unavailable."} You can
                 still review the case study above or open the full experience
@@ -201,7 +201,7 @@ export function ExperienceClientBoundary({
               (effectiveBehavior === "viewport" ||
                 effectiveBehavior === "immediate")) ? (
               <p
-                className="font-mono text-[11px] uppercase tracking-[0.14em] text-gold"
+                className="font-mono text-label uppercase tracking-[0.14em] text-gold"
                 aria-live="polite"
               >
                 {reduceMotion && effectiveBehavior !== "interaction"
@@ -214,7 +214,7 @@ export function ExperienceClientBoundary({
               <button
                 type="button"
                 onClick={() => void startLoad()}
-                className="inline-flex h-[52px] items-center border border-gold/65 bg-transparent px-[18px] font-mono text-[11px] font-medium uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:bg-gold/10 hover:text-gold"
+                className="inline-flex h-[52px] items-center border border-gold/65 bg-transparent px-[18px] font-mono text-label font-medium uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:bg-gold/10 hover:text-gold"
               >
                 {reduceMotion
                   ? "Load interactive version"
@@ -229,7 +229,7 @@ export function ExperienceClientBoundary({
                   startedRef.current = false;
                   void startLoad();
                 }}
-                className="inline-flex h-[44px] items-center border border-line px-4 font-mono text-[11px] uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:text-gold"
+                className="inline-flex h-[44px] items-center border border-line px-4 font-mono text-label uppercase tracking-[0.12em] text-fg transition-colors hover:border-gold hover:text-gold"
               >
                 Try again
               </button>

@@ -69,13 +69,13 @@ export default async function WorkIndexPage() {
             aria-label="Concept studies"
           >
             <div className="mx-auto w-full max-w-[1440px] px-5 md:px-10 lg:px-[74px]">
-              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-gold drop-shadow-[0_2px_18px_rgba(12,13,12,0.75)]">
+              <p className="font-mono text-label uppercase tracking-[0.16em] text-gold drop-shadow-[0_2px_18px_rgba(12,13,12,0.75)]">
                 Concept studies
               </p>
               <h1 className="mt-4 max-w-[16ch] text-balance font-display text-[clamp(2.25rem,5vw,4rem)] leading-[1.05] tracking-[-0.02em] text-fg drop-shadow-[0_2px_28px_rgba(12,13,12,0.85)]">
                 Speculative work with production intent.
               </h1>
-              <p className="mt-6 max-w-[48ch] text-pretty font-sans text-[15px] leading-7 text-fg drop-shadow-[0_2px_20px_rgba(12,13,12,0.9)] md:text-base md:leading-7">
+              <p className="mt-6 max-w-[48ch] text-pretty font-sans text-body leading-7 text-fg drop-shadow-[0_2px_20px_rgba(12,13,12,0.9)] md:text-base md:leading-7">
                 Speculative projects that show how we think, not client case
                 studies. Real work will replace these as engagements ship.
               </p>
@@ -85,13 +85,13 @@ export default async function WorkIndexPage() {
           <WorkCategoryIndex projects={projects} />
 
           <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-5 py-16 md:px-10 md:py-20 lg:px-[74px]">
-            <p className="max-w-[52ch] text-pretty font-sans text-[15px] leading-7 text-fg drop-shadow-[0_2px_16px_rgba(12,13,12,0.85)]">
+            <p className="max-w-[52ch] text-pretty font-sans text-body leading-7 text-fg drop-shadow-[0_2px_16px_rgba(12,13,12,0.85)]">
               Ready to talk about a real engagement? Send a short brief and
               we’ll reply with scope options.
             </p>
             <Link
               href="/quote"
-              className="inline-flex min-h-11 w-fit items-center font-mono text-[11px] uppercase tracking-[0.14em] text-gold drop-shadow-[0_2px_14px_rgba(12,13,12,0.8)]"
+              className="inline-flex min-h-11 w-fit items-center font-mono text-label uppercase tracking-[0.14em] text-gold drop-shadow-[0_2px_14px_rgba(12,13,12,0.8)]"
             >
               Request a project quote →
             </Link>
