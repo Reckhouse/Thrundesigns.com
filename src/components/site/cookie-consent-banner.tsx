@@ -57,8 +57,9 @@ export function CookieConsentBanner({
             id="cookie-consent-desc"
             className="mt-2 font-sans text-sm leading-6 text-fg-muted"
           >
-            We use essential cookies to run the site and optional analytics to
-            understand traffic. See our{" "}
+            We use essential cookies to run the site and optional analytics /
+            advertising measurement to understand traffic and campaign
+            performance. See our{" "}
             <Link href="/privacy#cookies" className="text-fg underline-offset-2 hover:text-gold hover:underline">
               Privacy Policy
             </Link>{" "}

@@ -3,13 +3,17 @@
 import { Analytics } from "@vercel/analytics/next";
 import { useEffect, useState } from "react";
 import { CookieConsentBanner } from "@/components/site/cookie-consent-banner";
+import { GoogleTag } from "@/components/site/google-tag";
 import {
   COOKIE_CONSENT_EVENT,
   readCookieConsent,
   type CookieConsentValue,
 } from "@/lib/cookie-consent";
 
-/** Loads Vercel Analytics only after the visitor accepts optional cookies. */
+/**
+ * Loads Vercel Analytics and the Google tag only after the visitor accepts
+ * optional cookies. Declining keeps essential site cookies only.
+ */
 export function ConsentAwareAnalytics() {
   const [consent, setConsent] = useState<CookieConsentValue | null>(null);
   const [ready, setReady] = useState(false);
@@ -26,7 +30,12 @@ export function ConsentAwareAnalytics() {
 
   return (
     <>
-      {consent === "accepted" ? <Analytics /> : null}
+      {consent === "accepted" ? (
+        <>
+          <Analytics />
+          <GoogleTag />
+        </>
+      ) : null}
       {consent === null ? (
         <CookieConsentBanner onConsentChange={setConsent} />
       ) : null}
