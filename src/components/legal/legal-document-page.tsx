@@ -39,7 +39,8 @@ export async function LegalDocumentPage({
   title,
   intro,
   sections,
-}: Omit<LegalDocumentPageProps, "metadata">) {
+  lastUpdated = "September 3, 2026",
+}: Omit<LegalDocumentPageProps, "metadata"> & { lastUpdated?: string }) {
   const settingsRes = await sanityFetch({ query: siteSettingsQuery }).catch(
     () => ({ data: null }),
   );
@@ -69,7 +70,7 @@ export async function LegalDocumentPage({
                 {intro}
               </p>
               <p className="mt-4 font-mono text-caption uppercase tracking-[0.12em] text-fg-muted">
-                Last updated: August 31, 2026
+                Last updated: {lastUpdated}
               </p>
             </div>
           </section>

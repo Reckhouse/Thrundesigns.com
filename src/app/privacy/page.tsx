@@ -22,14 +22,14 @@ const sections = [
   {
     title: "Information we collect",
     paragraphs: [
-      "When you browse the site, we may process limited technical data such as your browser type, device, and pages viewed. If you accept optional cookies, we use privacy-focused analytics to understand traffic patterns.",
+      "When you browse the site, we may process limited technical data such as your browser type, device, and pages viewed. If you accept optional cookies, we use analytics and advertising measurement tools to understand traffic and campaign performance.",
       "When you submit a project quote, we collect the details you provide—typically your name, email address, company, project type, budget range, timeline, message, and any files you attach. We also store security metadata needed to prevent abuse (for example, rate-limit counters and bot-check results).",
     ],
   },
   {
     title: "How we use information",
     paragraphs: [
-      "We use quote submissions to respond to your inquiry, scope work, and keep a record of project requests. Analytics data, when enabled with your consent, helps us improve site performance and content.",
+      "We use quote submissions to respond to your inquiry, scope work, and keep a record of project requests. Analytics and advertising measurement data, when enabled with your consent, helps us improve the site and measure ad performance.",
       "We do not sell personal information. We do not use quote details for unrelated marketing lists.",
     ],
   },
@@ -40,6 +40,7 @@ const sections = [
     ],
     list: [
       "Vercel — hosting, deployment, and (with consent) analytics",
+      "Google — Google tag / Analytics and advertising measurement (with consent)",
       "Sanity — content management and storage of quote submissions",
       "Cloudflare Turnstile — bot protection on the quote form",
       "Resend — transactional email when a quote is received (message content is limited to what is needed to notify us)",
@@ -50,19 +51,20 @@ const sections = [
     title: "Cookies and similar technologies",
     paragraphs: [
       "Essential cookies and local storage keep the site working—for example, remembering your cookie preference and protecting the quote form from abuse.",
-      "Optional analytics cookies load only if you choose “Accept all” on the cookie banner. You can change your choice anytime using Cookie settings in the site footer.",
+      "Optional analytics and advertising cookies load only if you choose “Accept all” on the cookie banner. You can change your choice anytime using Cookie settings in the site footer.",
       "Declining optional cookies does not block access to the site or quote form.",
     ],
     list: [
       "thrun-cookie-consent — stores your cookie preference (essential)",
       "Vercel Analytics — page views and performance metrics (optional, consent required)",
+      "Google tag (gtag.js) — Analytics and advertising measurement (optional, consent required)",
       "Cloudflare Turnstile — session tokens for bot verification on the quote form (essential to submit)",
     ],
   },
   {
     title: "Retention",
     paragraphs: [
-      "Quote submissions are kept as long as needed to evaluate and respond to your inquiry, maintain business records, and meet legal obligations. Analytics data is retained according to Vercel’s analytics policies.",
+      "Quote submissions are kept as long as needed to evaluate and respond to your inquiry, maintain business records, and meet legal obligations. Analytics and advertising measurement data is retained according to Vercel’s and Google’s policies for those products.",
       "You may ask us to delete quote information that is no longer required. Contact us using the quote form and note your request.",
     ],
   },
