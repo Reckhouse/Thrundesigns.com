@@ -51,13 +51,13 @@ const sections = [
     title: "Cookies and similar technologies",
     paragraphs: [
       "Essential cookies and local storage keep the site working—for example, remembering your cookie preference and protecting the quote form from abuse.",
-      "Optional analytics and advertising cookies load only if you choose “Accept all” on the cookie banner. You can change your choice anytime using Cookie settings in the site footer.",
+      "The Google tag snippet is present on every page so advertising and analytics tools can verify the install. Measurement cookies and advertising identifiers are used only if you choose “Accept all.” You can change your choice anytime using Cookie settings in the site footer.",
       "Declining optional cookies does not block access to the site or quote form.",
     ],
     list: [
       "thrun-cookie-consent — stores your cookie preference (essential)",
       "Vercel Analytics — page views and performance metrics (optional, consent required)",
-      "Google tag (gtag.js) — Analytics and advertising measurement (optional, consent required)",
+      "Google tag (gtag.js) — Analytics and advertising measurement (optional, Consent Mode until you accept)",
       "Cloudflare Turnstile — session tokens for bot verification on the quote form (essential to submit)",
     ],
   },
