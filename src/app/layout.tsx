@@ -4,6 +4,7 @@ import { draftMode } from "next/headers";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { DisableDraftMode } from "@/components/sanity/disable-draft-mode";
 import { ConsentAwareAnalytics } from "@/components/site/consent-aware-analytics";
+import { GoogleTag } from "@/components/site/google-tag";
 import { SiteJsonLd } from "@/components/seo/json-ld";
 import { SanityLive } from "@/sanity/lib/live";
 import { ScrollProgress } from "@/components/site/scroll-progress";
@@ -108,6 +109,9 @@ export default async function RootLayout({
       lang="en"
       className={`${libre.variable} ${plexSans.variable} ${plexMono.variable} dark h-full`}
     >
+      <head>
+        <GoogleTag />
+      </head>
       <body className="relative flex min-h-full flex-col bg-bg-deep text-fg">
         <SiteJsonLd />
         <ScrollProgress />

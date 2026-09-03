@@ -1,27 +1,26 @@
-"use client";
-
-import Script from "next/script";
-import { GOOGLE_TAG_ID } from "@/lib/google-tag";
+import {
+  GOOGLE_TAG_ID,
+  googleTagBootstrapScript,
+} from "@/lib/google-tag";
 
 /**
- * Google tag (gtag.js) for Analytics / Ads measurement.
- * Mount only after optional-cookie consent is accepted.
+ * Official Google tag (gtag.js) as raw head scripts on every page.
+ * next/script would wrap these in a Next.js loader that Google's
+ * "Test connection" crawler does not treat as an installed tag.
+ * Consent Mode keeps measurement denied until optional cookies are accepted.
  */
 export function GoogleTag() {
   return (
     <>
-      <Script
+      {/* Google tag (gtag.js) */}
+      <script
+        async
         src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}`}
-        strategy="afterInteractive"
       />
-      <Script id="google-tag-init" strategy="afterInteractive">
-        {`
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GOOGLE_TAG_ID}');
-        `.trim()}
-      </Script>
+      <script
+        id="google-tag-init"
+        dangerouslySetInnerHTML={{ __html: googleTagBootstrapScript() }}
+      />
     </>
   );
 }
