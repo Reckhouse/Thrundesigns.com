@@ -5,6 +5,11 @@ import {
   absoluteAssetUrl,
   absoluteUrl,
 } from "@/lib/seo";
+import {
+  STUDIO_KNOWS_ABOUT,
+  STUDIO_POSTAL_ADDRESS,
+  STUDIO_SERVICE_AREAS,
+} from "@/lib/studio-location";
 
 type JsonLdProps = {
   data: Record<string, unknown> | Record<string, unknown>[];
@@ -19,7 +24,7 @@ export function JsonLd({ data }: JsonLdProps) {
   );
 }
 
-/** Organization + WebSite graph for the marketing site. */
+/** Organization + WebSite + local ProfessionalService graph. */
 export function SiteJsonLd() {
   const base = getSiteUrl();
   return (
@@ -34,14 +39,16 @@ export function SiteJsonLd() {
           logo: `${base}/brand/logo-mark.png`,
           image: `${base}/brand/logo-mark.png`,
           description: DEFAULT_DESCRIPTION,
-          areaServed: "US",
-          knowsAbout: [
-            "Brand identity",
-            "Brand strategy",
-            "Web design",
-            "Marketing audits",
-            "Print and digital assets",
-          ],
+          address: STUDIO_POSTAL_ADDRESS,
+          areaServed: STUDIO_SERVICE_AREAS,
+          knowsAbout: STUDIO_KNOWS_ABOUT,
+          contactPoint: {
+            "@type": "ContactPoint",
+            contactType: "sales",
+            url: `${base}/quote`,
+            areaServed: STUDIO_SERVICE_AREAS,
+            availableLanguage: ["English"],
+          },
         },
         {
           "@context": "https://schema.org",
@@ -61,14 +68,48 @@ export function SiteJsonLd() {
           url: base,
           image: `${base}/brand/logo-mark.png`,
           description: DEFAULT_DESCRIPTION,
+          address: STUDIO_POSTAL_ADDRESS,
           serviceType: [
             "Brand identity design",
+            "Graphic design",
             "Website design",
+            "Website development",
+            "Startup branding",
             "Marketing audit",
             "Print design",
           ],
           provider: { "@id": `${base}/#organization` },
-          areaServed: "US",
+          areaServed: STUDIO_SERVICE_AREAS,
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: "Design services",
+            itemListElement: [
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Brand identity",
+                  url: `${base}/services/brand-identity`,
+                },
+              },
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Web design",
+                  url: `${base}/services/web-design`,
+                },
+              },
+              {
+                "@type": "Offer",
+                itemOffered: {
+                  "@type": "Service",
+                  name: "Graphic design",
+                  url: `${base}/services/graphic-design`,
+                },
+              },
+            ],
+          },
         },
       ]}
     />

@@ -16,7 +16,7 @@ export const service = defineType({
     defineField({
       name: "icon",
       type: "string",
-      description: "brand | web | audit | print",
+      description: "brand | web | audit | print | graphic",
     }),
     defineField({ name: "summary", type: "text", rows: 3 }),
     defineField({ name: "linkLabel", type: "string", initialValue: "Learn more" }),

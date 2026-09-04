@@ -9,10 +9,12 @@ import {
   SectionHeading,
   TextLink,
 } from "@/components/site/primitives";
+import { FaqJsonLd } from "@/components/seo/faq-json-ld";
 import { defaultHomeContent } from "@/lib/default-content";
 import { quoteHrefForProjectType } from "@/lib/quote/project-type";
 import { buildPageMetadata } from "@/lib/seo";
 import { SERVICES, getServiceBySlug } from "@/lib/services";
+import { STUDIO_SERVICE_AREA_SUMMARY } from "@/lib/studio-location";
 import { sanityFetch } from "@/sanity/lib/live";
 import { siteSettingsQuery } from "@/sanity/lib/queries";
 
@@ -72,6 +74,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
   return (
     <>
+      <FaqJsonLd faqs={service.faqs} />
       <SiteHeader nav={settings?.nav} />
       <main className="flex-1 pt-[120px] md:pt-[136px] lg:pt-[152px]">
         <article>
@@ -83,6 +86,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               </SectionHeading>
               <p className="mt-6 max-w-[48ch] text-pretty font-sans text-body leading-7 text-fg-muted">
                 {service.description}
+              </p>
+              <p className="mt-4 max-w-[52ch] text-pretty font-sans text-sm leading-6 text-fg-muted">
+                {STUDIO_SERVICE_AREA_SUMMARY}
               </p>
               <p className="mt-8 max-w-[52ch] text-pretty font-sans text-body leading-7 text-fg">
                 {service.situation}
@@ -249,6 +255,11 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                       </li>
                     ) : null,
                   )}
+                  {service.localLinks?.map((link) => (
+                    <li key={link.href}>
+                      <TextLink href={link.href}>{link.label}</TextLink>
+                    </li>
+                  ))}
                   <li>
                     <TextLink href="/about">About the studio</TextLink>
                   </li>

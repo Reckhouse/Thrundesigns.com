@@ -9,15 +9,20 @@ import {
 } from "@/components/site/primitives";
 import { SERVICES } from "@/lib/services";
 import { buildPageMetadata } from "@/lib/seo";
+import {
+  STUDIO_AREA_LABEL,
+  STUDIO_NAP_LINE,
+  STUDIO_SERVICE_AREA_SUMMARY,
+} from "@/lib/studio-location";
 import { sanityFetch } from "@/sanity/lib/live";
 import { siteSettingsQuery } from "@/sanity/lib/queries";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "About the studio",
+  title: `About Thrun Design Co. in ${STUDIO_AREA_LABEL}`,
   description:
-    "Thrun Design Co. is a brand and web design studio for founders and owners who need clearer systems, sites, and materials—with direct collaboration from brief to handoff.",
+    "Thrun Design Co. is a Colorado Springs brand and web design studio for founders and startups—identity systems, websites, and graphic materials with direct collaboration from brief to handoff.",
   path: "/about",
 });
 
@@ -44,13 +49,16 @@ export default async function AboutPage() {
           <section className="border-b border-line">
             <div className="mx-auto w-full max-w-[1440px] px-6 py-16 md:px-10 md:py-20 lg:px-[74px] lg:py-24">
               <Eyebrow>About</Eyebrow>
-              <SectionHeading as="h1" className="mt-4 max-w-[18ch]">
-                A design partner when the stakes feel real.
+              <SectionHeading as="h1" className="mt-4 max-w-[20ch]">
+                A Colorado Springs design partner when the stakes feel real.
               </SectionHeading>
-              <p className="mt-6 max-w-[48ch] text-pretty font-sans text-body leading-7 text-fg-muted">
+              <p className="mt-6 max-w-[52ch] text-pretty font-sans text-body leading-7 text-fg-muted">
                 Thrun Design Co. helps founders and owners steady a messy brand,
                 launch with clarity, or replace an outdated site—without the
                 agency layers that slow decisions down.
+              </p>
+              <p className="mt-4 max-w-[52ch] text-pretty font-sans text-body leading-7 text-fg-muted">
+                {STUDIO_SERVICE_AREA_SUMMARY}
               </p>
             </div>
           </section>
@@ -88,15 +96,25 @@ export default async function AboutPage() {
                   Service area
                 </p>
                 <p className="mt-4 font-sans text-body leading-7 text-fg">
-                  We work with growing businesses across the United States,
-                  primarily remote, with selective on-site collaboration when a
-                  project needs it.
+                  Based in Colorado Springs, we work with startups and growing
+                  businesses across the Front Range. Remote collaboration is
+                  available nationwide when a project needs direct, scoped
+                  design help.
+                </p>
+                <p className="mt-6 font-mono text-caption uppercase tracking-[0.12em] text-fg-muted">
+                  {STUDIO_NAP_LINE}
                 </p>
                 <p className="mt-6 font-sans text-body leading-7 text-fg-muted">
                   Current public studies are concept work with production
                   intent. Real client case studies will replace them as
                   engagements ship—we do not invent outcomes.
                 </p>
+                <div className="mt-6 flex flex-wrap gap-4">
+                  <TextLink href="/colorado-springs">
+                    Colorado Springs services
+                  </TextLink>
+                  <TextLink href="/startups">Design for startups</TextLink>
+                </div>
               </div>
             </div>
           </section>

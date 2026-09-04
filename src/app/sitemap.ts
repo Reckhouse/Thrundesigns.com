@@ -37,6 +37,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/privacy` },
     { url: `${base}/accessibility` },
     { url: `${base}/quote` },
+    { url: `${base}/colorado-springs` },
+    { url: `${base}/colorado-springs/branding` },
+    { url: `${base}/colorado-springs/web-design` },
+    { url: `${base}/colorado-springs/graphic-design` },
+    { url: `${base}/startups` },
     ...SERVICES.map((service) => ({
       url: `${base}/services/${service.slug}`,
     })),

@@ -23,6 +23,7 @@ import { resolveMediaUrl } from "@/lib/media";
 import {
   DEFAULT_DESCRIPTION,
   HOME_PAGE_TITLE,
+  SITE_NAME,
   buildPageMetadata,
   seoImageUrl,
 } from "@/lib/seo";
@@ -52,10 +53,16 @@ export async function generateMetadata(): Promise<Metadata> {
       };
     } | null
   )?.seo;
-  // Prefer CMS SEO when set; otherwise use the audit-recommended defaults so
-  // server HTML and the root layout description stay identical.
-  const title = seo?.title?.trim() || HOME_PAGE_TITLE;
-  const description = seo?.description?.trim() || DEFAULT_DESCRIPTION;
+  // Prefer CMS SEO when it adds real keywords; ignore thin titles that are
+  // only the studio name (those used to erase the stronger default).
+  const cmsTitle = seo?.title?.trim() || "";
+  const title =
+    cmsTitle && cmsTitle !== SITE_NAME ? cmsTitle : HOME_PAGE_TITLE;
+  const cmsDescription = seo?.description?.trim() || "";
+  const description =
+    cmsDescription && /colorado\s+springs/i.test(cmsDescription)
+      ? cmsDescription
+      : DEFAULT_DESCRIPTION;
   const imageUrl = seoImageUrl(seo?.ogImage);
 
   return {
