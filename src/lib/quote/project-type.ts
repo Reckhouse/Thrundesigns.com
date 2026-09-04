@@ -8,6 +8,7 @@ const iconToProjectType: Record<string, ProjectType> = {
   website: "website",
   audit: "audit",
   print: "print",
+  graphic: "print",
 };
 
 export function isProjectType(value: string): value is ProjectType {

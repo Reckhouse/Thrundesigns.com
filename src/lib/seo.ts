@@ -8,17 +8,17 @@ export const SITE_NAME = "Thrun Design Co.";
 
 /** Default meta description — keep identical in layout + homepage generateMetadata. */
 export const DEFAULT_DESCRIPTION =
-  "Thrun Design Co. builds brand systems, websites, marketing audits, and campaign assets for founders and owners ready to move forward.";
+  "Thrun Design Co. is a Colorado Springs brand and web design studio for startups and growing businesses—identity systems, websites, graphic design, and campaign assets with clear scope.";
 
 /** Homepage document title (absolute — includes brand; do not wrap with template). */
 export const HOME_PAGE_TITLE =
-  "Brand & Web Design for Growing Businesses | Thrun Design Co.";
+  "Brand & Web Design in Colorado Springs | Thrun Design Co.";
 
 export const DEFAULT_OG_IMAGE = {
   url: "/opengraph-image",
   width: 1200,
   height: 630,
-  alt: "Thrun Design Co. — brand & web design for growing businesses",
+  alt: "Thrun Design Co. — brand & web design in Colorado Springs",
 } as const;
 
 type BuildPageMetadataInput = {

@@ -39,6 +39,7 @@ const iconMap = {
   brand: BrandIcon,
   web: WebIcon,
   print: PrintIcon,
+  graphic: PrintIcon,
   audit: AuditIcon,
 } as const;
 

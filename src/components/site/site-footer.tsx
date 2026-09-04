@@ -2,15 +2,20 @@ import Link from "next/link";
 import { stegaClean } from "@sanity/client/stega";
 import { BrandLogo } from "@/components/icons/brand-logo";
 import { FooterLegalLinks } from "@/components/site/footer-legal-links";
+import {
+  STUDIO_NAP_LINE,
+  STUDIO_SERVICE_AREA_SUMMARY,
+} from "@/lib/studio-location";
 
 const defaultColumns = [
   {
     heading: "Explore",
     links: [
       { label: "Services", href: "/services/brand-identity" },
+      { label: "Colorado Springs", href: "/colorado-springs" },
+      { label: "Startups", href: "/startups" },
       { label: "Concept studies", href: "/work" },
       { label: "About", href: "/about" },
-      { label: "Process", href: "/#process" },
     ],
   },
   {
@@ -18,6 +23,7 @@ const defaultColumns = [
     links: [
       { label: "Brand identity", href: "/services/brand-identity" },
       { label: "Web design", href: "/services/web-design" },
+      { label: "Graphic design", href: "/services/graphic-design" },
       { label: "Marketing audit", href: "/services/marketing-audit" },
       { label: "Print & digital", href: "/services/print-digital" },
     ],
@@ -56,6 +62,20 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
             {tagline ||
               "Strategic design for founders and owners ready to move forward."}
           </p>
+          <p className="mt-4 max-w-[40ch] font-sans text-sm leading-6 text-fg-muted">
+            {STUDIO_SERVICE_AREA_SUMMARY}
+          </p>
+          <p className="mt-3 font-mono text-caption uppercase tracking-[0.12em] text-fg-muted">
+            {STUDIO_NAP_LINE}
+          </p>
+          <p className="mt-2">
+            <Link
+              href="/quote"
+              className="font-sans text-sm text-fg underline-offset-2 transition-colors hover:text-gold hover:underline"
+            >
+              Request a quote
+            </Link>
+          </p>
         </div>
 
         <div className="grid gap-10 sm:grid-cols-3">
@@ -89,7 +109,7 @@ export function SiteFooter({ tagline, columns }: SiteFooterProps) {
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 border-t border-line px-6 py-6 md:px-10 lg:px-[74px]">
         <div className="flex flex-col gap-3 font-mono text-caption uppercase tracking-[0.12em] text-fg-muted md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} Thrun Design Co.</p>
-          <p>Brand systems for growing businesses</p>
+          <p>{STUDIO_NAP_LINE}</p>
         </div>
         <FooterLegalLinks />
       </div>

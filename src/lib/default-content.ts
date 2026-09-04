@@ -4,8 +4,8 @@ export const defaultHomeContent = {
       eyebrow: "Thrun Design Co.",
       headline: "Strategic design when a rebrand, launch, or outdated site can’t wait.",
       support:
-        "For founders and owners facing a messy brand, a launch that needs to land, or marketing that no longer matches the business, we build clearer systems, websites, and materials so the next step is concrete.",
-      servicesMeta: "Brand systems  ·  Web  ·  Audits  ·  Print & digital",
+        "Based in Colorado Springs and available nationwide. For founders and owners facing a messy brand, a launch that needs to land, or marketing that no longer matches the business, we build clearer systems, websites, and materials so the next step is concrete.",
+      servicesMeta: "Brand  ·  Web  ·  Graphic design  ·  Audits",
       primaryCta: { label: "Browse concept studies", href: "/work" },
       secondaryCta: { label: "Browse concept studies", href: "/work" },
       image: {
@@ -17,7 +17,7 @@ export const defaultHomeContent = {
       eyebrow: null,
       heading: "Four ways we steady a growing brand.",
       intro:
-        "From the system that holds your identity together to the site you maintain and the materials your team ships every week.",
+        "From brand identity and graphic systems to the website you maintain and the materials your team ships every week.",
     },
     processIntro: {
       eyebrow: null,
@@ -136,11 +136,11 @@ export const defaultHomeContent = {
     },
     {
       _id: "service-print",
-      title: "Print & digital assets",
-      icon: "print",
+      title: "Graphic & campaign design",
+      icon: "graphic",
       summary:
-        "Collateral and campaigns that extend the brand into the world your customers actually meet.",
-      linkLabel: "Discuss assets",
+        "Graphic design for decks, packaging, and campaigns that match the brand system.",
+      linkLabel: "Discuss graphic design",
     },
   ],
   processSteps: [

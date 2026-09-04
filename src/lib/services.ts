@@ -3,12 +3,13 @@ import type { ProjectType } from "@/lib/quote/project-type";
 export type ServiceSlug =
   | "brand-identity"
   | "web-design"
+  | "graphic-design"
   | "marketing-audit"
   | "print-digital";
 
 export type ServiceDefinition = {
   slug: ServiceSlug;
-  icon: "brand" | "web" | "audit" | "print";
+  icon: "brand" | "web" | "audit" | "print" | "graphic";
   title: string;
   shortTitle: string;
   description: string;
@@ -22,6 +23,8 @@ export type ServiceDefinition = {
   relatedProjectSlugs: string[];
   relatedServiceSlugs: ServiceSlug[];
   ctaLabel: string;
+  /** Optional local/SEO cross-links shown on the service page. */
+  localLinks?: { label: string; href: string }[];
 };
 
 export const SERVICES: ServiceDefinition[] = [
@@ -31,11 +34,12 @@ export const SERVICES: ServiceDefinition[] = [
     title: "Brand identity & system design",
     shortTitle: "Brand identity",
     description:
-      "Naming, visual language, and guidelines that stay coherent as a growing business adds channels and people.",
+      "Naming, visual language, and guidelines for Colorado Springs startups and growing businesses that need a system other people can apply.",
     situation:
       "You are renaming, refreshing, or building a brand from scratch, and the current mark, voice, or guidelines cannot keep up with how the business actually sells.",
     forWhom: [
       "Founders and owners preparing a rebrand or launch",
+      "Colorado Springs and remote startups that need a coherent identity before scaling marketing",
       "Teams whose materials no longer match the product or sales story",
       "Businesses that need a system other people can apply without the designer in the room",
     ],
@@ -76,6 +80,11 @@ export const SERVICES: ServiceDefinition[] = [
         answer:
           "Yes. Brand and web often run as a sequence or a combined engagement so the site inherits the system instead of inventing a parallel one.",
       },
+      {
+        question: "Do you work with Colorado Springs startups?",
+        answer:
+          "Yes. We are based in Colorado Springs and regularly help early-stage founders establish brand identity systems before or alongside a launch site.",
+      },
     ],
     quoteType: "brand",
     relatedProjectSlugs: [
@@ -83,8 +92,12 @@ export const SERVICES: ServiceDefinition[] = [
       "hollowbeam",
       "northline-advisory",
     ],
-    relatedServiceSlugs: ["web-design", "print-digital"],
+    relatedServiceSlugs: ["web-design", "graphic-design", "print-digital"],
     ctaLabel: "Discuss a brand identity project",
+    localLinks: [
+      { label: "Branding in Colorado Springs", href: "/colorado-springs/branding" },
+      { label: "Design for startups", href: "/startups" },
+    ],
   },
   {
     slug: "web-design",
@@ -92,13 +105,13 @@ export const SERVICES: ServiceDefinition[] = [
     title: "Strategic web design",
     shortTitle: "Web design",
     description:
-      "Marketing and portfolio sites with clear hierarchy, conversion paths, and a maintenance plan after launch.",
+      "Website design and development for marketing and portfolio sites—clear hierarchy, conversion paths, and a CMS plan after launch.",
     situation:
       "Your site is outdated, confusing, or hard to update—and it no longer reflects how you sell or what customers need to decide.",
     forWhom: [
       "Owners who need a sharper marketing or portfolio site",
-      "Teams launching a new offer that needs a clear digital front door",
-      "Businesses that want a CMS they can actually maintain",
+      "Colorado Springs businesses and remote startups launching a new offer",
+      "Teams that want a CMS they can actually maintain",
     ],
     notFor: [
       "Fully custom app platforms outside a marketing-site scope",
@@ -137,6 +150,11 @@ export const SERVICES: ServiceDefinition[] = [
         answer:
           "Yes. Many projects start with a content and conversion audit of what you have, then rebuild the templates that matter most.",
       },
+      {
+        question: "Do you develop the website as well as design it?",
+        answer:
+          "Yes. Web engagements typically include design and front-end development with a maintainable CMS, confirmed in the quote.",
+      },
     ],
     quoteType: "website",
     relatedProjectSlugs: [
@@ -144,8 +162,84 @@ export const SERVICES: ServiceDefinition[] = [
       "hollowbeam-website",
       "orbit-systems",
     ],
-    relatedServiceSlugs: ["brand-identity", "marketing-audit"],
+    relatedServiceSlugs: ["brand-identity", "graphic-design", "marketing-audit"],
     ctaLabel: "Discuss a website project",
+    localLinks: [
+      {
+        label: "Web design in Colorado Springs",
+        href: "/colorado-springs/web-design",
+      },
+      { label: "Design for startups", href: "/startups" },
+    ],
+  },
+  {
+    slug: "graphic-design",
+    icon: "graphic",
+    title: "Graphic design for brands & campaigns",
+    shortTitle: "Graphic design",
+    description:
+      "Graphic design for collateral, packaging, decks, and campaigns—so every touchpoint matches the brand system.",
+    situation:
+      "You have a brand on paper, but decks, packaging, ads, or leave-behinds still look and sound like different companies.",
+    forWhom: [
+      "Teams shipping a launch, event, or seasonal campaign",
+      "Colorado Springs businesses that need sales and leave-behind materials to match the site",
+      "Startups that need pitch and launch assets without reinventing the identity each time",
+    ],
+    notFor: [
+      "One-off social posts with no brand system underneath",
+      "Print-only vendors who ignore digital continuity",
+      "Open-ended content mills",
+    ],
+    deliverables: [
+      "Campaign or collateral concepts aligned to the brand system",
+      "Layouts for print and digital formats as scoped",
+      "Production-ready file prep and vendor notes when needed",
+      "Templates your team can reuse for related pieces",
+      "Coordination with brand or web work so everything shares one voice",
+    ],
+    process: [
+      {
+        title: "Frame the job",
+        copy: "We define the audience moment—what someone should understand or do when they meet the piece.",
+      },
+      {
+        title: "Design for production",
+        copy: "Concepts move quickly into formats that print shops, platforms, and your team can actually use.",
+      },
+      {
+        title: "Ship and reuse",
+        copy: "You get final files plus patterns for the next related piece without starting from zero.",
+      },
+    ],
+    faqs: [
+      {
+        question: "Is graphic design different from brand identity?",
+        answer:
+          "Brand identity builds the system. Graphic design extends that system into collateral, packaging, and campaigns. They often run together.",
+      },
+      {
+        question: "Do you handle printing?",
+        answer:
+          "We prepare production files and can coordinate with your printer or recommend vendors. Physical printing is usually billed separately by the vendor.",
+      },
+      {
+        question: "Do you offer graphic design in Colorado Springs?",
+        answer:
+          "Yes. We are based in Colorado Springs and produce graphic design for local businesses as well as remote clients.",
+      },
+    ],
+    quoteType: "print",
+    relatedProjectSlugs: ["juniper-and-stone-coffee", "hollowbeam"],
+    relatedServiceSlugs: ["brand-identity", "print-digital", "web-design"],
+    ctaLabel: "Discuss graphic design",
+    localLinks: [
+      {
+        label: "Graphic design in Colorado Springs",
+        href: "/colorado-springs/graphic-design",
+      },
+      { label: "Print & digital campaigns", href: "/services/print-digital" },
+    ],
   },
   {
     slug: "marketing-audit",
@@ -203,6 +297,10 @@ export const SERVICES: ServiceDefinition[] = [
     relatedProjectSlugs: ["northline-advisory", "summit-construction"],
     relatedServiceSlugs: ["brand-identity", "web-design"],
     ctaLabel: "Request a marketing audit quote",
+    localLinks: [
+      { label: "Colorado Springs services", href: "/colorado-springs" },
+      { label: "Design for startups", href: "/startups" },
+    ],
   },
   {
     slug: "print-digital",
@@ -258,8 +356,15 @@ export const SERVICES: ServiceDefinition[] = [
     ],
     quoteType: "print",
     relatedProjectSlugs: ["juniper-and-stone-coffee", "hollowbeam"],
-    relatedServiceSlugs: ["brand-identity", "web-design"],
+    relatedServiceSlugs: ["graphic-design", "brand-identity", "web-design"],
     ctaLabel: "Discuss print & digital assets",
+    localLinks: [
+      {
+        label: "Graphic design in Colorado Springs",
+        href: "/colorado-springs/graphic-design",
+      },
+      { label: "Graphic design service", href: "/services/graphic-design" },
+    ],
   },
 ];
 
@@ -287,6 +392,9 @@ export function primaryServiceForProject(input: {
     input.workCategory === "web-design"
   ) {
     return getServiceBySlug("web-design")!;
+  }
+  if (blob.includes("graphic")) {
+    return getServiceBySlug("graphic-design")!;
   }
   if (
     blob.includes("print") ||
