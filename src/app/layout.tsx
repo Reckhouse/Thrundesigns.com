@@ -5,6 +5,7 @@ import { VisualEditing } from "next-sanity/visual-editing";
 import { DisableDraftMode } from "@/components/sanity/disable-draft-mode";
 import { ConsentAwareAnalytics } from "@/components/site/consent-aware-analytics";
 import { GoogleTag } from "@/components/site/google-tag";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteJsonLd } from "@/components/seo/json-ld";
 import { SanityLive } from "@/sanity/lib/live";
 import { ScrollProgress } from "@/components/site/scroll-progress";
@@ -128,6 +129,7 @@ export default async function RootLayout({
           </>
         ) : null}
         <ConsentAwareAnalytics />
+        <SpeedInsights />
       </body>
     </html>
   );
