@@ -106,7 +106,10 @@ export const defaultHomeContent = {
       heading: "Tell us where the brand needs to go next.",
       copy: "Share a short brief about your business, audience, and goal. We’ll reply within a few business days with scope options and clear next steps. No pressure, no invented promises.",
       primaryCta: { label: "Request a project quote", href: "/quote" },
-      secondaryCta: { label: "Browse concept studies", href: "/work" },
+      secondaryCta: {
+        label: "Colorado Springs services",
+        href: "/colorado-springs",
+      },
     },
   },
   services: [

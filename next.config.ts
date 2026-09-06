@@ -20,6 +20,23 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      // Soft duplicate of homepage that returned 200 and diluted crawl signals.
+      {
+        source: "/index",
+        destination: "/",
+        permanent: true,
+      },
+      // Production Vercel alias → canonical www (middleware is a second guard).
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "thrundesigns-com.vercel.app" }],
+        destination: "https://www.thrundesigns.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
