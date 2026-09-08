@@ -107,20 +107,18 @@ function MarqueeCard({
           </div>
         </Link>
       </HoverCardTrigger>
-      {!duplicate ? (
-        <HoverCardContent
-          side="top"
-          className="w-72 rounded-none border-line bg-bg-raised p-4 text-fg shadow-none"
-        >
-          <p className="font-mono text-caption uppercase tracking-[0.14em] text-gold">
-            Concept study
-          </p>
-          <p className="mt-2 font-display text-lg text-fg">{project.title}</p>
-          <p className="mt-2 text-sm leading-6 text-fg-muted">
-            {projectBlurb(project)}
-          </p>
-        </HoverCardContent>
-      ) : null}
+      <HoverCardContent
+        side="top"
+        className="w-72 rounded-none border-line bg-bg-raised p-4 text-fg shadow-none"
+      >
+        <p className="font-mono text-caption uppercase tracking-[0.14em] text-gold">
+          Concept study
+        </p>
+        <p className="mt-2 font-display text-lg text-fg">{project.title}</p>
+        <p className="mt-2 text-sm leading-6 text-fg-muted">
+          {projectBlurb(project)}
+        </p>
+      </HoverCardContent>
     </HoverCard>
   );
 }
@@ -182,7 +180,13 @@ export function WorkCategoryMarquee({
               />
             ))}
           </div>
-          <div className="flex gap-4" aria-hidden inert>
+          {/*
+            Duplicate half for a seamless CSS loop. Keep aria-hidden +
+            tabIndex={-1} so AT/keyboard only see one set, but do NOT use
+            `inert` — that disables pointer events, so cards become
+            unclickable whenever this half is on screen.
+          */}
+          <div className="flex gap-4" aria-hidden>
             {loopSource.map((project, index) => (
               <MarqueeCard
                 key={`${project._id}-b-${index}`}
