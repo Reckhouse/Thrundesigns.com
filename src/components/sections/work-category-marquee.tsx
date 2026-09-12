@@ -1,4 +1,5 @@
 "use client";
+import { useHydratedReducedMotion as useReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -9,7 +10,6 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { isControlledChaosSlug } from "@/lib/controlled-chaos-media";
-import { useReducedMotion } from "framer-motion";
 
 export type WorkMarqueeProject = {
   _id: string;
@@ -35,9 +35,7 @@ type WorkCategoryMarqueeProps = {
 };
 
 function projectHref(project: WorkMarqueeProject): string {
-  const slug = project.slug?.current
-    ? stegaClean(project.slug.current)
-    : "";
+  const slug = project.slug?.current ? stegaClean(project.slug.current) : "";
   return slug ? `/work/${slug}` : "/work";
 }
 
@@ -65,9 +63,7 @@ function MarqueeCard({
   project: WorkMarqueeProject;
   duplicate?: boolean;
 }) {
-  const slug = project.slug?.current
-    ? stegaClean(project.slug.current)
-    : "";
+  const slug = project.slug?.current ? stegaClean(project.slug.current) : "";
   const src = projectSrc(project);
   const href = projectHref(project);
   const imageFitClass = isControlledChaosSlug(slug)

@@ -1,9 +1,10 @@
 "use client";
+import { useHydratedReducedMotion as useReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 import { ClipHeading } from "@/components/site/clip-heading";
 import { SceneSection } from "@/components/site/scene-section";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { motionTokens } from "@/lib/motion-tokens";
 
 type WhySectionProps = {
@@ -20,38 +21,36 @@ export function WhySection({
   proofPoints,
 }: WhySectionProps) {
   const reduce = useReducedMotion();
-  const list =
-    bullets?.length
-      ? bullets
-      : [
-          "Systems that stay coherent as you grow",
-          "Brand architecture that works across channels",
-          "Careful craft without decorative excess",
-          "Steady pace from discovery through launch",
-        ];
+  const list = bullets?.length
+    ? bullets
+    : [
+        "Systems that stay coherent as you grow",
+        "Brand architecture that works across channels",
+        "Careful craft without decorative excess",
+        "Steady pace from discovery through launch",
+      ];
 
-  const deliverables =
-    proofPoints?.length
-      ? proofPoints
-      : [
-          {
-            num: "01",
-            label: "Identity systems and guidelines your team can actually use",
-          },
-          {
-            num: "02",
-            label:
-              "Websites designed for clarity and conversion, then maintained",
-          },
-          {
-            num: "03",
-            label: "Marketing audits that show what’s working and what isn’t",
-          },
-          {
-            num: "04",
-            label: "Print and digital assets that speak in one voice",
-          },
-        ];
+  const deliverables = proofPoints?.length
+    ? proofPoints
+    : [
+        {
+          num: "01",
+          label: "Identity systems and guidelines your team can actually use",
+        },
+        {
+          num: "02",
+          label:
+            "Websites designed for clarity and conversion, then maintained",
+        },
+        {
+          num: "03",
+          label: "Marketing audits that show what’s working and what isn’t",
+        },
+        {
+          num: "04",
+          label: "Print and digital assets that speak in one voice",
+        },
+      ];
 
   return (
     <SceneSection id="about" tone="clear" reveal="scale">
@@ -91,7 +90,10 @@ export function WhySection({
                     ease: motionTokens.easeOut,
                   }}
                 >
-                  <span className="mt-2 size-1.5 shrink-0 bg-gold" aria-hidden />
+                  <span
+                    className="mt-2 size-1.5 shrink-0 bg-gold"
+                    aria-hidden
+                  />
                   <p className="font-sans text-body leading-6 text-fg">
                     {item}
                   </p>
@@ -134,10 +136,7 @@ export function WhySection({
                       ease: motionTokens.easeOut,
                     }}
                   >
-                    <span
-                      className="font-mono text-xs text-gold"
-                      aria-hidden
-                    >
+                    <span className="font-mono text-xs text-gold" aria-hidden>
                       {item.num}
                     </span>
                     <p className="font-sans text-body leading-6 text-fg-muted">

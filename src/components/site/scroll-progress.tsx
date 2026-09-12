@@ -1,6 +1,7 @@
 "use client";
+import { useHydratedReducedMotion as useReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
-import { motion, useScroll, useSpring, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 
 export function ScrollProgress() {
   const reduce = useReducedMotion();

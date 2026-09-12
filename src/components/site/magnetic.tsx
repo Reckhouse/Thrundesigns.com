@@ -1,6 +1,7 @@
 "use client";
+import { useHydratedReducedMotion as useReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
-import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useRef, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 

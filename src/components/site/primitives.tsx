@@ -1,10 +1,10 @@
 "use client";
+import { useHydratedReducedMotion as useReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Magnetic } from "@/components/site/magnetic";
-import { useReducedMotion } from "framer-motion";
 
 type EyebrowProps = {
   children: React.ReactNode;
