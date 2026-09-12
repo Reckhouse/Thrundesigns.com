@@ -659,3 +659,52 @@
     overflow: hidden;
   }
 }
+/* Review adjustment: let portrait artwork determine its own frame. */
+.editorial-home > header a[aria-label="Thrun Design Co. home"] > img {
+  height: 88px;
+}
+.editorial-gallery {
+  grid-template-columns: 1.7fr 0.75fr 0.75fr;
+  align-items: start;
+}
+.editorial-project:first-child {
+  grid-row: auto;
+}
+.editorial-project:not(:first-child) .editorial-project-image {
+  min-height: 0;
+  flex: none;
+  background: transparent;
+  overflow: visible;
+}
+.editorial-project:not(:first-child) .editorial-project-image img {
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+}
+.editorial-project:not(:first-child):hover img {
+  transform: none;
+}
+.editorial-project:first-child .editorial-project-image {
+  min-height: 0;
+  aspect-ratio: 1;
+  flex: none;
+}
+@media (max-width: 899px) {
+  .editorial-gallery {
+    grid-template-columns: 1fr 1fr;
+  }
+  .editorial-project:first-child {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 599px) {
+  .editorial-home > header > div {
+    height: 88px;
+  }
+  .editorial-hero {
+    padding-top: 88px;
+  }
+  .editorial-project-caption h3 {
+    font-size: 1.05rem;
+  }
+}

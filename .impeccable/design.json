@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-12T03:32:16.610Z",
+  "generatedAt": "2026-09-12T13:39:32.3214970Z",
   "title": "Design System: Thrun Design Co.",
   "extensions": {
     "colorMeta": {
@@ -226,7 +226,7 @@
       {
         "name": "gallery-hover",
         "value": "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Image scale 1.025 on hover, removed for reduced motion."
+        "purpose": "Lead image scales to 1.025 on hover; secondary portrait artwork never scales. Removed for reduced motion."
       },
       {
         "name": "remaining-work-marquee",
@@ -247,7 +247,13 @@
         "name": "shared-desktop-nav",
         "value": "1024px"
       }
-    ]
+    ],
+    "homepageLayout": {
+      "gallery": "Desktop: 1.7fr 0.75fr 0.75fr, top aligned. Square coffee lead; natural-aspect portrait artwork without wide frames. Below 900px, the lead spans two columns with a smaller portrait pair beneath, including mobile.",
+      "modelStage": "Horizontal in landscape canvas; vertical in portrait canvas. Equal viewport cells fit each model. Stage height 58svh, minimum 320px; 68svh at md.",
+      "modelDelivery": "Recognized public GLB assets from the configured Sanity dataset use /api/model-assets/[filename]. Other resolved URLs are unchanged.",
+      "modelStates": "Visible initial and per-model loading, error alert with reload-to-retry, Reset models in normal motion, and paused explanation with model labels for reduced motion."
+    }
   },
   "components": [
     {
@@ -277,7 +283,7 @@
     {
       "name": "Desktop navigation link",
       "kind": "nav",
-      "description": "Shared desktop mono link; application owns menu and motion.",
+      "description": "Shared desktop mono link; application owns menu and motion. Homepage brand mark is 88px high; header is 96px, or 88px below 600px.",
       "html": "<nav aria-label=\"Preview navigation\"><a class=\"ds-nav\" href=\"/work\">Work</a></nav>",
       "css": ".ds-nav{display:inline-flex;align-items:center;min-height:44px;color:var(--fg,#f4f1e9);font-weight:500;text-decoration:none;font-family:var(--font-plex-mono,'IBM Plex Mono'),monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-size:14px;letter-spacing:.17em}.ds-nav:hover{color:var(--gold,#d4af6a)}.ds-nav:focus-visible{outline:2px solid currentColor;outline-offset:6px;}"
     },

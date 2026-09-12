@@ -142,13 +142,13 @@ The process heading uses clamp(2rem, 2.8vw, 2.75rem), and the close uses clamp(2
 
 Homepage content centers within 1440px using the fluid gutters and section rhythm in frontmatter. The desktop hero splits at 1.08fr / 1fr with a 16px gap and a 540px horse stage. Services split at 0.8fr / 1.25fr; process at 0.8fr / 2fr; the close at 1.1fr / 1fr.
 
-The gallery uses 1.5fr / 1fr with its first project spanning two rows, a 40px heading-to-gallery interval, and image minimum heights of 510px for the lead and 220px for the others. Service rows use a 52px number column with a 24px gap. Actions wrap with a 20px / 24px gap.
+The gallery uses three desktop columns at 1.7fr / 0.75fr / 0.75fr, aligned at the top, with a 40px heading-to-gallery interval. The leading coffee project has a square frame. Secondary portrait artwork determines its own height at natural aspect ratio, without a wide background frame or minimum image height. Service rows use a 52px number column with a 24px gap. Actions wrap with a 20px / 24px gap.
 
-Below 900px (max-width: 899px), services and process stack their introduction above content. The gallery lead spans both equal columns and uses a 430px image minimum. The hero remains split at 1fr / 0.9fr with a 440px stage.
+Below 900px (max-width: 899px), services and process stack their introduction above content. The square gallery lead spans both equal columns, with the two smaller portrait works paired beneath it. The hero remains split at 1fr / 0.9fr with a 440px stage.
 
-Below 600px (max-width: 599px), hero, gallery, process steps, and close become single columns. Gallery images have a 300px minimum; the horse stage is 330px tall and clips stage overflow. Service rows use a 38px number column and 16px gap; process dividers become horizontal.
+Below 600px (max-width: 599px), hero, process steps, and close become single columns. The gallery retains its two-column portrait pair below the full-width square lead; secondary captions reduce to 1.05rem. The horse stage is 330px tall and clips stage overflow. Service rows use a 38px number column and 16px gap; process dividers become horizontal.
 
-The fixed homepage header is 96px high, reducing to 80px below 600px, with matching hero offset and section scroll margin. Existing navigation switches to a menu sheet below the shared lg breakpoint (1024px), independently of the homepage layout thresholds.
+The fixed homepage header is 96px high, reducing to 88px below 600px, with a matching hero offset. Section scroll margin remains 96px on larger screens and 80px below 600px. Existing navigation switches to a menu sheet below the shared lg breakpoint (1024px), independently of the homepage layout thresholds.
 
 ## Elevation & Depth
 
@@ -158,7 +158,7 @@ Solid tonal bands and thin borders create homepage separation. Scene glass and p
 
 ## Shapes
 
-Controls and media frames have square corners. Gallery frames clip overflow, but the first image uses cover while the second and third use contain to preserve complete artwork. The established geometric mark may retain its circle; zero radius describes containers, not every illustration.
+Controls and media frames have square corners. The first gallery image uses cover within a clipped square frame. The second and third retain contain sizing with relative positioning, full width, automatic height, a transparent background, and visible overflow to preserve their natural portrait compositions. The established geometric mark may retain its circle; zero radius describes containers, not every illustration.
 
 ## Components
 
@@ -170,7 +170,7 @@ Homepage links have a 2px currentColor focus outline offset by 6px. Shared contr
 
 ### Navigation
 
-Preserve the existing brand mark, displayed at 76px high on the homepage. Desktop links use medium uppercase mono, expanding to 14px and 0.17em tracking at lg. Mobile opens a right-hand sheet. The quote action stays visible and shortens to “Quote” below sm.
+Preserve the existing brand mark, displayed at 88px high on the homepage. Desktop links use medium uppercase mono, expanding to 14px and 0.17em tracking at lg. Mobile opens a right-hand sheet. The quote action stays visible and shortens to “Quote” below sm.
 
 ### Service and process rows
 
@@ -178,11 +178,13 @@ Services are open numbered articles on ivory with separators, serif titles, comp
 
 ### Work gallery and moving work
 
-Use actual CMS-resolved images and retain concept labels. Secondary featured artwork is contained rather than cropped. Gallery hover scales images to 1.025 over 0.65s using cubic-bezier(0.16, 1, 0.3, 1). Remaining projects use the existing marquee with a 40-second requested duration. Project links remain usable without motion.
+Use actual CMS-resolved images and retain concept labels. Secondary featured artwork retains its natural aspect ratio and does not scale on hover. The lead image scales to 1.025 over 0.65s using cubic-bezier(0.16, 1, 0.3, 1). Remaining projects use the existing marquee with a 40-second requested duration. Project links remain usable without motion.
 
 ### Living Engraving and model stage
 
-The draggable particle horse remains the live hero signature, enlarged within its stage. Reduced motion requests staticMode for the horse, stops the marquee and gallery hover transform, and retains the model stage's existing fallback. Global CSS shortens animations and transitions and disables smooth scrolling for reduced motion.
+The draggable particle horse remains the live hero signature, enlarged within its stage. Reduced motion requests staticMode for the horse, stops the marquee and gallery hover transform, and keeps the 3D stage paused with a readable explanation and featured model labels. Global CSS shortens animations and transitions and disables smooth scrolling for reduced motion.
+
+The 3D stage arranges models horizontally in a landscape canvas and vertically in a portrait canvas, fitting them to equal viewport cells. The stage is 58svh tall with a 320px minimum, increasing to 68svh at md. It displays loading status, an error alert with a reload-to-retry action, and a visible Reset models control during normal motion. Recognized public GLB files from the configured Sanity dataset use the same-origin /api/model-assets/[filename] route; other resolved URLs retain their existing path. The runtime canvas and asset delivery remain application-owned rather than simulated by the design panel.
 
 ### Shared fields
 
@@ -204,4 +206,3 @@ The existing input primitive is square and transparent with a thin border, 44px 
 - **Don't** reintroduce a mountain backdrop or cobalt into the approved homepage.
 - **Don't** crop secondary gallery compositions to fill their frames.
 - **Don't** treat this homepage handoff as evidence that other routes were redesigned.
-
