@@ -9,8 +9,7 @@ const SANITY_IMG = "https://cdn.sanity.io";
 const SANITY_API = "https://*.api.sanity.io https://*.apicdn.sanity.io";
 const SANITY_STUDIO = "https://thrundesign.sanity.studio";
 /** Hosted Studio redirects into the Sanity manage / app shell. */
-const SANITY_STUDIO_SHELL =
-  "https://www.sanity.io https://admin.sanity.io";
+const SANITY_STUDIO_SHELL = "https://www.sanity.io https://admin.sanity.io";
 const BLOB = "https://*.public.blob.vercel-storage.com";
 const TURNSTILE = "https://challenges.cloudflare.com";
 const VERCEL = "https://vercel.live https://*.vercel.app";
@@ -45,7 +44,7 @@ const GOOGLE_TAG_BEACONS =
 export function buildContentSecurityPolicy(): string {
   return [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' ${TURNSTILE} ${GOOGLE_TAG_SCRIPTS}`,
+    `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} 'wasm-unsafe-eval' ${TURNSTILE} ${GOOGLE_TAG_SCRIPTS}`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data: blob: ${SANITY_IMG} ${BLOB} ${GOOGLE_TAG_BEACONS}`,
     `media-src 'self' blob: ${SANITY_IMG} ${BLOB}`,

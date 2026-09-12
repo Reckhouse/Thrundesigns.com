@@ -1,4 +1,5 @@
 import { getSiteUrl } from "@/lib/site-url";
+import { serializeJsonLd } from "@/lib/json-ld";
 import {
   DEFAULT_DESCRIPTION,
   SITE_NAME,
@@ -19,7 +20,7 @@ export function JsonLd({ data }: JsonLdProps) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
     />
   );
 }

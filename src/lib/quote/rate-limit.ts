@@ -2,149 +2,152 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { createHash } from "node:crypto";
 
-type LimitResult = {
+export type LimitResult = {
   success: boolean;
   retryAfterSec?: number;
-  /** Which bucket rejected the request (for abuse logs). */
-  limiter?:
-    | "ip_10m"
-    | "ip_1d"
-    | "email_1h"
-    | "email_1d"
-    | "global_1h";
+  limiter?: string;
+  unavailable?: boolean;
 };
+type Bucket = { name: string; key: string; limit: number; minutes: number };
+const memoryStore = new Map<string, { count: number; resetAt: number }>();
 
-type MemoryBucket = { count: number; resetAt: number };
+function getRedis(): Redis | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+  if (url && token) return new Redis({ url, token, retry: { retries: 0 } });
+  if (process.env.NODE_ENV === "production")
+    throw new Error("Shared rate limit storage required");
+  return null;
+}
 
-const memoryStore = new Map<string, MemoryBucket>();
-
-function memoryLimit(
-  key: string,
-  limit: number,
-  windowMs: number,
-): LimitResult {
+function memoryLimit(bucket: Bucket): LimitResult {
   const now = Date.now();
+  for (const [key, value] of memoryStore)
+    if (value.resetAt <= now) memoryStore.delete(key);
+  const key = `${bucket.name}:${bucket.key}`;
   const current = memoryStore.get(key);
-  if (!current || current.resetAt <= now) {
-    memoryStore.set(key, { count: 1, resetAt: now + windowMs });
+  if (!current) {
+    if (memoryStore.size >= 10_000)
+      return { success: false, unavailable: true };
+    memoryStore.set(key, { count: 1, resetAt: now + bucket.minutes * 60_000 });
     return { success: true };
   }
-  if (current.count >= limit) {
+  if (current.count >= bucket.limit) {
     return {
       success: false,
       retryAfterSec: Math.max(1, Math.ceil((current.resetAt - now) / 1000)),
     };
   }
   current.count += 1;
-  memoryStore.set(key, current);
   return { success: true };
 }
 
-function getRedis(): Redis | null {
-  // Prefer explicit Upstash vars; also accept Vercel Marketplace KV_* aliases.
-  const url =
-    process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-  const token =
-    process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
-  if (!url || !token) return null;
-  return new Redis({ url, token });
-}
-
-let ipShort: Ratelimit | null = null;
-let ipDay: Ratelimit | null = null;
-let emailHour: Ratelimit | null = null;
-let emailDay: Ratelimit | null = null;
-let globalHour: Ratelimit | null = null;
-
-function ensureLimiters(redis: Redis) {
-  if (!ipShort) {
-    ipShort = new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(3, "10 m"),
-      prefix: "quote:ip:10m",
-    });
-    ipDay = new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(10, "1 d"),
-      prefix: "quote:ip:1d",
-    });
-    emailHour = new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(3, "1 h"),
-      prefix: "quote:email:1h",
-    });
-    emailDay = new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(5, "1 d"),
-      prefix: "quote:email:1d",
-    });
-    globalHour = new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(150, "1 h"),
-      prefix: "quote:global:1h",
-    });
-  }
-}
-
-async function checkUpstash(
-  limiter: Ratelimit,
-  key: string,
+/** A denied early bucket must never consume a later/global budget. */
+export async function runLimitChecks(
+  checks: { name: string; check: () => Promise<LimitResult> }[],
 ): Promise<LimitResult> {
-  const result = await limiter.limit(key);
-  if (result.success) return { success: true };
-  const retryAfterSec = Math.max(
-    1,
-    Math.ceil((result.reset - Date.now()) / 1000),
-  );
-  return { success: false, retryAfterSec };
+  for (const { name, check } of checks) {
+    const result = await check();
+    if (!result.success) return { ...result, limiter: name };
+  }
+  return { success: true };
+}
+
+async function enforce(buckets: Bucket[]): Promise<LimitResult> {
+  try {
+    const redis = getRedis();
+    return await runLimitChecks(
+      buckets.map((bucket) => ({
+        name: bucket.name,
+        check: async () => {
+          if (!redis) return memoryLimit(bucket);
+          const limiter = new Ratelimit({
+            redis,
+            limiter: Ratelimit.slidingWindow(
+              bucket.limit,
+              `${bucket.minutes} m`,
+            ),
+            prefix: `quote:v2:${bucket.name}`,
+            timeout: 3000,
+            ephemeralCache: false,
+          });
+          const result = await limiter.limit(bucket.key);
+          // Upstash grants access on timeout by default; fail closed instead.
+          if (result.reason === "timeout")
+            return { success: false, unavailable: true };
+          return {
+            success: result.success,
+            retryAfterSec: Math.max(
+              1,
+              Math.ceil((result.reset - Date.now()) / 1000),
+            ),
+          };
+        },
+      })),
+    );
+  } catch {
+    return { success: false, unavailable: true, retryAfterSec: 60 };
+  }
 }
 
 export function fingerprintEmail(email: string): string {
-  return createHash("sha256").update(email).digest("hex").slice(0, 32);
+  return createHash("sha256")
+    .update(email.trim().toLowerCase())
+    .digest("hex")
+    .slice(0, 32);
 }
 
-export async function enforceQuoteRateLimits(options: {
+/** Before body parsing, CMS requests, or challenge verification. */
+export function enforceQuoteRequestRateLimit(ip: string) {
+  return enforce([{ name: "request_ip", key: ip, limit: 20, minutes: 10 }]);
+}
+
+/** Call after field, form-token, CAPTCHA and attachment validation. */
+export function enforceQuoteRateLimits({
+  ip,
+  email,
+}: {
   ip: string;
   email: string;
-}): Promise<LimitResult> {
-  const emailKey = fingerprintEmail(options.email);
-  const redis = getRedis();
-
-  const labels = [
-    "ip_10m",
-    "ip_1d",
-    "email_1h",
-    "email_1d",
-    "global_1h",
-  ] as const;
-
-  if (!redis) {
-    // Dev / misconfigured production still gets process-local protection.
-    const checks = [
-      memoryLimit(`ip:10m:${options.ip}`, 3, 10 * 60 * 1000),
-      memoryLimit(`ip:1d:${options.ip}`, 10, 24 * 60 * 60 * 1000),
-      memoryLimit(`email:1h:${emailKey}`, 3, 60 * 60 * 1000),
-      memoryLimit(`email:1d:${emailKey}`, 5, 24 * 60 * 60 * 1000),
-      memoryLimit("global:1h", 150, 60 * 60 * 1000),
-    ];
-    const index = checks.findIndex((check) => !check.success);
-    if (index < 0) return { success: true };
-    return { ...checks[index], limiter: labels[index] };
-  }
-
-  ensureLimiters(redis);
-
-  const results = await Promise.all([
-    checkUpstash(ipShort!, options.ip),
-    checkUpstash(ipDay!, options.ip),
-    checkUpstash(emailHour!, emailKey),
-    checkUpstash(emailDay!, emailKey),
-    checkUpstash(globalHour!, "global"),
+}) {
+  const key = fingerprintEmail(email);
+  return enforce([
+    { name: "ip_10m", key: ip, limit: 3, minutes: 10 },
+    { name: "ip_1d", key: ip, limit: 10, minutes: 1440 },
+    { name: "email_1h", key, limit: 3, minutes: 60 },
+    { name: "email_1d", key, limit: 5, minutes: 1440 },
+    { name: "global_1h", key: "global", limit: 150, minutes: 60 },
   ]);
+}
 
-  const index = results.findIndex((result) => !result.success);
-  if (index < 0) return { success: true };
-  return { ...results[index], limiter: labels[index] };
+export function enforceAttachmentUnlockRateLimits(ip: string) {
+  return enforce([
+    { name: "unlock_ip", key: ip, limit: 5, minutes: 15 },
+    { name: "unlock_global", key: "global", limit: 300, minutes: 15 },
+  ]);
+}
+
+function duplicateKey(options: {
+  email: string;
+  message: string;
+  projectType: string;
+}): string {
+  const digest = createHash("sha256")
+    .update(`${options.email}\n${options.projectType}\n${options.message}`)
+    .digest("hex");
+  return `quote:dup:${digest}`;
+}
+
+export async function releaseDuplicateSubmission(options: {
+  email: string;
+  message: string;
+  projectType: string;
+}) {
+  const key = duplicateKey(options);
+  const redis = getRedis();
+  if (redis) await redis.del(key);
+  else memoryStore.delete(`duplicate:${key}`);
 }
 
 export async function isDuplicateSubmission(options: {
@@ -152,19 +155,10 @@ export async function isDuplicateSubmission(options: {
   message: string;
   projectType: string;
 }): Promise<boolean> {
-  const material = `${options.email}\n${options.projectType}\n${options.message}`;
-  const digest = createHash("sha256").update(material).digest("hex");
-  const key = `quote:dup:${digest}`;
+  const key = duplicateKey(options);
   const redis = getRedis();
-
-  if (!redis) {
-    const hit = memoryStore.get(key);
-    const now = Date.now();
-    if (hit && hit.resetAt > now) return true;
-    memoryStore.set(key, { count: 1, resetAt: now + 60 * 60 * 1000 });
-    return false;
-  }
-
-  const created = await redis.set(key, "1", { nx: true, ex: 60 * 60 });
-  return created === null;
+  if (redis)
+    return (await redis.set(key, "1", { nx: true, ex: 3600 })) === null;
+  return !memoryLimit({ name: "duplicate", key, limit: 1, minutes: 60 })
+    .success;
 }

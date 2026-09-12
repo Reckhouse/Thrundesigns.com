@@ -13,9 +13,12 @@ export function getQuoteBlobToken(): string | null {
 /** Operator secret for unlock page + session cookies. */
 export function getAttachmentSignSecret(): string | null {
   const dedicated = process.env.QUOTE_ATTACHMENT_SECRET?.trim();
-  if (dedicated && dedicated.length >= 16) return dedicated;
-  const fallback = process.env.QUOTE_FORM_SECRET?.trim();
-  if (fallback && fallback.length >= 16) return fallback;
+  if (
+    dedicated &&
+    dedicated.length >= 32 &&
+    dedicated !== process.env.QUOTE_FORM_SECRET?.trim()
+  )
+    return dedicated;
   return null;
 }
 
@@ -77,9 +80,7 @@ export async function createAttachmentDownloadUrl(
 export async function createAttachmentDownloadUrls(
   pathnames: string[],
   ttlMs = ATTACHMENT_DOWNLOAD_TTL_MS,
-): Promise<
-  { pathname: string; url: string; expiresAt: string }[]
-> {
+): Promise<{ pathname: string; url: string; expiresAt: string }[]> {
   const unique = [...new Set(pathnames.map((p) => p.trim()).filter(Boolean))];
   const results: { pathname: string; url: string; expiresAt: string }[] = [];
 

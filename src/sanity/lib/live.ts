@@ -8,6 +8,7 @@ export const { sanityFetch, SanityLive } = defineLive({
     apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || "2025-01-01",
   }),
   serverToken: token,
-  // Browser token is only used while Draft Mode / Presentation is active.
-  browserToken: token,
+  // Keep dataset credentials server-side. Studio Presentation retains its own
+  // authenticated live connection; standalone shared draft previews do not.
+  browserToken: false,
 });

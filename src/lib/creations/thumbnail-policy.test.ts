@@ -4,7 +4,7 @@ import {
   detectImageKind,
   isAllowedCreationThumbnailUrl,
   isPlausibleCreatedAt,
-} from "./thumbnail-policy.ts";
+} from "./thumbnail-policy";
 
 describe("creation thumbnail policy", () => {
   it("allows vercel blob https hosts", () => {
