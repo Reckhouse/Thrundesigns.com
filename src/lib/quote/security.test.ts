@@ -5,7 +5,7 @@ import { PDFDocument } from "pdf-lib";
 import { serializeJsonLd } from "../json-ld";
 import { validateAttachments } from "./attachments";
 import { readBoundedFormData, RequestBodyError } from "./body";
-import { assertPrivateQuoteDataset, quoteStoreConfig } from "./store-config";
+import { quoteStoreConfig } from "./store-config";
 import { isAllowedQuoteOrigin } from "./request-guards";
 import {
   enforceQuoteRateLimits,
@@ -21,8 +21,23 @@ import {
 } from "./attachment-session";
 import { POST as unlock } from "../../app/api/quote/attachments/download/route";
 import { POST as submit } from "../../app/api/quote/route";
+import { GET as download } from "../../app/api/quote/attachments/download/route";
+import { quoteRecordPath, readQuoteRecord } from "./blob-store";
 
 const saved = { ...process.env };
+test("record identifiers cannot escape their namespace or expose contact information", async () => {
+  const path = quoteRecordPath("../../person@example.com");
+  assert.match(path, /^quotes\/records\/[a-f0-9]{64}\.json$/);
+  assert.equal(path.includes("example.com"), false);
+  assert.notEqual(path, quoteRecordPath("different"));
+  await assert.rejects(() => readQuoteRecord("quotes/../../outside.json"));
+});
+test("quote JSON download requires an authenticated operator", async () => {
+  process.env.QUOTE_ATTACHMENT_SECRET = "independent-test-secret-of-at-least-32-characters";
+  const response = await download(new Request(`https://www.thrundesigns.com/api/quote/attachments/download?pathname=${quoteRecordPath("test")}`));
+  assert.equal(response.status, 307);
+  assert.equal(new URL(response.headers.get("location")!).pathname, "/quote-attachments");
+});
 afterEach(() => {
   for (const key of Object.keys(process.env))
     if (!(key in saved)) delete process.env[key];
@@ -59,37 +74,11 @@ test("JSON-LD rejects HTML breakout while retaining the original JSON value", ()
   assert.equal(serialized.includes("<"), false);
   assert.deepEqual(JSON.parse(serialized), data);
 });
-test("quote store refuses missing, reused, and invalid datasets and tokens", () => {
-  for (const env of [
-    {},
-    { QUOTE_SANITY_DATASET: "production", QUOTE_SANITY_WRITE_TOKEN: "fixture" },
-    { QUOTE_SANITY_DATASET: "private-quotes" },
-    { QUOTE_SANITY_DATASET: "../../x", QUOTE_SANITY_WRITE_TOKEN: "fixture" },
-  ]) {
+test("quote store requires a dedicated token and never uses the public media token", () => {
+  for (const env of [{}, {BLOB_READ_WRITE_TOKEN: "public"}, {QUOTE_READ_WRITE_TOKEN: "same", BLOB_READ_WRITE_TOKEN: "same"}]) {
     assert.throws(() => quoteStoreConfig(env));
   }
-  assert.equal(
-    quoteStoreConfig({
-      QUOTE_SANITY_DATASET: "private-quotes",
-      QUOTE_SANITY_WRITE_TOKEN: "fixture",
-    }).dataset,
-    "private-quotes",
-  );
-});
-test("actual dataset ACL must be private", () => {
-  assert.throws(() =>
-    assertPrivateQuoteDataset(
-      [{ name: "quotes", aclMode: "public" }],
-      "quotes",
-    ),
-  );
-  assert.throws(() => assertPrivateQuoteDataset([], "quotes"));
-  assert.doesNotThrow(() =>
-    assertPrivateQuoteDataset(
-      [{ name: "quotes", aclMode: "private" }],
-      "quotes",
-    ),
-  );
+  assert.deepEqual(quoteStoreConfig({QUOTE_READ_WRITE_TOKEN: "private"}), {token: "private", access: "private"});
 });
 test("production quote intake fails closed without shared limits/private storage", async () => {
   localLimits();
