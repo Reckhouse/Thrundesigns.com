@@ -1,37 +1,23 @@
 # Security remediation rollout
 
-This patch prevents new quotes from entering the public content dataset. Existing records remain exposed until an operator completes the migration below. Do not treat merging this patch as completion of the data remediation.
+Quote records and attachments use the existing private Vercel Blob store. Sanity remains the public content CMS; no paid private dataset is needed.
 
-## Prepare the private quote store
+## Configuration and operator access
 
-1. In the Sanity project, create a separate dataset named `quotes` with **private** visibility. Do not change the public site's content dataset to private without preparing its read paths.
-2. Grant a dedicated server-only token access to the private dataset for writes and dataset metadata reads. Set `QUOTE_SANITY_DATASET=quotes` and `QUOTE_SANITY_WRITE_TOKEN` in each Vercel environment accepting submissions. The write route checks Sanity's actual `aclMode` before writes; lack of metadata access fails closed.
-3. Ensure `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (or the KV aliases) are configured. Production requests return 503 if shared limits are unavailable, including Upstash timeouts.
-4. Set a separately generated `QUOTE_ATTACHMENT_SECRET` of at least 32 characters, different from `QUOTE_FORM_SECRET`. Do not reuse the form secret. Existing operator sessions will require signing in again after rotation. Retain `QUOTE_READ_WRITE_TOKEN` for the private Blob store.
-5. Set `SANITY_STUDIO_QUOTE_DATASET=quotes` for the Studio build. Its private-quotes workspace uses authenticated Sanity access. The public content workspace no longer includes quote submissions. Viewer credentials are no longer forwarded to preview browsers; Studio Presentation remains the supported live draft-preview flow. Standalone shared preview links will not receive live draft updates. Restrict content and quote tokens to their respective datasets wherever supported.
+- `QUOTE_READ_WRITE_TOKEN` must belong to the private quote store, never the public media store. All writes and reads explicitly request private access.
+- Keep the existing `KV_REST_API_URL` / `KV_REST_API_TOKEN` (or Upstash aliases) for shared production limits.
+- `QUOTE_ATTACHMENT_SECRET` must be independently generated, at least 32 characters, and different from the form secret. Changes require a new deployment and invalidate old operator sessions.
+- Quote JSON is stored under `quotes/records/` with opaque hashed identifiers. Each submission is an immutable object; attachments remain under `quotes/`.
+- Authorized operators can browse and download records through the Vercel private store dashboard. Notification record links use the existing authenticated download route and operator unlock page. No public listing endpoint is provided.
+- Quote records are no longer managed in Sanity Studio. No `QUOTE_SANITY_*` settings are required. Do not configure the optional legacy Studio quote dataset.
 
-The submitter-facing form already handles service errors. Until the required private storage and Redis configuration exists, intake will return 503 rather than fall back to insecure storage. Make the configuration changes before deploying if continuous intake is required.
+## Migration from public Sanity
 
-## Migrate existing submissions
+Keep the old intake disabled until the new route is deployed. Run from `studio/` using `sanity exec scripts/migrate-quotes-to-blob.ts --with-user-token`, with the private Blob token loaded from an untracked environment file. This defaults to counts only. Add `-- --apply` to copy and verify; add `-- --apply --remove-source` to re-verify every complete original record and atomically delete the public sources with revision checks. Credentials and customer values are never logged. The user's existing Sanity CLI session supplies migration access; no persistent migration token is created.
 
-Temporarily stop public quote intake at the edge while migrating, so the old deployment cannot create more exposed records. Supply a temporary migration token with access to both datasets via `QUOTE_MIGRATION_TOKEN` in an untracked environment file. Never put tokens in command arguments, source control, or Studio public variables.
+Every original field, ID, revision, timestamp, and attachment reference is preserved in the JSON copy. Re-running never overwrites a conflicting destination. Verify anonymous Blob reads return 403 before removing sources; confirm the public quote count is zero afterwards. Provider history and backups are outside this migration's scope.
 
-From the repository root, with the variables above loaded:
-
-```sh
-node --env-file=.env.local scripts/migrate-private-quotes.mjs
-node --env-file=.env.local scripts/migrate-private-quotes.mjs --apply
-```
-
-The first command displays counts only. The second copies records into the verified private dataset, preserves their IDs, verifies document contents, and retains the source records. It never prints customer data. Verify operator access in the private Studio workspace. Once the copies are verified, remove the public copies:
-
-```sh
-node --env-file=.env.local scripts/migrate-private-quotes.mjs --apply --remove-source
-```
-
-The removal mode re-verifies each destination and uses an atomic source revision check before deleting. Changed or mismatched documents stop the migration instead of being overwritten or removed. It is safe to rerun after a partial success once any conflicts have been resolved. The deletion flag is deliberately separate because it changes production data.
-
-Deploy the application and Studio, re-enable intake, verify a test submission reaches only the private dataset, and confirm unauthenticated queries cannot read quote records. Review Sanity history/retention and access logs for the prior public copies; the script handles current documents, not provider backups or historical retention. Revoke the migration token afterwards.
+Production migration: three records copied and verified, all anonymous reads denied (403), then three public source records removed on 2026-09-12 UTC. Redis allowed the first isolated test request and denied the second within its configured test window.
 
 ## Application protections
 
@@ -43,6 +29,6 @@ Deploy the application and Studio, re-enable intake, verify a test submission re
 
 ## Validation
 
-Run `npm run test:security`, the existing tests, `npx tsc --noEmit`, and `npm run build`. Build the Studio separately with its private dataset variable. After deployment, verify quote submission, attachment download, draft previews, and image-heavy project pages with the configured services.
+Run `npm run test:security`, the existing tests, `npx tsc --noEmit`, and `npm run build`. After deployment, verify quote submission, authenticated downloads, and private Blob access with the configured services.
 
-The migration is not executed by tests or builds. Neither a successful build nor a passing unit suite proves live dataset privacy or external configuration.
+The migration is not executed by tests or builds. Neither a successful build nor a passing unit suite proves live storage privacy or external configuration.

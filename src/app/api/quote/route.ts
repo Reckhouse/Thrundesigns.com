@@ -22,7 +22,8 @@ import { createQuoteFieldsSchema } from "@/lib/quote/schema";
 import { hashIdentifier, logQuoteSecurity } from "@/lib/quote/security-log";
 import { verifyTurnstileToken } from "@/lib/quote/turnstile";
 import { trackAcceptedQuoteVolume } from "@/lib/quote/volume-alert";
-import { privateQuoteClient, quoteStoreConfig } from "@/lib/quote/store-config";
+import { quoteStoreConfig } from "@/lib/quote/store-config";
+import { storeQuoteRecord } from "@/lib/quote/blob-store";
 import { readBoundedFormData, RequestBodyError } from "@/lib/quote/body";
 
 export async function POST(request: Request) {
@@ -135,16 +136,9 @@ export async function POST(request: Request) {
     return genericError(rate.unavailable ? 503 : 429, rate.retryAfterSec);
   }
 
-  let writeClient: Awaited<ReturnType<typeof privateQuoteClient>>;
-  try {
-    writeClient = await privateQuoteClient();
-  } catch {
-    logQuoteSecurity("quote.storage_failed", { stage: "private_dataset" });
-    return genericError(503);
-  }
-
   // Prefer private quote store token; never fall back to the public media store.
-  const blobToken = process.env.QUOTE_READ_WRITE_TOKEN;
+  const blobToken = quoteStoreConfig().token;
+  let recordPathname: string | undefined;
   const attachments: string[] = [];
   if (attachmentCheck.files.length && !blobToken) return genericError(503);
 
@@ -181,7 +175,7 @@ export async function POST(request: Request) {
       parsed.data.projectType,
     )?.service;
 
-    await writeClient.create({
+    recordPathname = await storeQuoteRecord({
       _type: "quoteSubmission",
       status: "new",
       ...parsed.data,
@@ -206,7 +200,7 @@ export async function POST(request: Request) {
         logQuoteSecurity("quote.storage_failed", { stage: "blob_cleanup" });
       });
     }
-    logQuoteSecurity("quote.storage_failed", { stage: "sanity_write" });
+    logQuoteSecurity("quote.storage_failed", { stage: "blob_record_write" });
     return NextResponse.json(
       { error: "Unable to process request" },
       { status: 500 },
@@ -224,7 +218,7 @@ export async function POST(request: Request) {
   await notifyQuoteStored({
     ...parsed.data,
     attachmentPathnames: attachments,
-    studioUrl: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL,
+    recordPathname,
     formConfig,
   });
 

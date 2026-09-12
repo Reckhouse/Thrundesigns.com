@@ -12,7 +12,7 @@ import { getSiteUrl } from "@/lib/site-url";
 
 type NotifyQuoteInput = QuoteFields & {
   attachmentPathnames: string[];
-  studioUrl?: string;
+  recordPathname?: string;
   formConfig: QuoteFormConfig;
 };
 
@@ -20,7 +20,7 @@ async function buildPlainText(input: NotifyQuoteInput): Promise<string> {
   const { formConfig } = input;
   const projectOption = findOption(formConfig.projectTypes, input.projectType);
   const lines = [
-    "New quote request stored in Sanity.",
+    "New quote request stored privately.",
     "",
     `Name: ${input.name}`,
     `Email: ${input.email}`,
@@ -57,21 +57,23 @@ async function buildPlainText(input: NotifyQuoteInput): Promise<string> {
       );
     } catch {
       lines.push(
-        "(Private Blob pathnames — open Studio and use Download links)",
+        "(Private file paths — open the quote storage dashboard)",
         ...input.attachmentPathnames.map((path) => `- ${path}`),
       );
     }
   }
 
-  if (input.studioUrl) {
-    lines.push("", `Studio: ${input.studioUrl}`);
+  if (input.recordPathname) {
+    const url = new URL("/api/quote/attachments/download", getSiteUrl());
+    url.searchParams.set("pathname", input.recordPathname);
+    lines.push("", `Quote record (operator sign-in required): ${url}`);
   }
 
   return lines.join("\n");
 }
 
 /**
- * Notify after Sanity write succeeds. Never throws — email failure must not
+ * Notify after private storage succeeds. Never throws — email failure must not
  * fail the quote submission response.
  */
 export async function notifyQuoteStored(
