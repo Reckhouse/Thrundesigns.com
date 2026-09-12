@@ -32,16 +32,6 @@ export const structure: StructureResolver = (S) =>
                     .schemaType("quoteForm")
                     .documentId("quoteForm"),
                 ),
-              S.listItem()
-                .title("Quote submissions")
-                .id("quoteSubmissions")
-                .child(
-                  S.documentTypeList("quoteSubmission")
-                    .title("Quote submissions")
-                    .defaultOrdering([
-                      { field: "submittedAt", direction: "desc" },
-                    ]),
-                ),
             ]),
         ),
     ]);

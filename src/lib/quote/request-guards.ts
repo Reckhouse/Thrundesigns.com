@@ -52,33 +52,19 @@ function allowedOrigins(): string[] {
   return [...origins];
 }
 
-function isAllowedHost(hostname: string): boolean {
-  if (hostname === "localhost" || hostname === "127.0.0.1") {
-    return process.env.NODE_ENV !== "production";
-  }
-  if (
-    hostname === "www.thrundesigns.com" ||
-    hostname === "thrundesigns.com" ||
-    hostname === "thrundesigns-com.vercel.app"
-  ) {
-    return true;
-  }
-  // Vercel preview deployments for this project
-  if (
-    hostname.endsWith(".vercel.app") &&
-    hostname.includes("thrundesigns")
-  ) {
-    return true;
-  }
-  const site = process.env.NEXT_PUBLIC_SITE_URL;
-  if (site) {
+export function isAllowedQuoteOrigin(request: Request): boolean {
+  if (request.headers.get("sec-fetch-site") === "cross-site") return false;
+  const origin = request.headers.get("origin");
+  if (origin) return allowedOrigins().includes(origin);
+  const referer = request.headers.get("referer");
+  if (referer) {
     try {
-      return new URL(site).hostname === hostname;
+      return allowedOrigins().includes(new URL(referer).origin);
     } catch {
       return false;
     }
   }
-  return false;
+  return process.env.NODE_ENV !== "production";
 }
 
 export function assertQuoteRequestGuards(
@@ -99,47 +85,7 @@ export function assertQuoteRequestGuards(
     return genericError(413);
   }
 
-  const fetchSite = request.headers.get("sec-fetch-site");
-  if (fetchSite === "cross-site") {
-    return genericError(403);
-  }
-
-  const origin = request.headers.get("origin");
-  if (origin) {
-    try {
-      const originUrl = new URL(origin);
-      if (!isAllowedHost(originUrl.hostname)) {
-        return genericError(403);
-      }
-    } catch {
-      return genericError(403);
-    }
-  } else {
-    const referer = request.headers.get("referer");
-    if (referer) {
-      try {
-        const refererUrl = new URL(referer);
-        if (!isAllowedHost(refererUrl.hostname)) {
-          return genericError(403);
-        }
-      } catch {
-        return genericError(403);
-      }
-    } else if (process.env.NODE_ENV === "production" && !fetchSite) {
-      // Missing both Origin/Referer and Sec-Fetch-Site in production is suspicious.
-      return genericError(403);
-    }
-  }
-
-  // Prefer allowlisted origins when Origin is present.
-  if (origin && !allowedOrigins().includes(origin)) {
-    try {
-      const host = new URL(origin).hostname;
-      if (!isAllowedHost(host)) return genericError(403);
-    } catch {
-      return genericError(403);
-    }
-  }
+  if (!isAllowedQuoteOrigin(request)) return genericError(403);
 
   return null;
 }

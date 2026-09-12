@@ -227,14 +227,16 @@ export const quoteSubmission = defineType({
       readOnly: true,
     }),
     defineField({
-      name: "service",
-      title: "Linked service",
-      type: "reference",
-      to: [{ type: "service" }],
+      name: "serviceSnapshot",
+      title: "Service at submission",
+      type: "object",
+      fields: [
+        defineField({ name: "id", type: "string" }),
+        defineField({ name: "title", type: "string" }),
+      ],
       readOnly: true,
-      weak: true,
       description:
-        "Filled automatically when the chosen project type option links a Service.",
+        "Snapshot from the public content dataset; no cross-dataset document reference.",
     }),
     defineField({
       name: "budget",

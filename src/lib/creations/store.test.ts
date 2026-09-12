@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createDefaultPosterCreation } from "@thrun-design/controlled-chaos";
-import { parseCreationPayload } from "./store.ts";
+import { parseCreationPayload } from "./store";
 
 describe("parseCreationPayload hardening", () => {
   it("accepts a valid serialized creation", () => {

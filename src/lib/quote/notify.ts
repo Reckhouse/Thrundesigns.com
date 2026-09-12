@@ -1,8 +1,5 @@
 import { Resend } from "resend";
-import {
-  createAttachmentDownloadUrls,
-  filenameFromPathname,
-} from "@/lib/quote/attachment-download";
+import { filenameFromPathname } from "@/lib/quote/attachment-download";
 import {
   findOption,
   labelFor,
@@ -11,6 +8,7 @@ import {
 } from "@/lib/quote/form-config";
 import type { QuoteFields } from "@/lib/quote/schema";
 import { logQuoteSecurity } from "@/lib/quote/security-log";
+import { getSiteUrl } from "@/lib/site-url";
 
 type NotifyQuoteInput = QuoteFields & {
   attachmentPathnames: string[];
@@ -20,10 +18,7 @@ type NotifyQuoteInput = QuoteFields & {
 
 async function buildPlainText(input: NotifyQuoteInput): Promise<string> {
   const { formConfig } = input;
-  const projectOption = findOption(
-    formConfig.projectTypes,
-    input.projectType,
-  );
+  const projectOption = findOption(formConfig.projectTypes, input.projectType);
   const lines = [
     "New quote request stored in Sanity.",
     "",
@@ -49,14 +44,15 @@ async function buildPlainText(input: NotifyQuoteInput): Promise<string> {
 
   if (input.attachmentPathnames.length > 0) {
     try {
-      const downloads = await createAttachmentDownloadUrls(
-        input.attachmentPathnames,
-      );
+      const downloads = input.attachmentPathnames.map((pathname) => {
+        const url = new URL("/api/quote/attachments/download", getSiteUrl());
+        url.searchParams.set("pathname", pathname);
+        return { pathname, url: url.toString() };
+      });
       lines.push(
-        "(Private downloads — links expire in about 1 hour)",
+        "(Private downloads — operator sign-in required)",
         ...downloads.map(
-          (item) =>
-            `- ${filenameFromPathname(item.pathname)}: ${item.url}`,
+          (item) => `- ${filenameFromPathname(item.pathname)}: ${item.url}`,
         ),
       );
     } catch {
@@ -78,7 +74,9 @@ async function buildPlainText(input: NotifyQuoteInput): Promise<string> {
  * Notify after Sanity write succeeds. Never throws — email failure must not
  * fail the quote submission response.
  */
-export async function notifyQuoteStored(input: NotifyQuoteInput): Promise<void> {
+export async function notifyQuoteStored(
+  input: NotifyQuoteInput,
+): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.QUOTE_NOTIFY_TO?.trim();
   const from =

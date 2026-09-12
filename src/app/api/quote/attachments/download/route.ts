@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { get } from "@vercel/blob";
 import {
   assertSafeAttachmentPathname,
-  createAttachmentDownloadUrl,
+  getQuoteBlobToken,
+  filenameFromPathname,
 } from "@/lib/quote/attachment-download";
 import {
   createAttachmentSessionCookie,
@@ -10,6 +12,13 @@ import {
 } from "@/lib/quote/attachment-session";
 import { logQuoteSecurity } from "@/lib/quote/security-log";
 import { getSiteUrl } from "@/lib/site-url";
+import { enforceAttachmentUnlockRateLimits } from "@/lib/quote/rate-limit";
+import {
+  genericError,
+  getClientIp,
+  isAllowedQuoteOrigin,
+} from "@/lib/quote/request-guards";
+import { readBoundedFormData, RequestBodyError } from "@/lib/quote/body";
 
 function siteOrigin(): string {
   return getSiteUrl();
@@ -23,9 +32,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const authed = verifyAttachmentSessionCookie(
-    request.headers.get("cookie"),
-  );
+  const authed = verifyAttachmentSessionCookie(request.headers.get("cookie"));
   if (!authed) {
     const unlock = new URL("/quote-attachments", siteOrigin());
     unlock.searchParams.set("pathname", safe.pathname);
@@ -33,12 +40,31 @@ export async function GET(request: Request) {
   }
 
   try {
-    const download = await createAttachmentDownloadUrl(safe.pathname);
+    const token = getQuoteBlobToken();
+    if (!token) return genericError(503);
+    const file = await get(safe.pathname, {
+      token,
+      access: "private",
+      useCache: false,
+    });
+    if (!file || file.statusCode !== 200) return genericError(404);
     logQuoteSecurity("quote.attachment_signed", {
       count: 1,
-      via: "download_redirect",
+      via: "authenticated_download",
     });
-    return NextResponse.redirect(download.url);
+    const filename = filenameFromPathname(safe.pathname).replace(
+      /[^A-Za-z0-9._-]/g,
+      "_",
+    );
+    return new Response(file.stream, {
+      headers: {
+        "Content-Type": "application/octet-stream",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'none'; sandbox",
+      },
+    });
   } catch {
     logQuoteSecurity("quote.storage_failed", { stage: "attachment_download" });
     return NextResponse.json(
@@ -49,9 +75,15 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const form = await request.formData().catch(() => null);
-  if (!form) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  if (!isAllowedQuoteOrigin(request)) return genericError(403);
+  const rate = await enforceAttachmentUnlockRateLimits(getClientIp(request));
+  if (!rate.success)
+    return genericError(rate.unavailable ? 503 : 429, rate.retryAfterSec);
+  let form: FormData;
+  try {
+    form = await readBoundedFormData(request, 16 * 1024);
+  } catch (error) {
+    return genericError(error instanceof RequestBodyError ? error.status : 400);
   }
 
   const password = String(form.get("password") || "");
@@ -66,7 +98,7 @@ export async function POST(request: Request) {
     const unlock = new URL("/quote-attachments", siteOrigin());
     if (safe.ok) unlock.searchParams.set("pathname", safe.pathname);
     unlock.searchParams.set("error", "1");
-    return NextResponse.redirect(unlock);
+    return NextResponse.redirect(unlock, 303);
   }
 
   const session = createAttachmentSessionCookie();
@@ -86,7 +118,8 @@ export async function POST(request: Request) {
       )
     : new URL("/quote-attachments", siteOrigin());
 
-  const response = NextResponse.redirect(target);
+  const response = NextResponse.redirect(target, 303);
+  response.headers.set("Cache-Control", "no-store");
   response.cookies.set(session.name, session.value, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
