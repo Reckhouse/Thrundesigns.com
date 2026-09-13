@@ -661,7 +661,7 @@
 }
 /* Review adjustment: let portrait artwork determine its own frame. */
 .editorial-home > header a[aria-label="Thrun Design Co. home"] > img {
-  height: 88px;
+  height: 96px;
 }
 .editorial-gallery {
   grid-template-columns: 1.7fr 0.75fr 0.75fr;
@@ -699,10 +699,10 @@
 }
 @media (max-width: 599px) {
   .editorial-home > header > div {
-    height: 88px;
+    height: 96px;
   }
   .editorial-hero {
-    padding-top: 88px;
+    padding-top: 96px;
   }
   .editorial-project-caption h3 {
     font-size: 1.05rem;

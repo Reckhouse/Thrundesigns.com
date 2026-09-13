@@ -283,7 +283,7 @@
     {
       "name": "Desktop navigation link",
       "kind": "nav",
-      "description": "Shared desktop mono link; application owns menu and motion. Homepage brand mark is 88px high; header is 96px, or 88px below 600px.",
+      "description": "Shared desktop mono link; application owns menu and motion. Homepage brand mark and header are 96px high at all viewport widths.",
       "html": "<nav aria-label=\"Preview navigation\"><a class=\"ds-nav\" href=\"/work\">Work</a></nav>",
       "css": ".ds-nav{display:inline-flex;align-items:center;min-height:44px;color:var(--fg,#f4f1e9);font-weight:500;text-decoration:none;font-family:var(--font-plex-mono,'IBM Plex Mono'),monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-size:14px;letter-spacing:.17em}.ds-nav:hover{color:var(--gold,#d4af6a)}.ds-nav:focus-visible{outline:2px solid currentColor;outline-offset:6px;}"
     },

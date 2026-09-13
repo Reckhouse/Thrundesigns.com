@@ -148,7 +148,7 @@ Below 900px (max-width: 899px), services and process stack their introduction ab
 
 Below 600px (max-width: 599px), hero, process steps, and close become single columns. The gallery retains its two-column portrait pair below the full-width square lead; secondary captions reduce to 1.05rem. The horse stage is 330px tall and clips stage overflow. Service rows use a 38px number column and 16px gap; process dividers become horizontal.
 
-The fixed homepage header is 96px high, reducing to 88px below 600px, with a matching hero offset. Section scroll margin remains 96px on larger screens and 80px below 600px. Existing navigation switches to a menu sheet below the shared lg breakpoint (1024px), independently of the homepage layout thresholds.
+The fixed homepage header is 96px high at all viewport widths, with a matching hero offset. Section scroll margin remains 96px on larger screens and 80px below 600px. Existing navigation switches to a menu sheet below the shared lg breakpoint (1024px), independently of the homepage layout thresholds.
 
 ## Elevation & Depth
 
@@ -170,7 +170,7 @@ Homepage links have a 2px currentColor focus outline offset by 6px. Shared contr
 
 ### Navigation
 
-Preserve the existing brand mark, displayed at 88px high on the homepage. Desktop links use medium uppercase mono, expanding to 14px and 0.17em tracking at lg. Mobile opens a right-hand sheet. The quote action stays visible and shortens to “Quote” below sm.
+Preserve the existing brand mark, displayed at 96px high on the homepage. Desktop links use medium uppercase mono, expanding to 14px and 0.17em tracking at lg. Mobile opens a right-hand sheet. The quote action stays visible and shortens to “Quote” below sm.
 
 ### Service and process rows
 
