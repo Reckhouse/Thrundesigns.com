@@ -11,7 +11,6 @@ import { resolveFileUrl } from "@/lib/file-asset";
 import type { SanityFileValue } from "@/types/three-experience";
 import { SceneSection } from "@/components/site/scene-section";
 import { ModelStageErrorBoundary } from "@/components/sections/model-stage-error-boundary";
-import { MountainBackdrop } from "@/components/site/mountain-backdrop";
 
 const ModelStageCanvas = dynamic(
   () =>
@@ -158,7 +157,6 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
         className="model-landscape relative h-[58svh] min-h-[320px] w-full cursor-pointer md:h-[68svh]"
         onContextMenu={(event) => event.preventDefault()}
       >
-        <MountainBackdrop />
         {!entries.length ? (
           <p className="p-6 text-center">No models are available yet.</p>
         ) : active ? (

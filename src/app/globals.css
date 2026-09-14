@@ -242,6 +242,8 @@
 }
 /* Approved homepage: Editorial Split / Charcoal & Ivory. */
 .editorial-home {
+  isolation: isolate;
+  --editorial-header-height: 120px;
   background: var(--bg);
 }
 .editorial-container {
@@ -252,20 +254,10 @@
 .editorial-section {
   padding-block: clamp(56px, 6vw, 88px);
 }
-.editorial-home > header {
-  background: var(--bg);
-}
-.editorial-home > header > div {
-  height: 96px;
-}
-.editorial-home > header svg[role="img"],
-.editorial-home > header a[aria-label="Thrun Design Co. home"] > svg {
-  height: 76px;
-}
 .editorial-hero {
   position: relative;
   isolation: isolate;
-  padding-top: 96px;
+  padding-top: var(--editorial-header-height);
   overflow: hidden;
 }
 .editorial-hero-grid {
@@ -277,7 +269,7 @@
   padding-block: 32px 64px;
 }
 .mountain-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
@@ -296,18 +288,11 @@
   inset: 0;
   background: rgb(23 24 22 / 48%);
 }
-.mountain-backdrop--hero .mountain-backdrop-shade {
-  background: linear-gradient(90deg, rgb(23 24 22 / 91%) 0%, rgb(23 24 22 / 78%) 45%, rgb(23 24 22 / 56%) 100%);
+/* A continuous landscape beneath the translucent sections. */
+.editorial-hero {
+  background: linear-gradient(90deg, rgb(23 24 22 / 72%), rgb(23 24 22 / 24%));
 }
-.model-landscape {
-  isolation: isolate;
-  overflow: hidden;
-}
-@media (max-width: 899px) {
-  .mountain-backdrop--hero .mountain-backdrop-shade {
-    background: linear-gradient(180deg, rgb(23 24 22 / 86%) 0%, rgb(23 24 22 / 80%) 50%, rgb(23 24 22 / 58%) 100%);
-  }
-}
+.model-landscape { isolation: isolate; overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .mountain-backdrop-image { transform: none !important; }
 }
@@ -371,7 +356,7 @@
   --fg: #171816;
   --fg-muted: #514d46;
   --line: rgba(23, 24, 22, 0.24);
-  background: var(--contrast);
+  background: rgb(235 231 223 / 90%);
   color: var(--fg);
 }
 .editorial-ivory a:hover {
@@ -437,7 +422,7 @@
   text-underline-offset: 4px;
 }
 .editorial-work {
-  background: var(--bg-deep);
+  background: rgb(12 13 11 / 86%);
 }
 .editorial-work-heading {
   display: flex;
@@ -528,7 +513,7 @@
   margin-bottom: 16px;
 }
 .editorial-close {
-  background: var(--bg-deep);
+  background: rgb(12 13 11 / 86%);
   border-bottom: 1px solid var(--line);
 }
 .editorial-close-grid {
@@ -545,15 +530,15 @@
 }
 .editorial-home .scene-glass,
 .editorial-home .scene-plate {
-  background: var(--bg);
+  background: rgb(23 24 22 / 86%);
   backdrop-filter: none;
   box-shadow: none;
 }
 .editorial-home .scene-light {
-  background: var(--contrast);
+  background: rgb(235 231 223 / 90%);
 }
 .editorial-home section {
-  scroll-margin-top: 96px;
+  scroll-margin-top: var(--editorial-header-height);
 }
 .editorial-home a:focus-visible {
   outline: 2px solid currentColor;
@@ -592,11 +577,8 @@
   }
 }
 @media (max-width: 599px) {
-  .editorial-home > header > div {
-    height: 80px;
-  }
   .editorial-hero {
-    padding-top: 80px;
+    padding-top: var(--editorial-header-height);
   }
   .editorial-hero-grid {
     grid-template-columns: 1fr;
@@ -651,16 +633,13 @@
     font-size: 3rem;
   }
   .editorial-home section {
-    scroll-margin-top: 80px;
+    scroll-margin-top: var(--editorial-header-height);
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .editorial-project:hover img {
     transform: none;
   }
-}
-.editorial-home > header a[aria-label="Thrun Design Co. home"] > img {
-  height: 76px;
 }
 .editorial-horse .horse-engraving {
   inset: -18%;
@@ -672,10 +651,10 @@
   --fg-muted: #514d46;
   --line: rgba(23, 24, 22, 0.24);
   --gold: #71521f;
-  background: var(--contrast);
+  background: rgb(235 231 223 / 90%);
 }
 .editorial-home #engage .scene-glass {
-  background: var(--contrast);
+  background: rgb(235 231 223 / 90%);
 }
 .editorial-home #engage .editorial-panel,
 .editorial-home #about .editorial-panel {
@@ -698,9 +677,6 @@
   }
 }
 /* Review adjustment: let portrait artwork determine its own frame. */
-.editorial-home > header a[aria-label="Thrun Design Co. home"] > img {
-  height: 96px;
-}
 .editorial-gallery {
   grid-template-columns: 1.7fr 0.75fr 0.75fr;
   align-items: start;
@@ -809,13 +785,18 @@
   }
 }
 @media (max-width: 599px) {
-  .editorial-home > header > div {
-    height: 96px;
-  }
   .editorial-hero {
-    padding-top: 96px;
+    padding-top: var(--editorial-header-height);
   }
   .editorial-project-caption h3 {
     font-size: 1.05rem;
   }
+}
+
+.editorial-home #engage .scene-glass { background: transparent; }
+@media (min-width: 768px) {
+  .editorial-home { --editorial-header-height: 136px; }
+}
+@media (min-width: 1024px) {
+  .editorial-home { --editorial-header-height: 152px; }
 }

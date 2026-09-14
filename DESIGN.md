@@ -155,7 +155,7 @@ Editorial Brass (gold) fills quote actions and emphasizes dark-surface content. 
 
 ### Neutral
 
-Deep Charcoal (bg-deep) grounds work and closing bands. Studio Charcoal (bg) is the homepage field and opaque header. Raised Charcoal (bg-raised) and Surface Charcoal (surface) support shared modules. Warm Ivory (contrast) grounds services, process, and inquiry. Cream Ink (fg) and Muted Parchment (fg-muted) serve dark surfaces; Dark Ink (ink), Secondary Ink (ivory-secondary-ink), and Stone Numeral (ivory-numeral) serve light surfaces. Divider colors are contextual: line on dark, ivory-line on light.
+Deep Charcoal (bg-deep) grounds work and closing bands. Studio Charcoal (bg) is the homepage field and translucent scrolled header. Raised Charcoal (bg-raised) and Surface Charcoal (surface) support shared modules. Warm Ivory (contrast) grounds services, process, and inquiry. Cream Ink (fg) and Muted Parchment (fg-muted) serve dark surfaces; Dark Ink (ink), Secondary Ink (ivory-secondary-ink), and Stone Numeral (ivory-numeral) serve light surfaces. Divider colors are contextual: line on dark, ivory-line on light.
 
 **The Surface Contrast Rule.** On ivory, use dark supporting ink and brass ink; do not carry pale dark-surface text into small light-surface text.
 
@@ -181,7 +181,7 @@ Below 900px (max-width: 899px), services and process stack their introduction ab
 
 Below 600px (max-width: 599px), hero, process steps, and close become single columns. The gallery retains its two-column portrait pair below the full-width square lead; secondary captions reduce to 1.05rem. The mobile horse area is 450px tall, reserving 110px for its caption and keyboard controls. Service rows use a 38px number column and 16px gap; process dividers become horizontal.
 
-The fixed homepage header is 96px high at all viewport widths, with a matching hero offset. Section scroll margin remains 96px on larger screens and 80px below 600px. Existing navigation switches to a menu sheet below the shared lg breakpoint (1024px), independently of the homepage layout thresholds.
+The fixed homepage header matches production: 120px on mobile, 136px from 768px, and 152px from 1024px, with matching hero offsets and section scroll margins. Existing navigation switches to a menu sheet below the shared lg breakpoint (1024px), independently of the homepage layout thresholds.
 
 ## Elevation & Depth
 
@@ -203,7 +203,7 @@ Homepage links have a 2px currentColor focus outline offset by 6px. Shared contr
 
 ### Navigation
 
-Preserve the existing brand mark, displayed at 96px high on the homepage. Desktop links use medium uppercase mono, expanding to 14px and 0.17em tracking at lg. Mobile opens a right-hand sheet. The quote action stays visible and shortens to “Quote” below sm.
+Preserve the existing brand mark, displayed at 96px on mobile, 112px from 768px, and 128px from 1024px, matching production. Desktop links use medium uppercase mono, expanding to 14px and 0.17em tracking at lg. Mobile opens a right-hand sheet. The quote action stays visible and shortens to “Quote” below sm.
 
 ### Service and process rows
 
@@ -240,8 +240,8 @@ Portrait images retain intrinsic width/height and use responsive sizes matching 
 ### Don't:
 
 - **Don't** replace CMS artwork or copy with illustrative comp content.
-- **Don't** reintroduce a mountain backdrop or cobalt into the approved homepage.
+- **Don't** introduce cobalt surfaces; use the user-supplied mountain photograph as the continuous backdrop.
 - **Don't** crop secondary gallery compositions to fill their frames.
 - **Don't** treat this homepage handoff as evidence that other routes were redesigned.
 
-The homepage uses the supplied mountain photograph behind the hero and model stage. A bounded scroll displacement (maximum 48px) creates depth; pause freezes it and reduced motion presents a static landscape. The existing typography and horse artwork remain. Dark overlays preserve foreground contrast.
+The homepage uses one fixed, continuous supplied mountain photograph behind all sections. Ivory panels are 90% opaque and charcoal panels 86% opaque; the hero and model stage expose more of the landscape. A bounded scroll displacement (maximum 48px) creates depth; pause freezes it and reduced motion presents a static landscape. The existing typography and horse artwork remain. Dark overlays preserve foreground contrast.

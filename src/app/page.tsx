@@ -1,3 +1,4 @@
+import { MountainBackdrop } from "@/components/site/mountain-backdrop";
 import type { Metadata } from "next";
 import type { SanityImageSource } from "@sanity/image-url";
 import { HeroSection } from "@/components/sections/hero-section";
@@ -217,6 +218,7 @@ export default async function HomePage() {
   return (
     <>
       <div className="editorial-home relative z-10 flex min-h-full flex-1 flex-col">
+        <MountainBackdrop />
         <SiteHeader nav={settings?.nav} />
         <main className="flex-1">
           <HeroSection

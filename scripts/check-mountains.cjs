@@ -13,7 +13,9 @@ const assert = require("node:assert/strict");
         .getByRole("button", { name: "Decline optional", exact: true })
         .click();
       await page.waitForTimeout(3500);
-      const layer = page.locator(".editorial-hero .mountain-backdrop-image");
+      const layer = page.locator(
+        ".editorial-home > .mountain-backdrop .mountain-backdrop-image",
+      );
       const transform = () =>
         layer.evaluate((el) => getComputedStyle(el).transform);
       const before = await transform();
@@ -40,7 +42,7 @@ const assert = require("node:assert/strict");
       });
       assert(
         await page
-          .locator(".editorial-hero .mountain-backdrop img")
+          .locator(".editorial-home > .mountain-backdrop img")
           .evaluate((i) => i.complete && i.naturalWidth > 0),
       );
       await page.locator("#models").scrollIntoViewIfNeeded();
@@ -54,6 +56,24 @@ const assert = require("node:assert/strict");
       await page.screenshot({
         path: ".impeccable/review/mountains-models-" + reducedMotion + ".png",
       });
+      await page.locator("#services").scrollIntoViewIfNeeded();
+      await page.screenshot({
+        path:
+          ".impeccable/review/translucent-services-" + reducedMotion + ".png",
+      });
+      for (const [width, expected] of [
+        [1440, 128],
+        [768, 112],
+        [390, 96],
+      ]) {
+        await page.setViewportSize({ width, height: 844 });
+        assert.equal(
+          await page
+            .locator("header img")
+            .evaluate((i) => i.getBoundingClientRect().height),
+          expected,
+        );
+      }
       await page.setViewportSize({ width: 390, height: 844 });
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.waitForTimeout(300);
