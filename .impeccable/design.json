@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-12T13:39:32.3214970Z",
+  "generatedAt": "2026-09-12T13:39:32.321497Z",
   "title": "Design System: Thrun Design Co.",
   "extensions": {
     "colorMeta": {
@@ -252,7 +252,14 @@
       "gallery": "Desktop: 1.7fr 0.75fr 0.75fr, top aligned. Square coffee lead; natural-aspect portrait artwork without wide frames. Below 900px, the lead spans two columns with a smaller portrait pair beneath, including mobile.",
       "modelStage": "Horizontal in landscape canvas; vertical in portrait canvas. Equal viewport cells fit each model. Stage height 58svh, minimum 320px; 68svh at md.",
       "modelDelivery": "Recognized public GLB assets from the configured Sanity dataset use /api/model-assets/[filename]. Other resolved URLs are unchanged.",
-      "modelStates": "Visible initial and per-model loading, error alert with reload-to-retry, Reset models in normal motion, and paused explanation with model labels for reduced motion."
+      "modelStates": "Visible initial and per-model loading, error alert with reload-to-retry, Reset models, named selection/rotation/removal controls, and stationary models for reduced motion."
+    },
+    "auditRemediation": {
+      "date": "2026-09-14",
+      "targets": "44px minimum mobile link and artwork controls",
+      "motion": "Shared session pause and reduced-motion support; keyboard artwork controls; offscreen model frame gating",
+      "images": "Intrinsic portrait dimensions and column-based sizes",
+      "forms": "Required state, associated errors, first-invalid focus"
     }
   },
   "components": [

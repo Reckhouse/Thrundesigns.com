@@ -3,6 +3,7 @@
 import {
   Suspense,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -199,6 +200,7 @@ export type LivingEngravingLayout = "hero" | "centered";
 
 export type HorseParticlesProps = {
   staticMode?: boolean;
+  rotation?: number;
   /** Hero keeps the right-offset cameo; centered is for lab / case-study embeds. */
   layout?: LivingEngravingLayout;
   /** Base URL for particle buffers (no trailing slash). */
@@ -256,8 +258,7 @@ function useHorseLayout(layout: LivingEngravingLayout) {
   const { viewport } = useThree();
   // Hero: mild right bias so the cameo balances the left copy column
   // without crowding the far edge.
-  const offsetX =
-    layout === "hero" ? Math.min(viewport.width * 0.2, 2.8) : 0;
+  const offsetX = layout === "hero" ? Math.min(viewport.width * 0.2, 2.8) : 0;
   const offsetY = layout === "hero" ? viewport.height * 0.04 : 0;
   const scaleFactor = layout === "hero" ? 0.62 : 0.72;
   const scale = Math.min(
@@ -269,6 +270,7 @@ function useHorseLayout(layout: LivingEngravingLayout) {
 
 function HorseParticleField({
   staticMode = false,
+  rotation = 0,
   layout = "centered",
   assetBaseUrl = DEFAULT_ASSET_BASE,
   posterCapture = false,
@@ -299,7 +301,11 @@ function HorseParticleField({
   });
   const [buffers, setBuffers] = useState<ParticleBuffers | null>(null);
   const [drawCount, setDrawCount] = useState(TIER_STANDARD);
-  const { gl, size, viewport } = useThree();
+  const { gl, size, viewport, invalidate } = useThree();
+  useLayoutEffect(() => {
+    if (groupRef.current) groupRef.current.rotation.y = rotation;
+    invalidate();
+  }, [rotation, invalidate]);
   const { offsetX, offsetY, scale } = useHorseLayout(layout);
   const finePointer = useRef(preferFinePointer());
   const tiltCurrent = useRef({ yaw: 0, pitch: 0 });
@@ -553,7 +559,6 @@ function HorseParticleField({
   useEffect(() => {
     return () => {
       geometry?.dispose();
-      materialRef.current?.dispose();
     };
   }, [geometry]);
 
@@ -581,9 +586,13 @@ function HorseParticleField({
         uGold: { value: new Color(COLOR_GOLD) },
       },
     });
-    materialRef.current = mat;
     return mat;
   }, [posterCapture, staticMode]);
+  useLayoutEffect(() => {
+    materialRef.current = material;
+    invalidate();
+    return () => { materialRef.current = null; material.dispose(); };
+  }, [material, invalidate]);
 
   useFrame((_, delta) => {
     const mat = materialRef.current;
@@ -604,7 +613,8 @@ function HorseParticleField({
     const holding = orbit.current.holding;
     const targetOrbit = holding ? 1 : 0;
     orbit.current.amount +=
-      (targetOrbit - orbit.current.amount) * Math.min(1, delta * (holding ? 5 : 2.2));
+      (targetOrbit - orbit.current.amount) *
+      Math.min(1, delta * (holding ? 5 : 2.2));
     mat.uniforms.uOrbit.value = orbit.current.amount;
 
     // Ease orbit angles back to rest after release
@@ -626,10 +636,7 @@ function HorseParticleField({
       (targetIdle - mat.uniforms.uIdle.value) * Math.min(1, delta * 1.2);
 
     const ptr = pointerLocal.current;
-    const distFromCenter = Math.hypot(
-      ptr.x / HORSE_HALF,
-      ptr.y / HORSE_HALF,
-    );
+    const distFromCenter = Math.hypot(ptr.x / HORSE_HALF, ptr.y / HORSE_HALF);
     const inDeadZone =
       !pointerNdc.current.inside ||
       Math.hypot(pointerNdc.current.x, pointerNdc.current.y) *
@@ -669,7 +676,8 @@ function HorseParticleField({
         : 0;
 
     if (groupRef.current) {
-      groupRef.current.rotation.y = tiltCurrent.current.yaw + idleYaw;
+      groupRef.current.rotation.y =
+        rotation + tiltCurrent.current.yaw + idleYaw;
       groupRef.current.rotation.x = tiltCurrent.current.pitch;
     }
   });
@@ -685,6 +693,7 @@ function HorseParticleField({
 
 export function HorseParticles({
   staticMode = false,
+  rotation = 0,
   layout = "centered",
   assetBaseUrl = DEFAULT_ASSET_BASE,
   preserveDrawingBuffer = false,
@@ -720,7 +729,7 @@ export function HorseParticles({
     };
   }, [sectionRef]);
 
-  const running = staticMode || (tabActive && inView);
+  const running = !staticMode && tabActive && inView;
 
   return (
     <div
@@ -737,14 +746,18 @@ export function HorseParticles({
         }}
         camera={{ position: [0, 0, 6], fov: 40, near: 0.1, far: 50 }}
         dpr={[1, 1.5]}
-        frameloop={running ? "always" : "never"}
+        frameloop={running ? "always" : "demand"}
         onCreated={({ gl }) => {
-          gl.setClearColor(posterCapture ? 0x0c0d0c : 0x000000, posterCapture ? 1 : 0);
+          gl.setClearColor(
+            posterCapture ? 0x0c0d0c : 0x000000,
+            posterCapture ? 1 : 0,
+          );
         }}
       >
         <Suspense fallback={null}>
           <HorseParticleField
             staticMode={staticMode}
+            rotation={rotation}
             layout={layout}
             assetBaseUrl={assetBaseUrl}
             posterCapture={posterCapture}

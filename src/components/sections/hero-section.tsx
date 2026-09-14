@@ -1,6 +1,10 @@
 "use client";
 import { useHydratedReducedMotion as useReducedMotion } from "@/lib/use-hydrated-reduced-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import {
+  MotionToggle,
+  useMotionPreference,
+} from "@/components/site/motion-controls";
 import { stegaClean } from "@sanity/client/stega";
 
 import { PrimaryButtonLink, TextLink } from "@/components/site/primitives";
@@ -26,6 +30,8 @@ export function HeroSection({
       ? primaryCta
       : { href: "/quote", label: "Request a quote" };
   const reduce = useReducedMotion();
+  const { paused } = useMotionPreference();
+  const [rotation, setRotation] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   return (
@@ -58,13 +64,44 @@ export function HeroSection({
         <div className="editorial-horse">
           <HorseParticlesLazy
             layout="centered"
-            staticMode={Boolean(reduce)}
+            staticMode={Boolean(reduce) || paused}
+            rotation={rotation}
             ctaRef={ctaRef}
             sectionRef={sectionRef}
           />
           <span className="editorial-art-caption">
             Living Engraving · Drag to explore
           </span>
+          <div
+            className="art-controls"
+            role="group"
+            aria-label="Horse artwork controls"
+          >
+            <button
+              className="art-control"
+              type="button"
+              aria-label="Rotate horse left"
+              onClick={() => setRotation((v) => v - Math.PI / 12)}
+            >
+              ←
+            </button>
+            <button
+              className="art-control"
+              type="button"
+              aria-label="Rotate horse right"
+              onClick={() => setRotation((v) => v + Math.PI / 12)}
+            >
+              →
+            </button>
+            <button
+              className="art-control"
+              type="button"
+              onClick={() => setRotation(0)}
+            >
+              Reset horse
+            </button>
+            <MotionToggle />
+          </div>
         </div>
       </div>
     </section>

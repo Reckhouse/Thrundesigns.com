@@ -677,9 +677,82 @@
   overflow: visible;
 }
 .editorial-project:not(:first-child) .editorial-project-image img {
-  position: relative !important;
-  width: 100% !important;
-  height: auto !important;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Controls stay outside the artwork and keep their keyboard/touch affordance. */
+.art-control {
+  display: inline-flex;
+  min-height: 44px;
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+.art-control:hover {
+  border-color: var(--gold);
+}
+.art-control:disabled {
+  cursor: default;
+  color: var(--fg-muted);
+}
+.art-controls,
+.model-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.model-controls {
+  padding: 24px;
+}
+.model-controls select {
+  max-width: 100%;
+}
+.editorial-horse {
+  height: 640px;
+}
+.editorial-horse .horse-engraving {
+  top: calc(-18% + 19.8px);
+  bottom: auto;
+  height: calc(136% - 149.6px);
+}
+.editorial-art-caption {
+  bottom: 100px;
+}
+.art-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  justify-content: flex-end;
+}
+@media (max-width: 599px) {
+  .editorial-horse {
+    height: 450px;
+  }
+  .art-controls {
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 899px) {
+  .editorial-home main a:not(.editorial-project),
+  footer a,
+  footer button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .editorial-service-actions {
+    row-gap: 4px;
+  }
 }
 .editorial-project:not(:first-child):hover img {
   transform: none;

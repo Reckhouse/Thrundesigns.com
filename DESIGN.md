@@ -18,6 +18,39 @@ colors:
   ivory-numeral: "#746e64"
   ivory-line: "rgba(23, 24, 22, 0.24)"
 typography:
+  caption:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, sans-serif"
+    fontSize: "0.75rem"
+  action-small:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, sans-serif"
+    fontSize: "0.8125rem"
+  gallery-caption:
+    fontFamily: "Libre Baskerville, Georgia, serif"
+    fontSize: "1.05rem"
+  artifact-title:
+    fontFamily: "Libre Baskerville, Georgia, serif"
+    fontSize: "1.15rem"
+  work-category-title:
+    fontFamily: "Libre Baskerville, Georgia, serif"
+    fontSize: "26px"
+  service-number:
+    fontFamily: "Libre Baskerville, Georgia, serif"
+    fontSize: "2.5rem"
+  process-heading:
+    fontFamily: "Libre Baskerville, Georgia, serif"
+    fontSize: "clamp(2rem, 2.8vw, 2.75rem)"
+  closing-heading:
+    fontFamily: "Libre Baskerville, Georgia, serif"
+    fontSize: "clamp(2.5rem, 4.7vw, 4.5rem)"
+  brand-tablet:
+    fontFamily: "Libre Baskerville, Georgia, serif"
+    fontSize: "clamp(3rem, 7vw, 5rem)"
+  brand-mobile:
+    fontFamily: "Libre Baskerville, Georgia, serif"
+    fontSize: "clamp(3.5rem, 13vw, 4.5rem)"
+  closing-mobile:
+    fontFamily: "Libre Baskerville, Georgia, serif"
+    fontSize: "3rem"
   display:
     fontFamily: "Libre Baskerville, Georgia, serif"
     fontSize: "clamp(3.5rem, 6.65vw, 6rem)"
@@ -146,7 +179,7 @@ The gallery uses three desktop columns at 1.7fr / 0.75fr / 0.75fr, aligned at th
 
 Below 900px (max-width: 899px), services and process stack their introduction above content. The square gallery lead spans both equal columns, with the two smaller portrait works paired beneath it. The hero remains split at 1fr / 0.9fr with a 440px stage.
 
-Below 600px (max-width: 599px), hero, process steps, and close become single columns. The gallery retains its two-column portrait pair below the full-width square lead; secondary captions reduce to 1.05rem. The horse stage is 330px tall and clips stage overflow. Service rows use a 38px number column and 16px gap; process dividers become horizontal.
+Below 600px (max-width: 599px), hero, process steps, and close become single columns. The gallery retains its two-column portrait pair below the full-width square lead; secondary captions reduce to 1.05rem. The mobile horse area is 450px tall, reserving 110px for its caption and keyboard controls. Service rows use a 38px number column and 16px gap; process dividers become horizontal.
 
 The fixed homepage header is 96px high at all viewport widths, with a matching hero offset. Section scroll margin remains 96px on larger screens and 80px below 600px. Existing navigation switches to a menu sheet below the shared lg breakpoint (1024px), independently of the homepage layout thresholds.
 
@@ -164,7 +197,7 @@ Controls and media frames have square corners. The first gallery image uses cove
 
 ### Actions
 
-Primary quote links are brass rectangles with dark text and frontmatter dimensions. Hover changes to bronze and cream and may sweep a translucent highlight across the face. Secondary buttons use a brass outline. Text links pair uppercase mono with an up-right arrow. Service links use underlined sans text (0.8125rem) with a 32px minimum height.
+Primary quote links are brass rectangles with dark text and frontmatter dimensions. Hover changes to bronze and cream and may sweep a translucent highlight across the face. Secondary buttons use a brass outline. Text links pair uppercase mono with an up-right arrow. Service links use underlined sans text (0.8125rem) with a 44px minimum height on mobile.
 
 Homepage links have a 2px currentColor focus outline offset by 6px. Shared controls outside that override retain the global 2px brass outline offset by 3px. Keyboard focus remains visible independently of hover.
 
@@ -182,13 +215,17 @@ Use actual CMS-resolved images and retain concept labels. Secondary featured art
 
 ### Living Engraving and model stage
 
-The draggable particle horse remains the live hero signature, enlarged within its stage. Reduced motion requests staticMode for the horse, stops the marquee and gallery hover transform, and keeps the 3D stage paused with a readable explanation and featured model labels. Global CSS shortens animations and transitions and disables smooth scrolling for reduced motion.
+The draggable particle horse remains the live hero signature, enlarged within its stage. Reduced motion requests staticMode for the horse, stops the marquee and gallery hover transform, and keeps the 3D stage visible and stationary with keyboard rotation and removal controls. Global CSS shortens animations and transitions and disables smooth scrolling for reduced motion.
 
 The 3D stage arranges models horizontally in a landscape canvas and vertically in a portrait canvas, fitting them to equal viewport cells. The stage is 58svh tall with a 320px minimum, increasing to 68svh at md. It displays loading status, an error alert with a reload-to-retry action, and a visible Reset models control during normal motion. Recognized public GLB files from the configured Sanity dataset use the same-origin /api/model-assets/[filename] route; other resolved URLs retain their existing path. The runtime canvas and asset delivery remain application-owned rather than simulated by the design panel.
 
 ### Shared fields
 
 The existing input primitive is square and transparent with a thin border, 44px minimum height, and brass focus border. Disabled and invalid states remain component-owned. This records a shared primitive, not a new homepage form or quote-page redesign.
+
+Homepage artwork controls use 44px minimum targets. Pause animations is shared across the hero, project strip, and model stage and persists for the browser session. Reduced-motion preferences keep automatic movement paused while explicit rotation/removal controls remain usable. Model render loops stop offscreen and in hidden tabs without unloading assets. Horse controls reserve space below the canvas; model controls sit above the stage, never on top of the models.
+
+Portrait images retain intrinsic width/height and use responsive sizes matching their actual columns. Quote fields expose required status and associated errors; invalid Continue actions focus the first failing field.
 
 ## Do's and Don'ts
 

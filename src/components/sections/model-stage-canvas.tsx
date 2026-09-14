@@ -248,15 +248,26 @@ function RotatingModel({
   reduce,
   y,
   target,
+  paused,
+  yaw,
+  hidden,
 }: {
   url: string;
   x: number;
   y: number;
   target: number;
   reduce: boolean;
+  paused: boolean;
+  yaw: number;
+  hidden: boolean;
 }) {
+  const invalidate = useThree((state) => state.invalidate);
   const renderer = useThree((state) => state.gl);
   const group = useRef<THREE.Group>(null);
+  useLayoutEffect(() => {
+    if (group.current) group.current.rotation.y = yaw;
+    invalidate();
+  }, [yaw, hidden, invalidate]);
   const motion = useRef({
     falling: false,
     velocity: new THREE.Vector3(),
@@ -287,6 +298,11 @@ function RotatingModel({
     event.nativeEvent.preventDefault();
     if (event.button !== 0 && event.button !== 2) return;
     const node = group.current;
+    if (paused && node) {
+      node.visible = false;
+      invalidate();
+      return;
+    }
     const state = motion.current;
     if (!node || state.falling) return;
     state.falling = true;
@@ -309,6 +325,7 @@ function RotatingModel({
   };
 
   useFrame((_, delta) => {
+    if (paused) return;
     const node = group.current;
     if (!node) return;
     const state = motion.current;
@@ -328,7 +345,7 @@ function RotatingModel({
   });
 
   return (
-    <group ref={group} position={[x, y, 0]} scale={scale}>
+    <group ref={group} position={[x, y, 0]} scale={scale} visible={!hidden}>
       <Center>
         <group>
           <primitive object={scene} />
@@ -347,7 +364,12 @@ function RotatingModel({
   );
 }
 
-function StageModels({ models }: { models: StageModel[] }) {
+type StageProps = {
+  models: StageModel[];
+  paused: boolean;
+  adjustments: Record<number, { yaw: number; hidden: boolean }>;
+};
+function StageModels({ models, paused, adjustments }: StageProps) {
   const reduce = Boolean(useReducedMotion());
   const { width, height } = useThree((state) => state.viewport);
   const vertical = width < height;
@@ -381,6 +403,9 @@ function StageModels({ models }: { models: StageModel[] }) {
               y={vertical ? -offset : 0}
               target={target}
               reduce={reduce}
+              paused={paused}
+              yaw={adjustments[index]?.yaw ?? 0}
+              hidden={adjustments[index]?.hidden ?? false}
             />
           </Suspense>
         );
@@ -388,9 +413,15 @@ function StageModels({ models }: { models: StageModel[] }) {
     </>
   );
 }
-export function ModelStageCanvas({ models }: { models: StageModel[] }) {
+export function ModelStageCanvas({
+  models,
+  paused,
+  adjustments,
+  visible,
+}: StageProps & { visible: boolean }) {
   return (
     <Canvas
+      frameloop={visible && !paused ? "always" : "demand"}
       className="h-full w-full"
       dpr={[1, 1.25]}
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
@@ -400,7 +431,11 @@ export function ModelStageCanvas({ models }: { models: StageModel[] }) {
       <ambientLight intensity={0.12} />
       <directionalLight position={[4, 8, 6]} intensity={0.55} />
       <directionalLight position={[-5, 2, -3]} intensity={0.18} />
-      <StageModels models={models} />
+      <StageModels
+        models={models}
+        paused={paused || !visible}
+        adjustments={adjustments}
+      />
     </Canvas>
   );
 }

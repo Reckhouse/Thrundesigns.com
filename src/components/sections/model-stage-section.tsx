@@ -3,7 +3,10 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { modelAssetUrl } from "@/lib/model-asset-url";
-import { useHydratedReducedMotion } from "@/lib/use-hydrated-reduced-motion";
+import {
+  MotionToggle,
+  useMotionPreference,
+} from "@/components/site/motion-controls";
 import { resolveFileUrl } from "@/lib/file-asset";
 import type { SanityFileValue } from "@/types/three-experience";
 import { SceneSection } from "@/components/site/scene-section";
@@ -30,7 +33,13 @@ type ModelStageSectionProps = {
 export function ModelStageSection({ models }: ModelStageSectionProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
-  const reducedMotion = useHydratedReducedMotion();
+  const { paused } = useMotionPreference();
+  const [visible, setVisible] = useState(false);
+  const [tabVisible, setTabVisible] = useState(true);
+  const [selected, setSelected] = useState(0);
+  const [adjustments, setAdjustments] = useState<
+    Record<number, { yaw: number; hidden: boolean }>
+  >({});
   const [reset, setReset] = useState(0);
 
   const entries = (models ?? [])
@@ -45,18 +54,31 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
     .filter((item): item is { url: string; label: string } => Boolean(item));
 
   useEffect(() => {
-    if (reducedMotion) return;
     const node = stageRef.current;
     if (!node) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) setActive(true);
+        setVisible(Boolean(entry?.isIntersecting));
       },
-      { rootMargin: "200px 0px", threshold: 0.05 },
+      { threshold: 0.01 },
     );
     observer.observe(node);
-    return () => observer.disconnect();
-  }, [reducedMotion]);
+    const visibility = () =>
+      setTabVisible(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, []);
+
+  function adjust(yaw: number, hidden = false) {
+    setAdjustments((current) => ({
+      ...current,
+      [selected]: { yaw: (current[selected]?.yaw ?? 0) + yaw, hidden },
+    }));
+  }
 
   const aria = entries.length
     ? `Rotating 3D models: ${entries.map((item) => item.label).join(", ")}. Click a model to knock it off the stage.`
@@ -70,32 +92,73 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
       ariaLabel={aria}
       className="border-b-0"
     >
+      {entries.length > 0 && (
+        <div
+          className="model-controls"
+          role="group"
+          aria-label="3D model controls"
+        >
+          <label htmlFor="selected-model">Model</label>
+          <select
+            id="selected-model"
+            className="art-control"
+            value={selected}
+            onChange={(e) => setSelected(Number(e.target.value))}
+          >
+            {entries.map((entry, index) => (
+              <option value={index} key={entry.url}>
+                {entry.label}
+              </option>
+            ))}
+          </select>
+          <button
+            className="art-control"
+            type="button"
+            aria-label="Rotate selected model left"
+            onClick={() => adjust(-Math.PI / 6)}
+          >
+            ←
+          </button>
+          <button
+            className="art-control"
+            type="button"
+            aria-label="Rotate selected model right"
+            onClick={() => adjust(Math.PI / 6)}
+          >
+            →
+          </button>
+          <button
+            className="art-control"
+            type="button"
+            onClick={() => adjust(0, true)}
+          >
+            Remove model
+          </button>
+          <button
+            className="art-control"
+            type="button"
+            onClick={() => {
+              setReset((v) => v + 1);
+              setAdjustments({});
+            }}
+          >
+            Reset models
+          </button>
+          <MotionToggle />
+          <span className="sr-only" role="status">
+            {adjustments[selected]?.hidden
+              ? `${entries[selected]?.label} removed. Reset models to restore it.`
+              : `${entries[selected]?.label} selected.`}
+          </span>
+        </div>
+      )}
       <div
         ref={stageRef}
         className="relative h-[58svh] min-h-[320px] w-full cursor-pointer md:h-[68svh]"
         onContextMenu={(event) => event.preventDefault()}
       >
-        {!reducedMotion && (
-          <button
-            type="button"
-            onClick={() => setReset((value) => value + 1)}
-            className="absolute right-6 top-6 z-20 border border-line bg-bg px-4 py-3 text-sm text-fg hover:border-gold"
-          >
-            Reset models
-          </button>
-        )}
-        {reducedMotion ? (
-          <div className="flex h-full flex-col items-center justify-center gap-4 border border-line bg-bg-raised px-6 text-center">
-            <p className="font-mono text-label uppercase tracking-[0.14em] text-gold">
-              3D stage
-            </p>
-            <p className="max-w-[36ch] text-pretty font-sans text-body text-fg-muted">
-              Interactive models are paused because reduced motion is preferred.
-              {entries.length
-                ? ` Featured pieces: ${entries.map((item) => item.label).join(", ")}.`
-                : null}
-            </p>
-          </div>
+        {!entries.length ? (
+          <p className="p-6 text-center">No models are available yet.</p>
         ) : active ? (
           <ModelStageErrorBoundary
             key={reset}
@@ -117,7 +180,12 @@ export function ModelStageSection({ models }: ModelStageSectionProps) {
               </div>
             }
           >
-            <ModelStageCanvas models={entries} />
+            <ModelStageCanvas
+              models={entries}
+              paused={paused}
+              visible={visible && tabVisible}
+              adjustments={adjustments}
+            />
           </ModelStageErrorBoundary>
         ) : (
           <p

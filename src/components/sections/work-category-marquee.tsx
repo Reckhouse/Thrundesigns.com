@@ -1,5 +1,9 @@
 "use client";
 import { useHydratedReducedMotion as useReducedMotion } from "@/lib/use-hydrated-reduced-motion";
+import {
+  MotionToggle,
+  useMotionPreference,
+} from "@/components/site/motion-controls";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -125,6 +129,7 @@ export function WorkCategoryMarquee({
   durationSeconds = 42,
 }: WorkCategoryMarqueeProps) {
   const reduce = useReducedMotion();
+  const { paused } = useMotionPreference();
 
   if (projects.length === 0) return null;
 
@@ -156,6 +161,9 @@ export function WorkCategoryMarquee({
 
   return (
     <div className="group/marquee flex w-full flex-col gap-4">
+      <div className="px-6">
+        <MotionToggle />
+      </div>
       {label ? (
         <p className="px-5 font-mono text-label uppercase tracking-[0.16em] text-gold md:px-10 lg:px-[74px]">
           {label}
@@ -166,6 +174,7 @@ export function WorkCategoryMarquee({
           className="work-marquee-track flex w-max gap-4 py-1 group-hover/marquee:[animation-play-state:paused] group-focus-within/marquee:[animation-play-state:paused]"
           style={{
             animationDuration: `${durationSeconds}s`,
+            animationPlayState: paused ? "paused" : undefined,
           }}
         >
           <div className="flex gap-4" aria-hidden={false}>
