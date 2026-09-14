@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState, cloneElement, isValidElement } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  cloneElement,
+  isValidElement,
+} from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Turnstile } from "@marsidev/react-turnstile";
@@ -168,7 +174,7 @@ export function QuoteForm({
       ["projectType", "budget", "timeline"],
       ["message"],
     ];
-    const valid = await form.trigger(fields[step]);
+    const valid = await form.trigger(fields[step], { shouldFocus: true });
     if (valid) setStep((s) => Math.min(s + 1, config.stepLabels.length - 1));
   }
 
@@ -201,6 +207,7 @@ export function QuoteForm({
       </div>
 
       <form
+        noValidate
         onSubmit={form.handleSubmit(onSubmit)}
         className="relative border border-line bg-bg-raised p-5 md:p-8"
         autoComplete="on"
@@ -236,6 +243,7 @@ export function QuoteForm({
               <div className="space-y-5">
                 <Field
                   label={config.nameField.label}
+                  required
                   helperText={config.nameField.helperText}
                   error={form.formState.errors.name?.message}
                 >
@@ -247,6 +255,7 @@ export function QuoteForm({
                 </Field>
                 <Field
                   label={config.emailField.label}
+                  required
                   helperText={config.emailField.helperText}
                   error={form.formState.errors.email?.message}
                 >
@@ -274,6 +283,7 @@ export function QuoteForm({
               <div className="space-y-5">
                 <Field
                   label={config.projectTypeField.label}
+                  required
                   helperText={config.projectTypeField.helperText}
                   description={selectedProjectOption?.service?.summary}
                   error={form.formState.errors.projectType?.message}
@@ -292,6 +302,7 @@ export function QuoteForm({
                 </Field>
                 <Field
                   label={config.budgetField.label}
+                  required
                   helperText={config.budgetField.helperText}
                   error={form.formState.errors.budget?.message}
                 >
@@ -309,6 +320,7 @@ export function QuoteForm({
                 </Field>
                 <Field
                   label={config.timelineField.label}
+                  required
                   helperText={config.timelineField.helperText}
                   error={form.formState.errors.timeline?.message}
                 >
@@ -331,15 +343,14 @@ export function QuoteForm({
               <div className="space-y-5">
                 <Field
                   label={config.messageField.label}
+                  required
                   helperText={config.messageField.helperText}
                   error={form.formState.errors.message?.message}
                 >
                   <Textarea
                     rows={6}
                     className="rounded-none border-line bg-bg"
-                    placeholder={
-                      config.messageField.placeholder || undefined
-                    }
+                    placeholder={config.messageField.placeholder || undefined}
                     {...form.register("message")}
                   />
                 </Field>
@@ -437,12 +448,14 @@ export function QuoteForm({
 
 function Field({
   label,
+  required = false,
   helperText,
   description,
   error,
   children,
 }: {
   label: string;
+  required?: boolean;
   helperText?: string | null;
   description?: string | null;
   error?: string;
@@ -456,22 +469,46 @@ function Field({
         className="font-mono text-label uppercase tracking-[0.14em] text-gold"
       >
         {label}
+        {required && <span> (required)</span>}
       </Label>
-      {isValidElement<{ id?: string }>(children)
-        ? cloneElement(children, { id })
+      {isValidElement<{
+        id?: string;
+        required?: boolean;
+        "aria-invalid"?: boolean;
+        "aria-describedby"?: string;
+      }>(children)
+        ? cloneElement(children, {
+            id,
+            required,
+            "aria-invalid": Boolean(error),
+            "aria-describedby":
+              [
+                description && `${id}-description`,
+                helperText && `${id}-help`,
+                error && `${id}-error`,
+              ]
+                .filter(Boolean)
+                .join(" ") || undefined,
+          })
         : children}
       {description ? (
-        <p className="max-w-[42ch] text-pretty font-sans text-sm leading-6 text-fg-muted">
+        <p
+          id={`${id}-description`}
+          className="max-w-[42ch] text-pretty font-sans text-sm leading-6 text-fg-muted"
+        >
           {description}
         </p>
       ) : null}
       {helperText ? (
-        <p className="font-mono text-caption uppercase tracking-[0.12em] text-fg-muted">
+        <p
+          id={`${id}-help`}
+          className="font-mono text-caption uppercase tracking-[0.12em] text-fg-muted"
+        >
           {helperText}
         </p>
       ) : null}
       {error ? (
-        <p className="text-sm text-red-300" role="alert">
+        <p id={`${id}-error`} className="text-sm text-red-300" role="alert">
           {error}
         </p>
       ) : null}

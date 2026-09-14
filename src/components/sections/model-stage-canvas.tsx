@@ -8,11 +8,14 @@ import {
   useThree,
   type ThreeEvent,
 } from "@react-three/fiber";
-import { Center } from "@react-three/drei";
+import { Center, Html } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { GLTFLoader, type GLTFParser } from "three/examples/jsm/loaders/GLTFLoader.js";
+import {
+  GLTFLoader,
+  type GLTFParser,
+} from "three/examples/jsm/loaders/GLTFLoader.js";
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 
@@ -60,7 +63,7 @@ function getKtx2Loader(renderer: THREE.WebGLRenderer) {
       bptcSupported: Boolean(gl.getExtension("EXT_texture_compression_bptc")),
       pvrtcSupported: Boolean(
         gl.getExtension("WEBGL_compressed_texture_pvrtc") ||
-          gl.getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc"),
+        gl.getExtension("WEBKIT_WEBGL_compressed_texture_pvrtc"),
       ),
     };
   }
@@ -129,7 +132,10 @@ function registerBasisuBufferPlugin(loader: GLTFLoader) {
       const promise = parser
         .getDependency("bufferView", sourceDef.bufferView)
         .then((bufferView) =>
-          parseKtx2(ktx2, copyBuffer(bufferView as ArrayBuffer | ArrayBufferView)),
+          parseKtx2(
+            ktx2,
+            copyBuffer(bufferView as ArrayBuffer | ArrayBufferView),
+          ),
         )
         .then((texture) => {
           texture.flipY = false;
@@ -240,13 +246,28 @@ function RotatingModel({
   url,
   x,
   reduce,
+  y,
+  target,
+  paused,
+  yaw,
+  hidden,
 }: {
   url: string;
   x: number;
+  y: number;
+  target: number;
   reduce: boolean;
+  paused: boolean;
+  yaw: number;
+  hidden: boolean;
 }) {
+  const invalidate = useThree((state) => state.invalidate);
   const renderer = useThree((state) => state.gl);
   const group = useRef<THREE.Group>(null);
+  useLayoutEffect(() => {
+    if (group.current) group.current.rotation.y = yaw;
+    invalidate();
+  }, [yaw, hidden, invalidate]);
   const motion = useRef({
     falling: false,
     velocity: new THREE.Vector3(),
@@ -257,28 +278,37 @@ function RotatingModel({
     loader.setKTX2Loader(getKtx2Loader(renderer));
     registerBasisuBufferPlugin(loader);
   });
-  const scale = useMemo(() => fitScale(gltf.scene), [gltf.scene]);
+  const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  const unitScale = useMemo(() => fitScale(scene, 1), [scene]);
+  const scale = unitScale * target;
   const hitSize = useMemo(() => {
-    const size = measureMeshBox(gltf.scene).getSize(new THREE.Vector3());
+    const size = measureMeshBox(scene).getSize(new THREE.Vector3());
     if (size.lengthSq() === 0) size.set(1, 1, 1);
     size.multiplyScalar(1.08);
     return size;
-  }, [gltf.scene]);
+  }, [scene]);
 
   useLayoutEffect(() => {
-    prepareMaterials(gltf.scene);
-    disableMeshRaycast(gltf.scene);
-  }, [gltf.scene]);
+    prepareMaterials(scene);
+    disableMeshRaycast(scene);
+  }, [scene]);
 
   const knockOff = (event: ThreeEvent<PointerEvent>) => {
     event.stopPropagation();
     event.nativeEvent.preventDefault();
     if (event.button !== 0 && event.button !== 2) return;
     const node = group.current;
+    if (paused && node) {
+      node.visible = false;
+      invalidate();
+      return;
+    }
     const state = motion.current;
     if (!node || state.falling) return;
     state.falling = true;
-    const away = event.point.clone().sub(node.getWorldPosition(new THREE.Vector3()));
+    const away = event.point
+      .clone()
+      .sub(node.getWorldPosition(new THREE.Vector3()));
     away.y = 0;
     if (away.lengthSq() < 0.0001) away.set(x >= 0 ? 1 : -1, 0, 0.2);
     away.normalize();
@@ -295,6 +325,7 @@ function RotatingModel({
   };
 
   useFrame((_, delta) => {
+    if (paused) return;
     const node = group.current;
     if (!node) return;
     const state = motion.current;
@@ -314,10 +345,10 @@ function RotatingModel({
   });
 
   return (
-    <group ref={group} position={[x, 0, 0]} scale={scale}>
+    <group ref={group} position={[x, y, 0]} scale={scale} visible={!hidden}>
       <Center>
         <group>
-          <primitive object={gltf.scene} />
+          <primitive object={scene} />
         </group>
       </Center>
       <mesh onPointerDown={knockOff} onContextMenu={knockOff}>
@@ -333,36 +364,78 @@ function RotatingModel({
   );
 }
 
-export function ModelStageCanvas({ models }: { models: StageModel[] }) {
+type StageProps = {
+  models: StageModel[];
+  paused: boolean;
+  adjustments: Record<number, { yaw: number; hidden: boolean }>;
+};
+function StageModels({ models, paused, adjustments }: StageProps) {
   const reduce = Boolean(useReducedMotion());
-  const count = models.length;
-  const span = 8.6;
-  const positions = models.map((_, index) => {
-    if (count <= 1) return 0;
-    return -span / 2 + (span * index) / (count - 1);
-  });
-
+  const { width, height } = useThree((state) => state.viewport);
+  const vertical = width < height;
+  const available = vertical ? height : width;
+  const cell = available / Math.max(1, models.length);
+  const target = Math.min(1.8, cell * 0.65);
+  return (
+    <>
+      {models.map((model, index) => {
+        const offset = (index - (models.length - 1) / 2) * cell;
+        return (
+          <Suspense
+            key={`${model.url}-${index}`}
+            fallback={
+              <Html
+                position={vertical ? [0, -offset, 0] : [offset, 0, 0]}
+                center
+              >
+                <p
+                  role="status"
+                  className="whitespace-nowrap text-sm text-fg-muted"
+                >
+                  Loading {model.label}…
+                </p>
+              </Html>
+            }
+          >
+            <RotatingModel
+              url={model.url}
+              x={vertical ? 0 : offset}
+              y={vertical ? -offset : 0}
+              target={target}
+              reduce={reduce}
+              paused={paused}
+              yaw={adjustments[index]?.yaw ?? 0}
+              hidden={adjustments[index]?.hidden ?? false}
+            />
+          </Suspense>
+        );
+      })}
+    </>
+  );
+}
+export function ModelStageCanvas({
+  models,
+  paused,
+  adjustments,
+  visible,
+}: StageProps & { visible: boolean }) {
   return (
     <Canvas
+      frameloop={visible && !paused ? "always" : "demand"}
       className="h-full w-full"
       dpr={[1, 1.25]}
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
-      camera={{ position: [0, 0.35, 7.2], fov: 32, near: 0.1, far: 40 }}
+      camera={{ position: [0, 0, 7.2], fov: 32, near: 0.1, far: 40 }}
     >
       <StudioEnvironment />
       <ambientLight intensity={0.12} />
       <directionalLight position={[4, 8, 6]} intensity={0.55} />
       <directionalLight position={[-5, 2, -3]} intensity={0.18} />
-      <Suspense fallback={null}>
-        {models.map((model, index) => (
-          <RotatingModel
-            key={`${model.url}-${index}`}
-            url={model.url}
-            x={positions[index] ?? 0}
-            reduce={reduce}
-          />
-        ))}
-      </Suspense>
+      <StageModels
+        models={models}
+        paused={paused || !visible}
+        adjustments={adjustments}
+      />
     </Canvas>
   );
 }

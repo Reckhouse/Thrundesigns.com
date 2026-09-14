@@ -1,3 +1,4 @@
+import { MountainBackdrop } from "@/components/site/mountain-backdrop";
 import type { Metadata } from "next";
 import type { SanityImageSource } from "@sanity/image-url";
 import { HeroSection } from "@/components/sections/hero-section";
@@ -14,7 +15,6 @@ import {
 } from "@/components/sections/model-stage-section";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { MountainScene } from "@/components/site/mountain-scene";
 import { withConceptLabel } from "@/lib/concept-label";
 import { resolveControlledChaosCardSrc } from "@/lib/controlled-chaos-media";
 import { resolveCounterspaceCardSrc } from "@/lib/counterspace-media";
@@ -56,8 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // Prefer CMS SEO when it adds real keywords; ignore thin titles that are
   // only the studio name (those used to erase the stronger default).
   const cmsTitle = seo?.title?.trim() || "";
-  const title =
-    cmsTitle && cmsTitle !== SITE_NAME ? cmsTitle : HOME_PAGE_TITLE;
+  const title = cmsTitle && cmsTitle !== SITE_NAME ? cmsTitle : HOME_PAGE_TITLE;
   const cmsDescription = seo?.description?.trim() || "";
   const description =
     cmsDescription && /colorado\s+springs/i.test(cmsDescription)
@@ -108,18 +107,14 @@ export default async function HomePage() {
   } | null;
 
   const cmsHome = (homeRes.data || null) as
-    | (typeof defaultHomeContent.home & Record<string, unknown>)
-    | null;
+    (typeof defaultHomeContent.home & Record<string, unknown>) | null;
   const defaults = defaultHomeContent.home;
 
   const home = {
     hero: {
       ...defaults.hero,
       ...cmsHome?.hero,
-      primaryCta: pickCta(
-        cmsHome?.hero?.primaryCta,
-        defaults.hero.primaryCta,
-      ),
+      primaryCta: pickCta(cmsHome?.hero?.primaryCta, defaults.hero.primaryCta),
       secondaryCta: pickCta(
         cmsHome?.hero?.secondaryCta,
         defaults.hero.secondaryCta,
@@ -213,23 +208,17 @@ export default async function HomePage() {
   const projects = asArray<(typeof defaultHomeContent.projects)[number]>(
     projectsRes.data,
   );
-  const resolvedProjects = (projects.length
-    ? projects
-    : defaultHomeContent.projects
+  const resolvedProjects = (
+    projects.length ? projects : defaultHomeContent.projects
   ).map((project) => ({
     ...project,
     industry: withConceptLabel(project.industry),
   }));
 
-  const mountainSrc = "/images/hero-mountain.jpg";
-  const mountainAlt =
-    home.hero?.image?.alt ||
-    "Snow-capped mountain ridge under a pale dawn sky";
-
   return (
     <>
-      <MountainScene imageSrc={mountainSrc} />
-      <div className="relative z-10 flex min-h-full flex-1 flex-col">
+      <div className="editorial-home relative z-10 flex min-h-full flex-1 flex-col">
+        <MountainBackdrop />
         <SiteHeader nav={settings?.nav} />
         <main className="flex-1">
           <HeroSection
@@ -239,8 +228,6 @@ export default async function HomePage() {
             servicesMeta={home.hero?.servicesMeta}
             primaryCta={home.hero?.primaryCta}
             secondaryCta={home.hero?.secondaryCta}
-            imageSrc={mountainSrc}
-            imageAlt={mountainAlt}
           />
           <ServicesSection
             heading={home.servicesIntro?.heading}
@@ -263,6 +250,10 @@ export default async function HomePage() {
                 ) || `/images/project-0${index + 1}.jpg`,
             }))}
           />
+          <ProcessSection
+            heading={home.processIntro?.heading}
+            steps={resolvedSteps}
+          />
           <ArtifactSection
             eyebrow={home.artifact?.eyebrow}
             heading={home.artifact?.heading}
@@ -272,10 +263,7 @@ export default async function HomePage() {
             ctaLabel={home.artifact?.ctaLabel}
             ctaHref={home.artifact?.ctaHref}
           />
-          <ProcessSection
-            heading={home.processIntro?.heading}
-            steps={resolvedSteps}
-          />
+
           <EngageSection
             heading={home.engage?.heading}
             engageSteps={home.engage?.steps}
@@ -288,17 +276,18 @@ export default async function HomePage() {
             credibilityHeading={home.whyThrun?.credibilityHeading}
             proofPoints={home.whyThrun?.proofPoints}
           />
-          <FinalCtaSection
-            heading={home.finalCta?.heading}
-            copy={home.finalCta?.copy}
-            primaryCta={home.finalCta?.primaryCta}
-            secondaryCta={home.finalCta?.secondaryCta}
-          />
+
           <ModelStageSection
             models={asArray<HomepageModelItem>(
               (cmsHome as { modelStage?: HomepageModelItem[] } | null)
                 ?.modelStage,
             )}
+          />
+          <FinalCtaSection
+            heading={home.finalCta?.heading}
+            copy={home.finalCta?.copy}
+            primaryCta={home.finalCta?.primaryCta}
+            secondaryCta={home.finalCta?.secondaryCta}
           />
         </main>
         <SiteFooter tagline={settings?.tagline} />

@@ -1,4 +1,5 @@
 "use client";
+import { useHydratedReducedMotion as useReducedMotion } from "@/lib/use-hydrated-reduced-motion";
 
 import Link from "next/link";
 import { stegaClean } from "@sanity/client/stega";
@@ -15,12 +16,7 @@ import {
 import { Magnetic } from "@/components/site/magnetic";
 import { NavLink } from "@/components/site/nav-link";
 import { cn } from "@/lib/utils";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useMotionValueEvent,
-} from "framer-motion";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
 
 const defaultNav = [
@@ -40,9 +36,8 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
       label: item?.label ? stegaClean(item.label) : "",
       href: item?.href ? stegaClean(item.href) : "",
     }))
-    .filter(
-      (item): item is { label: string; href: string } =>
-        Boolean(item.label && item.href),
+    .filter((item): item is { label: string; href: string } =>
+      Boolean(item.label && item.href),
     );
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
@@ -83,8 +78,7 @@ export function SiteHeader({ nav }: SiteHeaderProps) {
           onMouseLeave={() => setHovered(null)}
         >
           {items.map((item, index) => {
-            const dimmed =
-              hovered !== null && hovered !== item.href && !reduce;
+            const dimmed = hovered !== null && hovered !== item.href && !reduce;
             return (
               <motion.div
                 key={item.href}

@@ -4,7 +4,6 @@ import { TextLink } from "@/components/site/primitives";
 import { Reveal, Stagger, StaggerItem } from "@/components/site/reveal";
 import { ClipHeading } from "@/components/site/clip-heading";
 import { SceneSection } from "@/components/site/scene-section";
-import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
   AccordionContent,
@@ -54,13 +53,7 @@ export function EngageSection({
     <SceneSection id="engage" tone="glass" reveal="rise">
       <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:gap-14 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16 lg:px-[74px] lg:py-28">
         <Reveal variant="left">
-          <Badge
-            variant="outline"
-            className="rounded-none border-gold/50 bg-transparent px-2.5 py-1 font-mono text-caption uppercase tracking-[0.16em] text-gold"
-          >
-            Engagement
-          </Badge>
-          <ClipHeading className="mt-5 max-w-lg text-balance font-display text-[clamp(1.75rem,3.5vw,2.65rem)] leading-[1.1] tracking-[-0.02em] text-fg">
+          <ClipHeading className="max-w-lg text-balance font-display text-[clamp(1.75rem,3.5vw,2.65rem)] leading-[1.1] tracking-[-0.02em] text-fg">
             {heading || "How we engage, and what you’ll get in a reply."}
           </ClipHeading>
           <p className="mt-6 max-w-[48ch] text-pretty font-sans text-body leading-7 text-fg-muted md:text-base">
