@@ -243,3 +243,5 @@ Portrait images retain intrinsic width/height and use responsive sizes matching 
 - **Don't** reintroduce a mountain backdrop or cobalt into the approved homepage.
 - **Don't** crop secondary gallery compositions to fill their frames.
 - **Don't** treat this homepage handoff as evidence that other routes were redesigned.
+
+The homepage uses the supplied mountain photograph behind the hero and model stage. A bounded scroll displacement (maximum 48px) creates depth; pause freezes it and reduced motion presents a static landscape. The existing typography and horse artwork remain. Dark overlays preserve foreground contrast.

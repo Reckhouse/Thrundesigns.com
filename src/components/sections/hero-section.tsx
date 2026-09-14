@@ -9,6 +9,7 @@ import { stegaClean } from "@sanity/client/stega";
 
 import { PrimaryButtonLink, TextLink } from "@/components/site/primitives";
 import { HorseParticlesLazy } from "@/components/hero/horse-particles-lazy";
+import { MountainBackdrop } from "@/components/site/mountain-backdrop";
 type HeroSectionProps = {
   eyebrow?: string | null;
   headline?: string | null;
@@ -40,6 +41,7 @@ export function HeroSection({
       className="editorial-hero"
       aria-label="Introduction"
     >
+      <MountainBackdrop hero />
       <div className="editorial-container editorial-hero-grid">
         <div className="editorial-hero-copy">
           <p className="editorial-brand">{eyebrow || "Thrun Design Co."}</p>

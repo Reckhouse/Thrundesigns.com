@@ -263,15 +263,53 @@
   height: 76px;
 }
 .editorial-hero {
+  position: relative;
+  isolation: isolate;
   padding-top: 96px;
   overflow: hidden;
 }
 .editorial-hero-grid {
+  position: relative;
   display: grid;
   grid-template-columns: 1.08fr 1fr;
   align-items: center;
   gap: 16px;
   padding-block: 32px 64px;
+}
+.mountain-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+.mountain-backdrop-image {
+  position: absolute;
+  inset: -64px 0;
+}
+.mountain-backdrop-image img {
+  object-fit: cover;
+  object-position: center 58%;
+}
+.mountain-backdrop-shade {
+  position: absolute;
+  inset: 0;
+  background: rgb(23 24 22 / 48%);
+}
+.mountain-backdrop--hero .mountain-backdrop-shade {
+  background: linear-gradient(90deg, rgb(23 24 22 / 91%) 0%, rgb(23 24 22 / 78%) 45%, rgb(23 24 22 / 56%) 100%);
+}
+.model-landscape {
+  isolation: isolate;
+  overflow: hidden;
+}
+@media (max-width: 899px) {
+  .mountain-backdrop--hero .mountain-backdrop-shade {
+    background: linear-gradient(180deg, rgb(23 24 22 / 86%) 0%, rgb(23 24 22 / 80%) 50%, rgb(23 24 22 / 58%) 100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mountain-backdrop-image { transform: none !important; }
 }
 .editorial-hero-copy {
   position: relative;
