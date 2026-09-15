@@ -221,9 +221,17 @@ editors can click content and jump to the matching field.
 - Locations resolve for Home, Site settings, Projects, Services, Process steps,
   and Quote form
 
-**CORS** (Sanity Manage → API → CORS origins): allow the site origin and
-`http://localhost:3000` with **Allow credentials** enabled so Presentation can
-fetch drafts.
+**CORS** (Sanity Manage → API → CORS origins): allow these origins with
+**Allow credentials** enabled so Presentation, Live Content, and homepage GLB
+fetches from `cdn.sanity.io` work:
+
+- `https://www.thrundesigns.com` (production — required for Model Stage GLBs)
+- `https://thrundesigns.com` (apex; redirects to www)
+- `https://thrundesigns-com.vercel.app` / `https://*.vercel.app` (previews)
+- `http://localhost:3000` (local Next)
+
+Missing the production www origin returns `403 CORS Origin not allowed` on
+`.glb` fetches and leaves the homepage model stage empty.
 
 Redeploy Studio after changing Presentation config:
 
